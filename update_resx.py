@@ -28,3 +28,4 @@ update_resx('src/Roster.Web/Resources/SharedResource.resx', 'CreateGameError', '
 update_resx('src/Roster.Web/Resources/SharedResource.it.resx', 'CreateGameCaptainLabel', 'Abilita capitano')
 update_resx('src/Roster.Web/Resources/SharedResource.it.resx', 'CreateGameCaptainMultiplierLabel', 'Moltiplicatore capitano')
 update_resx('src/Roster.Web/Resources/SharedResource.it.resx', 'CreateGameError', 'Errore: {0}')
+
