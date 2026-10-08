@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Roster.Plugins.Abstractions\Roster.Plugins.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Roster.Plugins.Csv\Roster.Plugins.Csv.csproj" />
+    <ProjectReference Include="..\..\src\Roster.Plugins.Sessionize\Roster.Plugins.Sessionize.csproj" />
+  </ItemGroup>
+</Project>

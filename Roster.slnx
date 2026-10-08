@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Roster.AppHost/Roster.AppHost.csproj" />
+    <Project Path="src/Roster.ServiceDefaults/Roster.ServiceDefaults.csproj" />
+    <Project Path="src/Roster.Domain/Roster.Domain.csproj" />
+    <Project Path="src/Roster.Application/Roster.Application.csproj" />
+    <Project Path="src/Roster.Infrastructure/Roster.Infrastructure.csproj" />
+    <Project Path="src/Roster.Plugins.Abstractions/Roster.Plugins.Abstractions.csproj" />
+    <Project Path="src/Roster.Plugins.Csv/Roster.Plugins.Csv.csproj" />
+    <Project Path="src/Roster.Plugins.Sessionize/Roster.Plugins.Sessionize.csproj" />
+    <Project Path="src/Roster.DomainPacks/Roster.DomainPacks.csproj" />
+    <Project Path="src/Roster.Ui/Roster.Ui.csproj" />
+    <Project Path="src/Roster.Web/Roster.Web.csproj" />
+    <Project Path="src/Roster.Web.Client/Roster.Web.Client.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Roster.Domain.Tests/Roster.Domain.Tests.csproj" />
+    <Project Path="tests/Roster.Application.Tests/Roster.Application.Tests.csproj" />
+    <Project Path="tests/Roster.Plugins.Tests/Roster.Plugins.Tests.csproj" />
+    <Project Path="tests/Roster.Ui.Tests/Roster.Ui.Tests.csproj" />
+    <Project Path="tests/Roster.IntegrationTests/Roster.IntegrationTests.csproj" />
+    <Project Path="tests/Roster.E2E/Roster.E2E.csproj" />
+  </Folder>
+</Solution>
