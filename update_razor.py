@@ -1,4 +1,6 @@
-@page "/organizer/create-game"
+import os
+
+content = """@page "/organizer/create-game"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
@@ -87,9 +89,9 @@
                 <!-- STEP 2: Settings (Name, etc.) -->
                 <div class="cg-step-title">@Loc["CreateGameStep2Title"]</div>
                 
-                <EditForm Model="_state" OnValidSubmit="NextStep">
+                <EditForm Model="_state" OnValidSubmit="NextStep" style="display:flex; flex-direction:column; flex:1;">
                     <DataAnnotationsValidator />
-                    <div style="display:flex; flex-direction:column; gap:16px">
+                    <div style="display:flex; flex-direction:column; gap:16px; flex:1;">
                         <div class="cg-form-group">
                             <label class="cg-label">@Loc["CreateGameNameLabel"]</label>
                             <InputText @bind-Value="_state.Name" class="cg-input" style="border:2px solid var(--color-primary);" />
@@ -134,8 +136,8 @@
                             <i class="icon-calendar-range cg-source-icon"></i>
                             @if(_state.SourceType == "sessionize") { <span class="cg-source-check"><i class="icon-check"></i></span> }
                         </div>
-                        <div class="cg-source-name">Sessionize</div>
-                        <div class="cg-source-desc">Speaker e sessioni dall'API del tuo evento.</div>
+                        <div class="cg-source-name">@Loc["SourceSessionize"]</div>
+                        <div class="cg-source-desc">@Loc["SourceSessionizeDesc"]</div>
                     </div>
                     
                     <div @onclick="@(() => _state.SourceType = "csv")" class="cg-source-card" style="border:@(_state.SourceType == "csv" ? "2px solid var(--color-primary)" : "1px solid var(--color-line)"); background:@(_state.SourceType == "csv" ? "var(--color-primary-tint)" : "var(--color-surface)");">
@@ -143,8 +145,8 @@
                             <i class="icon-file-spreadsheet cg-source-icon"></i>
                             @if(_state.SourceType == "csv") { <span class="cg-source-check"><i class="icon-check"></i></span> }
                         </div>
-                        <div class="cg-source-name">CSV</div>
-                        <div class="cg-source-desc">Una riga per elemento (non ancora supportato nel wizard interamente).</div>
+                        <div class="cg-source-name">@Loc["SourceCSV"]</div>
+                        <div class="cg-source-desc">@Loc["SourceCSVDesc"]</div>
                     </div>
 
                     <div @onclick="@(() => _state.SourceType = "manual")" class="cg-source-card" style="border:@(_state.SourceType == "manual" ? "2px solid var(--color-primary)" : "1px solid var(--color-line)"); background:@(_state.SourceType == "manual" ? "var(--color-primary-tint)" : "var(--color-surface)");">
@@ -152,16 +154,16 @@
                             <i class="icon-pencil-line cg-source-icon"></i>
                             @if(_state.SourceType == "manual") { <span class="cg-source-check"><i class="icon-check"></i></span> }
                         </div>
-                        <div class="cg-source-name">Nessuna</div>
-                        <div class="cg-source-desc">Aggiungerai elementi a mano in seguito.</div>
+                        <div class="cg-source-name">@Loc["SourceNone"]</div>
+                        <div class="cg-source-desc">@Loc["SourceNoneDesc"]</div>
                     </div>
                 </div>
 
                 @if (_state.SourceType == "sessionize")
                 {
                     <div class="cg-form-group" style="margin-top:16px">
-                        <div class="cg-label">ID API Sessionize</div>
-                        <input type="text" @bind="_state.SessionizeApiId" class="cg-input" style="border:2px solid var(--color-primary); background:var(--color-surface); font-family:ui-monospace,monospace" placeholder="e.g. k3x9vq2m" />
+                        <div class="cg-label">@Loc["SessionizeApiId"]</div>
+                        <input type="text" @bind="_state.SessionizeApiId" class="cg-input" style="border:2px solid var(--color-primary); background:var(--color-surface); font-family:ui-monospace,monospace" placeholder="@Loc["SessionizePlaceholder"]" />
                         @if (!string.IsNullOrEmpty(SourceTestResult))
                         {
                             <div class="cg-alert-success"><i class="icon-check"></i>@SourceTestResult</div>
@@ -175,18 +177,18 @@
 
                 <div class="cg-bottom-nav">
                     <button @onclick="PrevStep" class="cg-btn-secondary">@Loc["BtnBack"]</button>
-                    <button @onclick="ValidateSourceAndNext" class="cg-btn-primary">Importa e continua</button>
+                    <button @onclick="ValidateSourceAndNext" class="cg-btn-primary">@Loc["ImportAndContinue"]</button>
                 </div>
             }
             else if (CurrentStep == 4)
             {
                 <!-- STEP 4: Review Elements -->
                 <div class="cg-step-title">@Loc["CreateGameStep4Title"]</div>
-                <div class="cg-step-desc" style="margin-top:6px">@PreviewElements.Count elementi trovati. Invieremo una richiesta di consenso in seguito.</div>
+                <div class="cg-step-desc" style="margin-top:6px">@string.Format(Loc["PreviewElementsCount"], PreviewElements.Count)</div>
                 
                 <div class="cg-list-container">
                     <div class="cg-list-header">
-                        <div>Nome</div><div>Sottotitolo</div><div>Gruppo</div>
+                        <div>@Loc["ColName"]</div><div>@Loc["ColSubtitle"]</div><div>@Loc["ColGroup"]</div>
                     </div>
                     @foreach (var el in PreviewElements)
                     {
@@ -267,9 +269,14 @@
     private bool IsSubmitting = false;
     private string? CreationError;
 
-    private readonly (int Number, string Label)[] Steps = 
+    private (int Number, string Label)[] Steps => new[]
     {
-        (1, "Ambito"), (2, "Impostazioni"), (3, "Sorgente"), (4, "Elementi"), (5, "Regole"), (6, "Pubblica")
+        (1, Loc["StepScope"].ToString()), 
+        (2, Loc["StepSettings"].ToString()), 
+        (3, Loc["StepSource"].ToString()), 
+        (4, Loc["StepElements"].ToString()), 
+        (5, Loc["StepRules"].ToString()), 
+        (6, Loc["StepPublish"].ToString())
     };
 
     protected override void OnInitialized()
@@ -318,13 +325,13 @@
                     var config = new PluginConfig(new Dictionary<string, string> { { "EndpointId", _state.SessionizeApiId } });
                     var result = await plugin.ImportAsync(config, default);
                     PreviewElements = result.Elements.ToList();
-                    SourceTestResult = $"Trovati {PreviewElements.Count} elementi";
+                    SourceTestResult = string.Format(Loc["SessionizeFound"], PreviewElements.Count);
                     NextStep();
                 }
             }
             catch (Exception ex)
             {
-                SourceTestError = "Errore durante l'importazione: " + ex.Message;
+                SourceTestError = string.Format(Loc["SessionizeError"], ex.Message);
             }
         }
         else if (_state.SourceType == "manual")
@@ -334,7 +341,7 @@
         }
         else 
         {
-            SourceTestError = "CSV preview is not implemented in this mockup.";
+            SourceTestError = Loc["SessionizeCsvError"];
         }
     }
 
@@ -378,3 +385,7 @@
         }
     }
 }
+"""
+
+with open("src/Roster.Web/Components/Pages/Organizer/CreateGame.razor", "w", encoding="utf-8") as f:
+    f.write(content)

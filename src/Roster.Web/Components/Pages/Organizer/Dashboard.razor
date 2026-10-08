@@ -1,0 +1,72 @@
+@page "/organizer"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Roster.Application.Ports.Data
+@using Roster.Domain.Games
+@attribute [Authorize]
+@inject IGameRepository GameRepository
+@inject IStringLocalizer<SharedResource> Loc
+
+<PageTitle>@Loc["DashboardTitle"]</PageTitle>
+
+<div class="dashboard-header">
+    <div class="dashboard-title">@Loc["DashboardTitle"]</div>
+    <a href="/organizer/create-game" class="new-game-btn">
+        <i class="icon-plus"></i> @Loc["NewGame"]
+    </a>
+</div>
+
+<div class="game-filters">
+    <div class="filter-chip active">@Loc["FilterAll"]</div>
+    <div class="filter-chip">@Loc["FilterDrafts"]</div>
+    <div class="filter-chip">@Loc["FilterLive"]</div>
+    <div class="filter-chip">@Loc["FilterArchived"]</div>
+</div>
+
+<div class="games-grid">
+    @if (Games == null)
+    {
+        <div>@Loc["Loading"]</div>
+    }
+    else
+    {
+        @foreach (var game in Games)
+        {
+            var isLive = game.State == GameState.Live;
+            var dotColor = isLive ? "var(--color-success)" : "var(--color-ink-2)";
+            var actionText = isLive ? Loc["ManageLive"] : Loc["OpenGame"];
+            var statusText = game.State.ToString(); // Or mapped to IT
+
+            <div class="game-card">
+                <div class="game-status">
+                    <span class="status-dot" style="background: @dotColor"></span>
+                    @statusText
+                    <i class="icon-ellipsis game-menu-icon"></i>
+                </div>
+                <div class="game-name">@game.Name</div>
+                <div class="game-meta">
+                    Pack: @game.DomainPackId
+                </div>
+                <div class="game-footer">
+                    <span>@game.CreatedAt.ToString("MMM yyyy")</span>
+                    <a href="/organizer/games/@game.Id" class="game-action">@actionText</a>
+                </div>
+            </div>
+        }
+    }
+
+    <div class="duplicate-card">
+        <i class="icon-copy"></i>
+        <div class="duplicate-title">@Loc["DuplicateTitle"]</div>
+        <div class="duplicate-desc">@Loc["DuplicateDesc"]</div>
+    </div>
+</div>
+
+@code {
+    private List<Game>? Games;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Games = await GameRepository.GetAllAsync();
+    }
+}

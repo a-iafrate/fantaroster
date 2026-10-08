@@ -1,0 +1,141 @@
+.dashboard-header {
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-title {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.new-game-btn {
+    margin-left: auto;
+    height: 48px;
+    padding: 0 18px;
+    border-radius: 12px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: 800;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.game-filters {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-chip {
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    color: var(--color-ink);
+    border: 1.5px solid var(--color-line-strong);
+    cursor: pointer;
+}
+
+.filter-chip.active {
+    background: var(--color-ink);
+    color: var(--color-bg);
+    border-color: var(--color-ink);
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.game-card {
+    border-radius: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.game-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.game-menu-icon {
+    margin-left: auto;
+    font-size: 20px;
+    color: var(--color-ink-2);
+    cursor: pointer;
+}
+
+.game-name {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.game-meta {
+    font-size: 14px;
+    color: var(--color-ink-2);
+}
+
+.game-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-line);
+    font-size: 13px;
+    color: var(--color-ink-2);
+}
+
+.game-action {
+    font-weight: 800;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.duplicate-card {
+    border-radius: 16px;
+    border: 1.5px dashed var(--color-line-strong);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.duplicate-card i {
+    font-size: 24px;
+    color: var(--color-ink-2);
+}
+
+.duplicate-title {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.duplicate-desc {
+    font-size: 14px;
+    color: var(--color-ink-2);
+}

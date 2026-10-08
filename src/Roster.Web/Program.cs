@@ -14,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+builder.Services.Configure<Roster.Web.Options.BrandOptions>(builder.Configuration.GetSection(Roster.Web.Options.BrandOptions.SectionName));
+
 builder.Services.AddDbContext<RosterDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("sqldb")));
 
@@ -64,10 +66,19 @@ builder.Services.AddHostedService<Roster.Web.Jobs.ResyncBackgroundJob>();
 builder.Services.AddSingleton<Roster.DomainPacks.IDomainPackLoader, Roster.DomainPacks.DomainPackLoader>();
 
 // Add services to the container.
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
+
+var supportedCultures = new[] { "en", "it" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("en")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
