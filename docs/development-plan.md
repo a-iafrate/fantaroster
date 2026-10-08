@@ -127,16 +127,16 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Goal:** the core model and the scoring engine, fully tested, persisted with EF Core.
 
 **Tasks**
-- [ ] Implement entities and value objects in `Roster.Domain`: `Game`, `Element`, `Rule`, `Participant`, `Lineup`, `ScoreEntry`, `Referee`, `SourceBinding`, `ConsentInvitation` (P1 entities `Report` and `SponsorBonus` stubbed).
-- [ ] Implement the game lifecycle (`Draft → Open → Live → Ended → Archived`) with guarded transitions.
-- [ ] Implement lineup rules: size, captain, uniqueness, consent and selectability checks, lock on `Live`.
-- [ ] Implement the **scoring engine** as a pure function: score entries + lineups + multiplier → ranked leaderboard (standard competition ranking).
-- [ ] Use `TimeProvider` for all time-dependent logic.
-- [ ] Unit tests for every rule, transition and scoring edge case (ties, voided entries, captain, personal bonuses, empty lineups).
-- [ ] `RosterDbContext` in `Roster.Infrastructure`: configurations, `RowVersion` concurrency tokens, unique indexes (nickname per game, external ID per binding, idempotency key per game).
-- [ ] First migration; migrations applied by a dedicated step in the AppHost for development.
-- [ ] Repository/query ports in `Roster.Application`; EF Core implementations in `Roster.Infrastructure` (no lazy loading, `AsNoTracking` for reads).
-- [ ] Integration tests against a real SQL Server (Aspire testing or Testcontainers), using fixtures from at least two contexts (people-based and team-based elements).
+- [x] Implement entities and value objects in `Roster.Domain`: `Game`, `Element`, `Rule`, `Participant`, `Lineup`, `ScoreEntry`, `Referee`, `SourceBinding`, `ConsentInvitation` (P1 entities `Report` and `SponsorBonus` stubbed).
+- [x] Implement the game lifecycle (`Draft → Open → Live → Ended → Archived`) with guarded transitions.
+- [x] Implement lineup rules: size, captain, uniqueness, consent and selectability checks, lock on `Live`.
+- [x] Implement the **scoring engine** as a pure function: score entries + lineups + multiplier → ranked leaderboard (standard competition ranking).
+- [x] Use `TimeProvider` for all time-dependent logic.
+- [x] Unit tests for every rule, transition and scoring edge case (ties, voided entries, captain, personal bonuses, empty lineups).
+- [x] `RosterDbContext` in `Roster.Infrastructure`: configurations, `RowVersion` concurrency tokens, unique indexes (nickname per game, external ID per binding, idempotency key per game).
+- [x] First migration; migrations applied by a dedicated step in the AppHost for development.
+- [x] Repository/query ports in `Roster.Application`; EF Core implementations in `Roster.Infrastructure` (no lazy loading, `AsNoTracking` for reads).
+- [x] Integration tests against a real SQL Server (Aspire testing or Testcontainers), using fixtures from at least two contexts (people-based and team-based elements).
 
 **Deliverables:** domain model, scoring engine, database schema.
 

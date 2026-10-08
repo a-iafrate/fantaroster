@@ -1,6 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using Roster.Infrastructure;
+using Roster.Infrastructure.Data;
 using Roster.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
+
+builder.Services.AddDbContext<RosterDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("sqldb")));
+
+builder.Services.AddInfrastructure();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

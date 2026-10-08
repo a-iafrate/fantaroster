@@ -1,0 +1,8 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <!-- CA1707: Identifiers should not contain underscores (violated by test method naming conventions) -->
+    <!-- CA1822: Mark members as static (often annoying in test classes) -->
+    <NoWarn>$(NoWarn);CA1707;CA1822;CA1001;CS0618</NoWarn>
+  </PropertyGroup>
+</Project>
