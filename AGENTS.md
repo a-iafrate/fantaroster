@@ -32,7 +32,7 @@ dotnet build                                   # must produce zero warnings
 dotnet test                                    # all tests
 dotnet test tests/<Project>                    # one test project
 dotnet format --verify-no-changes              # formatting gate used by CI
-dotnet run --project src/Roster.AppHost        # run everything locally (Aspire)
+dotnet run --project src/Roster.Web              # run the web app locally
 dotnet ef migrations add <Name> -p src/Roster.Infrastructure -s src/Roster.Web
 dotnet list package --outdated                 # check for newer stable versions
 dotnet list package --vulnerable               # security gate used by CI

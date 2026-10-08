@@ -10,7 +10,7 @@ public class GameWizardState
     public string DomainPackId { get; set; } = string.Empty;
 
     // Step 2
-    [Required(ErrorMessage = "Name is required")]
+    [Required(ErrorMessage = "NameRequired")]
     public string Name { get; set; } = string.Empty;
     public string Culture { get; set; } = "en";
     public int LineupSize { get; set; } = 3;

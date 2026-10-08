@@ -93,15 +93,18 @@
                         <div class="cg-form-group">
                             <label class="cg-label">@Loc["CreateGameNameLabel"]</label>
                             <InputText @bind-Value="_state.Name" class="cg-input" style="border:2px solid var(--color-primary);" />
-                            <ValidationMessage For="@(() => _state.Name)" style="color:var(--color-danger); font-size:13px;" />
+                            @if (context.GetValidationMessages(() => _state.Name).Any())
+                            {
+                                <div style="color:var(--color-danger); font-size:13px; margin-top:2px;">@Loc[context.GetValidationMessages(() => _state.Name).First()]</div>
+                            }
                         </div>
                         
                         <div class="cg-grid-2">
                             <div class="cg-form-group">
                                 <label class="cg-label">@Loc["CreateGameLanguageLabel"]</label>
                                 <InputSelect @bind-Value="_state.Culture" class="cg-input">
-                                    <option value="en">English</option>
-                                    <option value="it">Italiano</option>
+                                    <option value="en">@Loc["LangEnglish"]</option>
+                                    <option value="it">@Loc["LangItalian"]</option>
                                 </InputSelect>
                             </div>
                             <div class="cg-form-group">
@@ -111,7 +114,7 @@
                         </div>
 
                         <div class="cg-checkbox-group">
-                            <InputCheckbox @bind-Value="_state.CaptainEnabled" id="capt" />
+                            <InputCheckbox @bind-Value="_state.CaptainEnabled" id="capt" class="cg-checkbox" />
                             <label for="capt" class="cg-checkbox-label">@Loc["CreateGameCaptainLabel"]</label>
                         </div>
                     </div>
