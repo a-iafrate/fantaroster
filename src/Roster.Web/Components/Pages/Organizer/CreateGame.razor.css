@@ -169,13 +169,20 @@
 }
 
 .cg-bottom-nav {
-    margin-top: auto;
     display: flex;
     justify-content: space-between;
 }
 
 .cg-bottom-nav.right {
     justify-content: flex-end;
+}
+
+.cg-mt-auto {
+    margin-top: auto;
+}
+
+.cg-mt-40 {
+    margin-top: 40px;
 }
 
 .cg-btn-primary {

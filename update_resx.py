@@ -80,3 +80,4 @@ it_entries = {
 
 add_entries('src/Roster.Web/Resources/SharedResource.en.resx', en_entries)
 add_entries('src/Roster.Web/Resources/SharedResource.it.resx', it_entries)
+

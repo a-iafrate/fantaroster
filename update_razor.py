@@ -389,3 +389,4 @@ content = """@page "/organizer/create-game"
 
 with open("src/Roster.Web/Components/Pages/Organizer/CreateGame.razor", "w", encoding="utf-8") as f:
     f.write(content)
+
