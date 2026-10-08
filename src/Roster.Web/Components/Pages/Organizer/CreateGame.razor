@@ -29,13 +29,9 @@
             {
                 var isDone = step.Number < CurrentStep;
                 var isCurrent = step.Number == CurrentStep;
-                var fg = isCurrent ? "var(--color-ink)" : "var(--color-ink-2)";
-                var bg = isDone || isCurrent ? "var(--color-primary)" : "transparent";
-                var numFg = isDone || isCurrent ? "var(--color-on-primary)" : "var(--color-ink-2)";
-                var bd = isDone || isCurrent ? "none" : "1.5px solid var(--color-line-strong)";
                 
-                <div class="cg-step" style="color:@fg">
-                    <span class="cg-step-num" style="background:@bg; color:@numFg; border:@bd;">
+                <div class="cg-step @(isDone ? "done" : "") @(isCurrent ? "current" : "")">
+                    <span class="cg-step-num">
                         @(isDone ? "✓" : step.Number.ToString())
                     </span>
                     @step.Label
@@ -60,13 +56,10 @@
                     @foreach (var pack in DomainPacks)
                     {
                         var isSelected = _state.DomainPackId == pack.Id;
-                        var border = isSelected ? "2px solid var(--color-primary)" : "1px solid var(--color-line)";
-                        var iconBg = isSelected ? "var(--color-primary)" : "var(--color-surface-2)";
-                        var iconFg = isSelected ? "var(--color-on-primary)" : "var(--color-ink)";
                         var icon = pack.Id == "tech-conference" ? "icon-mic" : pack.Id == "generic" ? "icon-sparkles" : "icon-trophy";
 
-                        <div @onclick="() => SelectDomainPack(pack.Id)" class="cg-pack-card" style="border:@border;">
-                            <div class="cg-pack-icon" style="background:@iconBg; color:@iconFg;">
+                        <div @onclick="() => SelectDomainPack(pack.Id)" class="cg-pack-card @(isSelected ? "selected" : "")">
+                            <div class="cg-pack-icon">
                                 <i class="@icon"></i>
                             </div>
                             <div style="flex:1">
@@ -89,13 +82,13 @@
                 
                 <EditForm Model="_state" OnValidSubmit="NextStep">
                     <DataAnnotationsValidator />
-                    <div style="display:flex; flex-direction:column; gap:16px">
+                    <div class="cg-flex-col-16">
                         <div class="cg-form-group">
                             <label class="cg-label">@Loc["CreateGameNameLabel"]</label>
-                            <InputText @bind-Value="_state.Name" class="cg-input" style="border:2px solid var(--color-primary);" />
+                            <InputText @bind-Value="_state.Name" class="cg-input" />
                             @if (context.GetValidationMessages(() => _state.Name).Any())
                             {
-                                <div style="color:var(--color-danger); font-size:13px; margin-top:2px;">@Loc[context.GetValidationMessages(() => _state.Name).First()]</div>
+                                <div class="cg-validation-msg">@Loc[context.GetValidationMessages(() => _state.Name).First()]</div>
                             }
                         </div>
                         
@@ -117,6 +110,14 @@
                             <InputCheckbox @bind-Value="_state.CaptainEnabled" id="capt" class="cg-checkbox" />
                             <label for="capt" class="cg-checkbox-label">@Loc["CreateGameCaptainLabel"]</label>
                         </div>
+                        
+                        @if (_state.CaptainEnabled)
+                        {
+                            <div class="cg-form-group cg-mt-16">
+                                <label class="cg-label">@Loc["CreateGameCaptainMultiplierLabel"]</label>
+                                <InputNumber @bind-Value="_state.CaptainMultiplier" class="cg-input" step="0.5" />
+                            </div>
+                        }
                     </div>
 
                     <div class="cg-bottom-nav cg-mt-40">
@@ -132,7 +133,7 @@
                 <div class="cg-step-desc">@Loc["CreateGameSourceDesc"]</div>
                 
                 <div class="cg-grid-3">
-                    <div @onclick="@(() => _state.SourceType = "sessionize")" class="cg-source-card" style="border:@(_state.SourceType == "sessionize" ? "2px solid var(--color-primary)" : "1px solid var(--color-line)"); background:@(_state.SourceType == "sessionize" ? "var(--color-primary-tint)" : "var(--color-surface)");">
+                    <div @onclick="@(() => _state.SourceType = "sessionize")" class="cg-source-card @(_state.SourceType == "sessionize" ? "selected" : "")">
                         <div class="cg-source-header">
                             <i class="icon-calendar-range cg-source-icon"></i>
                             @if(_state.SourceType == "sessionize") { <span class="cg-source-check"><i class="icon-check"></i></span> }
@@ -141,7 +142,7 @@
                         <div class="cg-source-desc">@Loc["SourceSessionizeDesc"]</div>
                     </div>
                     
-                    <div @onclick="@(() => _state.SourceType = "csv")" class="cg-source-card" style="border:@(_state.SourceType == "csv" ? "2px solid var(--color-primary)" : "1px solid var(--color-line)"); background:@(_state.SourceType == "csv" ? "var(--color-primary-tint)" : "var(--color-surface)");">
+                    <div @onclick="@(() => _state.SourceType = "csv")" class="cg-source-card @(_state.SourceType == "csv" ? "selected" : "")">
                         <div class="cg-source-header">
                             <i class="icon-file-spreadsheet cg-source-icon"></i>
                             @if(_state.SourceType == "csv") { <span class="cg-source-check"><i class="icon-check"></i></span> }
@@ -150,7 +151,7 @@
                         <div class="cg-source-desc">@Loc["SourceCSVDesc"]</div>
                     </div>
 
-                    <div @onclick="@(() => _state.SourceType = "manual")" class="cg-source-card" style="border:@(_state.SourceType == "manual" ? "2px solid var(--color-primary)" : "1px solid var(--color-line)"); background:@(_state.SourceType == "manual" ? "var(--color-primary-tint)" : "var(--color-surface)");">
+                    <div @onclick="@(() => _state.SourceType = "manual")" class="cg-source-card @(_state.SourceType == "manual" ? "selected" : "")">
                         <div class="cg-source-header">
                             <i class="icon-pencil-line cg-source-icon"></i>
                             @if(_state.SourceType == "manual") { <span class="cg-source-check"><i class="icon-check"></i></span> }
@@ -162,9 +163,9 @@
 
                 @if (_state.SourceType == "sessionize")
                 {
-                    <div class="cg-form-group" style="margin-top:16px">
+                    <div class="cg-form-group cg-mt-16">
                         <div class="cg-label">@Loc["SessionizeApiId"]</div>
-                        <input type="text" @bind="_state.SessionizeApiId" class="cg-input" style="border:2px solid var(--color-primary); background:var(--color-surface); font-family:ui-monospace,monospace" placeholder="@Loc["SessionizePlaceholder"]" />
+                        <input type="text" @bind="_state.SessionizeApiId" class="cg-input cg-input-code" placeholder="@Loc["SessionizePlaceholder"]" />
                         @if (!string.IsNullOrEmpty(SourceTestResult))
                         {
                             <div class="cg-alert-success"><i class="icon-check"></i>@SourceTestResult</div>
@@ -185,7 +186,7 @@
             {
                 <!-- STEP 4: Review Elements -->
                 <div class="cg-step-title">@Loc["CreateGameStep4Title"]</div>
-                <div class="cg-step-desc" style="margin-top:6px">@string.Format(Loc["PreviewElementsCount"], PreviewElements.Count)</div>
+                <div class="cg-step-desc cg-mt-6">@Loc["PreviewElementsCount", PreviewElements.Count]</div>
                 
                 <div class="cg-list-container">
                     <div class="cg-list-header">
@@ -210,18 +211,16 @@
             {
                 <!-- STEP 5: Rules -->
                 <div class="cg-step-title">@Loc["CreateGameStep5Title"]</div>
-                <div class="cg-step-desc" style="margin-top:6px">@Loc["CreateGameRulesDesc"]</div>
+                <div class="cg-step-desc cg-mt-6">@Loc["CreateGameRulesDesc"]</div>
 
-                <div style="display:flex; flex-direction:column; gap:10px;">
+                <div class="cg-flex-col-10">
                     @foreach (var rule in PreviewRules)
                     {
                         var isMalus = rule.Points < 0;
-                        var bg = isMalus ? "var(--color-danger-bg)" : "var(--color-lime)";
-                        var fg = isMalus ? "var(--color-danger)" : "var(--color-on-lime)";
                         
                         <div class="cg-rule-card">
                             <div class="cg-rule-label">@(rule.Label.TryGetValue(_state.Culture, out var l) ? l : rule.Label.Values.FirstOrDefault())</div>
-                            <div class="cg-rule-badge" style="background:@bg; color:@fg;">
+                            <div class="cg-rule-badge @(isMalus ? "malus" : "bonus")">
                                 @(rule.Points > 0 ? "+" : "")@rule.Points
                             </div>
                         </div>
@@ -237,7 +236,7 @@
             {
                 <!-- STEP 6: Publish -->
                 <div class="cg-step-title">@Loc["CreateGameStep6Title"]</div>
-                <div class="cg-step-desc" style="margin-top:6px">@Loc["CreateGamePublishDesc"]</div>
+                <div class="cg-step-desc cg-mt-6">@Loc["CreateGamePublishDesc"]</div>
 
                 @if (!string.IsNullOrEmpty(CreationError))
                 {
@@ -326,13 +325,13 @@
                     var config = new PluginConfig(new Dictionary<string, string> { { "EndpointId", _state.SessionizeApiId } });
                     var result = await plugin.ImportAsync(config, default);
                     PreviewElements = result.Elements.ToList();
-                    SourceTestResult = string.Format(Loc["SessionizeFound"], PreviewElements.Count);
+                    SourceTestResult = Loc["SessionizeFound", PreviewElements.Count];
                     NextStep();
                 }
             }
             catch (Exception ex)
             {
-                SourceTestError = string.Format(Loc["SessionizeError"], ex.Message);
+                SourceTestError = Loc["SessionizeError", ex.Message];
             }
         }
         else if (_state.SourceType == "manual")
@@ -381,7 +380,7 @@
         }
         catch (Exception ex)
         {
-            CreationError = ex.Message;
+            CreationError = Loc["CreateGameError", ex.Message];
             IsSubmitting = false;
         }
     }

@@ -35,7 +35,7 @@
             var isLive = game.State == GameState.Live;
             var dotColor = isLive ? "var(--color-success)" : "var(--color-ink-2)";
             var actionText = isLive ? Loc["ManageLive"] : Loc["OpenGame"];
-            var statusText = game.State.ToString(); // Or mapped to IT
+            var statusText = Loc["State" + game.State.ToString()];
 
             <div class="game-card">
                 <div class="game-status">
