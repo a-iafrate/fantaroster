@@ -11,7 +11,7 @@ using Roster.Infrastructure.Data;
 
 namespace Roster.Web.Jobs;
 
-public sealed class ResyncBackgroundJob : BackgroundService
+public sealed partial class ResyncBackgroundJob : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<ResyncBackgroundJob> _logger;
@@ -32,7 +32,7 @@ public sealed class ResyncBackgroundJob : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred executing resync background job.");
+                LogJobExecutionError(_logger, ex);
             }
 
             await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
@@ -55,14 +55,26 @@ public sealed class ResyncBackgroundJob : BackgroundService
         {
             try
             {
-                _logger.LogInformation("Starting background resync for Game {GameId}, Binding {BindingId}", binding.GameId, binding.Id);
+                LogResyncStarted(_logger, binding.GameId, binding.Id);
                 var result = await resyncService.ResyncGameElementsAsync(binding.GameId, binding.Id, cancellationToken);
-                _logger.LogInformation("Resync finished. Added: {Added}, Updated: {Updated}, Missing: {Missing}", result.AddedCount, result.UpdatedCount, result.MarkedMissingCount);
+                LogResyncFinished(_logger, result.AddedCount, result.UpdatedCount, result.MarkedMissingCount);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to resync binding {BindingId}", binding.Id);
+                LogResyncFailed(_logger, binding.Id, ex);
             }
         }
     }
+
+    [LoggerMessage(LogLevel.Error, "Error occurred executing resync background job.")]
+    private static partial void LogJobExecutionError(ILogger logger, Exception ex);
+
+    [LoggerMessage(LogLevel.Information, "Starting background resync for Game {GameId}, Binding {BindingId}")]
+    private static partial void LogResyncStarted(ILogger logger, Guid gameId, Guid bindingId);
+
+    [LoggerMessage(LogLevel.Information, "Resync finished. Added: {Added}, Updated: {Updated}, Missing: {Missing}")]
+    private static partial void LogResyncFinished(ILogger logger, int added, int updated, int missing);
+
+    [LoggerMessage(LogLevel.Error, "Failed to resync binding {BindingId}")]
+    private static partial void LogResyncFailed(ILogger logger, Guid bindingId, Exception ex);
 }

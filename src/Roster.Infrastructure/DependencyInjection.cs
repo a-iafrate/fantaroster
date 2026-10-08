@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<IParticipantRepository, ParticipantRepository>();
         services.AddScoped<IScoreEntryRepository, ScoreEntryRepository>();
         services.AddScoped<ISourceBindingRepository, SourceBindingRepository>();
+        services.AddScoped<IRuleRepository, RuleRepository>();
 
         services.AddSingleton<IPluginRegistry, PluginRegistry>();
 

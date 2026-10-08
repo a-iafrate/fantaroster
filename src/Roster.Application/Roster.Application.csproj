@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Roster.Domain\Roster.Domain.csproj" />
     <ProjectReference Include="..\Roster.Plugins.Abstractions\Roster.Plugins.Abstractions.csproj" />
+    <ProjectReference Include="..\Roster.DomainPacks\Roster.DomainPacks.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

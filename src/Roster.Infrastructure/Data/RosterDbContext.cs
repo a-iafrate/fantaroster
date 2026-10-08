@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Roster.Domain.Elements;
 using Roster.Domain.Games;
@@ -8,7 +9,7 @@ using Roster.Domain.Sources;
 
 namespace Roster.Infrastructure.Data;
 
-public sealed class RosterDbContext : DbContext
+public sealed class RosterDbContext : IdentityDbContext<OrganizerUser>
 {
     public RosterDbContext(DbContextOptions<RosterDbContext> options) : base(options)
     {
@@ -25,9 +26,9 @@ public sealed class RosterDbContext : DbContext
     public DbSet<SponsorBonus> SponsorBonuses => Set<SponsorBonus>();
     public DbSet<SourceBinding> SourceBindings => Set<SourceBinding>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(RosterDbContext).Assembly);
+        base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(typeof(RosterDbContext).Assembly);
     }
 }

@@ -1,0 +1,32 @@
+{
+  "speakers": [
+    {
+      "id": "abc-123",
+      "firstName": "John",
+      "lastName": "Doe",
+      "fullName": "John Doe",
+      "bio": "A developer.",
+      "tagLine": "Senior Engineer",
+      "profilePicture": "https://example.com/johndoe.jpg"
+    },
+    {
+      "id": "def-456",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "fullName": "Jane Smith",
+      "bio": "Another developer.",
+      "tagLine": "Architect",
+      "profilePicture": "https://example.com/janesmith.jpg"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "sess-999",
+      "title": "Building Awesome APIs",
+      "description": "Learn how to build APIs.",
+      "speakers": ["abc-123"]
+    }
+  ],
+  "rooms": [],
+  "categories": []
+}

@@ -157,7 +157,7 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 - [x] **Sessionize plugin:** typed `HttpClient` with resilience; read `https://sessionize.com/api/v2/{endpointId}/view/All`; map speakers (and optionally sessions) to elements with stable external IDs; surface a clear error when the endpoint is not enabled. Never call undocumented endpoints.
 - [x] Resync service: match by external ID, add/update/mark missing, never delete elements with lineups or points; produce a change summary.
 - [x] Background job for scheduled resync (optional per binding).
-- [ ] **Plugin contract test suite** in `Roster.Plugins.Tests`, run against every plugin with recorded sample data (no live network in CI).
+- [x] **Plugin contract test suite** in `Roster.Plugins.Tests`, run against every plugin with recorded sample data (no live network in CI).
 - [x] Domain packs: JSON schema and loader in `Roster.DomainPacks`; create the `generic` pack first (the foundation), then `tech-conference` (terminology EN/IT, default rules from the project description §6.1, recommended plugins). Add a test-only `amateur-tournament` pack (rules from §6.2) used by tests.
 - [x] Make sure every context-specific UI word (element name in singular/plural, group label, consent wording) is defined by the pack, with sensible defaults in `generic`.
 
@@ -176,8 +176,8 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Goal:** an organizer can create, configure and publish a game from a laptop.
 
 **Tasks**
-- [ ] Organizer authentication: ASP.NET Core Identity with **magic link** sign-in (email via Azure Communication Services; local mail catcher in development); anti-enumeration and rate limiting.
-- [ ] Create-game wizard (labels come from the selected domain pack): choose domain pack → name and settings → connect a source (plugin form generated from `ConfigSchema`) → review imported elements → review and edit rules → publish.
+- [x] Organizer authentication: ASP.NET Core Identity with **magic link** sign-in (email via Azure Communication Services; local mail catcher in development); anti-enumeration and rate limiting.
+- [x] Create-game wizard (labels come from the selected domain pack): choose domain pack → name and settings → connect a source (plugin form generated from `ConfigSchema`) → review imported elements → review and edit rules → publish.
 - [ ] Element management: edit, hide, mark as not selectable, show source state and consent status.
 - [ ] Consent flow: generate consent invitations (link per element, optional email), public consent page (accept/decline), status visible in the console.
 - [ ] Rule editor: add, edit, reorder, delete (only while `Draft`/`Open`); points must be non-zero.
@@ -263,7 +263,7 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Tasks**
 - [ ] Brand resolution middleware and `BrandOptions` (FantaRoster, ImagiRoster); theme token layers per brand; brand assets (logo, icons, social image).
 - [ ] Complete EN and IT resources; culture selection (brand default → user choice); date/number formats.
-- [ ] Import the tokens from `docs/design/tokens/` into `Roster.Ui` and apply the mockups in `docs/design/screens/` to every screen.
+- [ ] Import the tokens from `docs/design/tokens/` into `Roster.Ui` and apply the mockups in `docs/design/screens/` to every screen. *(Login and Public site layouts done)*
 - [ ] Security review: OWASP ASVS L1 checklist, rate limits, input validation, upload policies, signed tokens rotation, security headers, CSP compatible with Blazor.
 - [ ] Privacy: privacy notice and terms (EN, IT), data retention job (photos 30 days after end), organizer data export and deletion.
 - [ ] Accessibility audit (automated with axe in Playwright + manual pass) to WCAG 2.2 AA.

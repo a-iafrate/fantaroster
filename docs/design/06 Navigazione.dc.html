@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.460.0/font/lucide.css">
+<link rel="stylesheet" href="tokens/tokens.css">
+<style>body{margin:0;background:#ECEEF2;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#2B2D42;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}a{color:#5000A5}a:hover{color:#2D0060}[class^="icon-"]{font-style:normal;line-height:1;display:inline-block}</style>
+</helmet>
+
+<section data-screen-label="Intro" style="padding:56px 80px 8px">
+  <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap"><h1 style="margin:0;font-size:40px;font-weight:800;letter-spacing:-1px">Struttura del sito e navigazione</h1><a href="01 Identita e Sistema.dc.html" style="font-size:15px">Sistema</a><a href="02 Partecipante.dc.html" style="font-size:15px">Partecipante</a><a href="03 Arbitro e Organizzatore.dc.html" style="font-size:15px">Arbitro e organizzatore</a><a href="04 Maxischermo e Pubblico.dc.html" style="font-size:15px">Maxischermo e pubblico</a><a href="05 Accesso.dc.html" style="font-size:15px">Accesso</a></div>
+  <p style="margin:10px 0 0;font-size:16px;color:#5C5F73;max-width:1040px;line-height:1.55">Cinque aree con cinque menu diversi, perché chi le usa ha bisogni diversi: il sito pubblico vende, l'organizzatore gestisce, il partecipante gioca, l'arbitro assegna punti, il maxischermo si guarda. Menu, cassetti e selettori qui sotto si aprono e chiudono: tocca hamburger, avatar e selettore partita.</p>
+</section>
+
+<section data-screen-label="Mappa del sito" style="padding:40px 80px 56px;border-top:1px solid #D9DCE3;display:flex;flex-direction:column;gap:20px">
+  <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px">Mappa del sito</div>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;max-width:1880px">
+    <sc-for list="{{ areas }}" as="a" hint-placeholder-count="5">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="border-radius:16px;background:{{ a.bg }};color:{{ a.fg }};padding:18px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px"><i class="{{ a.icon }}" style="font-size:22px"></i><span style="font-size:18px;font-weight:800">{{ a.name }}</span></div>
+          <div style="font-size:13px;line-height:1.45;font-weight:500">{{ a.who }}</div>
+          <div style="font-size:12px;font-weight:700;font-family:ui-monospace,monospace">{{ a.base }}</div>
+        </div>
+        <sc-for list="{{ a.pages }}" as="p" hint-placeholder-count="5">
+          <div style="border-radius:12px;background:#FFFFFF;border:1px solid #E3E5EA;padding:12px 14px;display:flex;flex-direction:column;gap:3px;margin-left:{{ p.indent }}px">
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="font-size:14px;font-weight:700">{{ p.name }}</span><span style="font-size:12px;font-weight:700;color:#5000A5">{{ p.ref }}</span></div>
+            <div style="font-size:12px;color:#5C5F73;font-family:ui-monospace,monospace;word-break:break-all">{{ p.url }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;max-width:1880px">
+    <sc-for list="{{ flows }}" as="f" hint-placeholder-count="4">
+      <div style="border-radius:14px;background:#FFFFFF;border:1px solid #E3E5EA;padding:16px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:14px;font-weight:800">{{ f.title }}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;font-weight:600">
+          <sc-for list="{{ f.steps }}" as="s" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:6px"><span style="padding:4px 9px;border-radius:8px;background:#F1F2F5">{{ s.t }}</span><i class="{{ s.arrow }}" style="color:#5C5F73"></i></span></sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section data-theme="light" data-screen-label="Sito pubblico" style="padding:40px 80px 56px;border-top:1px solid #D9DCE3;display:flex;flex-direction:column;gap:14px">
+  <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px">1. Sito pubblico</div>
+  <div style="display:flex;gap:40px;align-items:flex-start">
+    <div data-screen-label="Pubblico menu mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column;position:relative">
+      <div style="height:48px;padding:0 28px;display:flex;align-items:center;font-size:15px;font-weight:700;flex:none">9:41</div>
+      <div style="height:60px;padding:0 12px 0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--color-line)"><div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div><div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer" onClick="{{ togglePub }}" aria-label="Menu"><i class="{{ pubIcon }}"></i></div></div>
+      <div style="padding:28px 20px;display:flex;flex-direction:column;gap:14px"><div style="font-size:40px;font-weight:800;line-height:1;letter-spacing:-1.5px">Il fanta di qualsiasi cosa</div><div style="font-size:15px;color:var(--color-ink-2);line-height:1.5">Conferenze, matrimoni, tornei. Scegli cosa è in gioco e apri un QR.</div><div style="height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;display:flex;align-items:center;justify-content:center">Crea il tuo fanta</div></div>
+      <sc-if value="{{ pubOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;left:0;right:0;top:108px;bottom:0;background:var(--color-bg);padding:12px 20px 28px;display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ pubLinks }}" as="l" hint-placeholder-count="4"><div style="min-height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--color-line);font-size:20px;font-weight:700">{{ l.t }}<i class="icon-chevron-right" style="color:var(--color-ink-2)"></i></div></sc-for>
+          <div style="display:flex;gap:8px;margin-top:16px"><div style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--color-line-strong);font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px"><i class="icon-globe"></i>Italiano</div><div style="height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--color-line-strong);font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px"><i class="icon-moon"></i>Tema</div></div>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+            <div style="height:56px;border-radius:14px;border:1.5px solid var(--color-line-strong);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-qr-code"></i>Ho un codice partita</div>
+            <div style="height:56px;border-radius:14px;border:1.5px solid var(--color-line-strong);font-weight:700;display:flex;align-items:center;justify-content:center">Accedi</div>
+            <div style="height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;display:flex;align-items:center;justify-content:center">Crea il tuo fanta</div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div data-screen-label="Pubblico header desktop" style="width:1440px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line)">
+        <div style="height:80px;padding:0 72px;display:flex;align-items:center;gap:32px;background:var(--color-surface);border-bottom:1px solid var(--color-line)">
+          <div style="display:flex;align-items:center;gap:10px"><img src="assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain"><span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+          <div style="display:flex;gap:4px;margin-left:24px;font-size:15px;font-weight:600"><sc-for list="{{ pubLinksD }}" as="l" hint-placeholder-count="4"><div style="height:44px;padding:0 14px;border-radius:10px;display:flex;align-items:center;gap:6px;background:{{ l.bg }};color:{{ l.fg }};font-weight:{{ l.fw }}">{{ l.t }}<sc-if value="{{ l.menu }}"><i class="icon-chevron-down" style="font-size:16px"></i></sc-if></div></sc-for></div>
+          <div style="margin-left:auto;display:flex;gap:10px;align-items:center"><div style="height:44px;padding:0 14px;border-radius:12px;display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px"><i class="icon-qr-code"></i>Ho un codice</div><div style="height:44px;padding:0 14px;border-radius:12px;display:flex;align-items:center;font-weight:700;font-size:15px">Accedi</div><div style="height:44px;padding:0 18px;border-radius:12px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:15px;display:flex;align-items:center">Crea il tuo fanta</div></div>
+        </div>
+        <div style="height:300px;position:relative;padding:0 72px">
+          <div style="position:absolute;left:330px;top:8px;width:620px;border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);box-shadow:var(--shadow-overlay);padding:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+            <sc-for list="{{ megaUses }}" as="u" hint-placeholder-count="4"><div style="display:flex;gap:12px;padding:12px;border-radius:12px;background:{{ u.bg }}"><div style="width:44px;height:44px;border-radius:11px;background:var(--color-primary-tint);color:var(--color-link);display:flex;align-items:center;justify-content:center;font-size:22px;flex:none"><i class="{{ u.icon }}"></i></div><div><div style="font-size:15px;font-weight:800">{{ u.t }}</div><div style="font-size:13px;color:var(--color-ink-2);line-height:1.4">{{ u.d }}</div></div></div></sc-for>
+          </div>
+        </div>
+      </div>
+      <div data-screen-label="Pubblico footer desktop" style="width:1440px;flex:none;border-radius:16px;overflow:hidden;background:#1A0033;color:#EDE7F6;padding:48px 72px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:32px">
+        <div style="display:grid;grid-template-columns:minmax(0,1.4fr) repeat(4,minmax(0,1fr));gap:32px">
+          <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;align-items:center;gap:10px"><img src="assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain"><span style="font-size:22px;letter-spacing:-1.1px;color:#FFFFFF"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div><div style="font-size:15px;color:#B3A6CC;line-height:1.5;max-width:300px">Il fanta di qualsiasi cosa. In inglese è <span style="color:#CDB4FF;font-weight:700">imagiroster.com</span></div></div>
+          <sc-for list="{{ footerCols }}" as="col" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:14px;font-weight:800;color:#FFFFFF">{{ col.t }}</div><sc-for list="{{ col.items }}" as="i" hint-placeholder-count="3"><div style="font-size:14px;color:#B3A6CC">{{ i.t }}</div></sc-for></div></sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid #3A2560;font-size:13px;color:#B3A6CC"><span>© 2026 FantaRoster</span><div style="display:flex;gap:10px"><div style="height:36px;padding:0 12px;border-radius:999px;border:1px solid #5A4285;display:flex;align-items:center;gap:6px;font-weight:700"><i class="icon-globe"></i>Italiano</div><div style="height:36px;padding:0 12px;border-radius:999px;border:1px solid #5A4285;display:flex;align-items:center;gap:6px;font-weight:700"><i class="icon-moon"></i>Scuro</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Desktop: 4 voci (Come funziona, Casi d'uso con mega-menu, Esempi, Prezzi) + tre azioni a destra in ordine di peso crescente. Mobile: il menu copre lo schermo, azioni in fondo a portata di pollice. "Ho un codice" è sempre visibile: chi arriva dal passaparola deve entrare in un tocco. Lingua nel footer e nel menu mobile; il dominio sceglie la lingua di default.</div>
+</section>
+
+<section data-theme="light" data-screen-label="Organizzatore" style="padding:40px 80px 56px;border-top:1px solid #D9DCE3;display:flex;flex-direction:column;gap:32px">
+  <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px">2. Area organizzatore: due livelli</div>
+  <div style="font-size:15px;color:#5C5F73;max-width:1040px;line-height:1.55;margin-top:-20px">Livello account (le mie partite, modelli, piano) e livello partita (tutto ciò che riguarda una partita). Il selettore in cima alla barra laterale fa da ponte: mostra la partita corrente e permette di cambiarla o tornare all'elenco.</div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800">2a. Le mie partite (livello account)</div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div data-screen-label="Le mie partite mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column;position:relative">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;font-size:15px;font-weight:700;flex:none">9:41</div>
+        <div style="height:60px;padding:0 12px 0 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div><div style="width:44px;height:44px;border-radius:12px;background:var(--color-avatar-1);color:var(--color-on-avatar-1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">CM</div></div>
+        <div style="padding:8px 20px 100px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><div style="font-size:26px;font-weight:800;letter-spacing:-0.5px">Le mie partite</div></div>
+          <sc-for list="{{ games }}" as="g" hint-placeholder-count="3">
+            <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700"><span style="width:10px;height:10px;border-radius:50%;background:{{ g.dot }}"></span>{{ g.status }}<span style="margin-left:auto;color:var(--color-ink-2);font-weight:600">{{ g.when }}</span></div>
+              <div style="font-size:18px;font-weight:800;line-height:1.25">{{ g.name }}</div>
+              <div style="font-size:13px;color:var(--color-ink-2)">{{ g.meta }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="position:absolute;right:20px;bottom:100px;height:56px;padding:0 20px;border-radius:16px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lift)"><i class="icon-plus"></i>Nuova partita</div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:78px;background:var(--color-surface);border-top:1px solid var(--color-line);display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:14px">
+          <sc-for list="{{ acctTabs }}" as="t" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:{{ t.fw }};color:{{ t.fg }}"><i class="{{ t.icon }}" style="font-size:22px"></i>{{ t.label }}</div></sc-for>
+        </div>
+      </div>
+      <div data-screen-label="Le mie partite desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:grid;grid-template-columns:248px minmax(0,1fr);position:relative">
+        <div style="background:var(--color-surface);border-right:1px solid var(--color-line);padding:24px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 8px 24px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+          <sc-for list="{{ acctNav }}" as="n" hint-placeholder-count="4"><div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:{{ n.fw }};background:{{ n.bg }};color:{{ n.fg }}"><i class="{{ n.icon }}" style="font-size:18px"></i>{{ n.label }}</div></sc-for>
+          <div style="margin-top:auto;padding:14px;border-radius:14px;background:var(--color-primary-tint);display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:800">Piano Gratis</div><div style="font-size:13px;color:var(--color-ink-2);line-height:1.4">1 partita live, fino a 50 giocatori.</div><div style="font-size:14px;font-weight:800;color:var(--color-link)">Passa a Evento</div></div>
+          <div style="height:56px;padding:0 8px;border-radius:12px;display:flex;align-items:center;gap:10px;cursor:pointer;background:{{ acctBg }}" onClick="{{ toggleAcct }}"><div style="width:36px;height:36px;border-radius:9px;background:var(--color-avatar-1);color:var(--color-on-avatar-1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">CM</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Chiara Monti</div><div style="font-size:12px;color:var(--color-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">chiara@dotnetemilia.it</div></div><i class="icon-chevrons-up-down" style="color:var(--color-ink-2)"></i></div>
+        </div>
+        <div style="padding:32px 40px;display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;align-items:center"><div style="font-size:36px;font-weight:800;letter-spacing:-1px">Le mie partite</div><div style="margin-left:auto;height:48px;padding:0 18px;border-radius:12px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px"><i class="icon-plus"></i>Nuova partita</div></div>
+          <div style="display:flex;gap:8px"><sc-for list="{{ gameFilters }}" as="f" hint-placeholder-count="4"><div style="height:36px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:700;display:flex;align-items:center;background:{{ f.bg }};color:{{ f.fg }};border:{{ f.bd }}">{{ f.t }}</div></sc-for></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+            <sc-for list="{{ games }}" as="g" hint-placeholder-count="3">
+              <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:20px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700"><span style="width:10px;height:10px;border-radius:50%;background:{{ g.dot }}"></span>{{ g.status }}<i class="icon-ellipsis" style="margin-left:auto;font-size:20px;color:var(--color-ink-2)"></i></div>
+                <div style="font-size:20px;font-weight:800;line-height:1.25">{{ g.name }}</div>
+                <div style="font-size:14px;color:var(--color-ink-2)">{{ g.meta }}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--color-line);font-size:13px;color:var(--color-ink-2)"><span>{{ g.when }}</span><span style="font-weight:800;color:var(--color-link)">{{ g.action }}</span></div>
+              </div>
+            </sc-for>
+            <div style="border-radius:16px;border:1.5px dashed var(--color-line-strong);padding:20px;display:flex;flex-direction:column;gap:8px;justify-content:center;align-items:flex-start"><i class="icon-copy" style="font-size:24px;color:var(--color-ink-2)"></i><div style="font-size:16px;font-weight:800">Duplica un'edizione</div><div style="font-size:14px;color:var(--color-ink-2)">Riparti da regole ed elementi di una partita passata.</div></div>
+          </div>
+        </div>
+        <sc-if value="{{ acctOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:16px;bottom:84px;width:280px;border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);box-shadow:var(--shadow-overlay);padding:8px;display:flex;flex-direction:column;gap:2px;z-index:5">
+            <sc-for list="{{ acctMenu }}" as="m" hint-placeholder-count="6"><div style="min-height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:{{ m.fg }};border-top:{{ m.sep }}"><i class="{{ m.icon }}" style="font-size:18px"></i><span style="flex:1">{{ m.t }}</span><span style="font-size:13px;color:var(--color-ink-2)">{{ m.val }}</span></div></sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800">2b. Dentro una partita: barra laterale e selettore (cliccabili)</div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div data-screen-label="Partita menu mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column;position:relative">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;font-size:15px;font-weight:700;flex:none">11:40</div>
+        <div style="height:60px;padding:0 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--color-line)"><div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer" onClick="{{ toggleOrg }}" aria-label="Menu"><i class="icon-menu"></i></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--color-ink-2);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-success)"></span>Live</div><div style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Community Day Bologna 2027</div></div><div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px"><i class="icon-monitor"></i></div></div>
+        <div style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px">{{ cur.label }}</div>
+          <div style="font-size:15px;color:var(--color-ink-2);line-height:1.5">{{ cur.desc }}</div>
+          <sc-if value="{{ cur.isOverview }}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><sc-for list="{{ ovStats }}" as="s" hint-placeholder-count="4"><div style="padding:14px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line)"><div style="font-size:26px;font-weight:800">{{ s.v }}</div><div style="font-size:13px;color:var(--color-ink-2)">{{ s.l }}</div></div></sc-for></div></sc-if>
+        </div>
+        <sc-if value="{{ orgOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;inset:0;background:var(--color-scrim);cursor:pointer" onClick="{{ toggleOrg }}"></div>
+          <div style="position:absolute;left:0;top:0;bottom:0;width:320px;background:var(--color-surface);padding:56px 16px 24px;display:flex;flex-direction:column;gap:4px;box-shadow:var(--shadow-overlay)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 12px"><div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div><div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer" onClick="{{ toggleOrg }}" aria-label="Chiudi"><i class="icon-x"></i></div></div>
+            <div style="min-height:56px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:50%;background:var(--color-success)"></span><div style="flex:1;min-width:0;font-size:14px;font-weight:800;line-height:1.3">Community Day Bologna 2027</div><i class="icon-chevrons-up-down" style="color:var(--color-ink-2)"></i></div>
+            <sc-for list="{{ gameNav }}" as="n" hint-placeholder-count="7"><div style="min-height:48px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:12px;font-size:16px;font-weight:{{ n.fw }};background:{{ n.bg }};color:{{ n.fg }};cursor:pointer" onClick="{{ n.goMobile }}"><i class="{{ n.icon }}" style="font-size:20px"></i><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.hasBadge }}"><span style="min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--color-warning-bg);color:var(--color-warning);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ n.badge }}</span></sc-if></div></sc-for>
+            <div style="margin-top:auto;border-top:1px solid var(--color-line);padding-top:12px;display:flex;flex-direction:column;gap:4px">
+              <div style="min-height:48px;padding:0 12px;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600"><i class="icon-arrow-left" style="font-size:20px"></i>Le mie partite</div>
+              <div style="min-height:48px;padding:0 12px;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600"><div style="width:28px;height:28px;border-radius:8px;background:var(--color-avatar-1);color:var(--color-on-avatar-1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px">CM</div>Chiara Monti</div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+      <div data-screen-label="Partita panoramica desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:grid;grid-template-columns:264px minmax(0,1fr);position:relative">
+        <div style="background:var(--color-surface);border-right:1px solid var(--color-line);padding:24px 16px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 8px 20px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+          <div style="min-height:56px;padding:8px 12px;border-radius:12px;border:1.5px solid {{ switchBd }};display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer;background:{{ switchBg }}" onClick="{{ toggleSwitch }}"><span style="width:10px;height:10px;border-radius:50%;background:var(--color-success);flex:none"></span><div style="flex:1;min-width:0;font-size:14px;font-weight:800;line-height:1.3">Community Day Bologna 2027</div><i class="icon-chevrons-up-down" style="color:var(--color-ink-2)"></i></div>
+          <sc-for list="{{ gameNav }}" as="n" hint-placeholder-count="7"><div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:{{ n.fw }};background:{{ n.bg }};color:{{ n.fg }};cursor:pointer" onClick="{{ n.go }}"><i class="{{ n.icon }}" style="font-size:18px"></i><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.hasBadge }}"><span style="min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--color-warning-bg);color:var(--color-warning);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ n.badge }}</span></sc-if></div></sc-for>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:4px">
+            <div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600"><i class="icon-monitor" style="font-size:18px"></i><span style="flex:1">Apri maxischermo</span><i class="icon-external-link" style="font-size:16px;color:var(--color-ink-2)"></i></div>
+            <div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600"><i class="icon-eye" style="font-size:18px"></i><span style="flex:1">Vedi come giocatore</span><i class="icon-external-link" style="font-size:16px;color:var(--color-ink-2)"></i></div>
+            <div style="height:56px;padding:0 8px;border-radius:12px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--color-line);margin-top:8px"><div style="width:36px;height:36px;border-radius:9px;background:var(--color-avatar-1);color:var(--color-on-avatar-1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">CM</div><div style="flex:1;font-size:14px;font-weight:700">Chiara Monti</div><i class="icon-chevrons-up-down" style="color:var(--color-ink-2)"></i></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;min-height:0">
+          <div style="height:64px;flex:none;padding:0 40px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--color-line);font-size:14px;color:var(--color-ink-2);font-weight:600"><span>Le mie partite</span><i class="icon-chevron-right"></i><span>Community Day Bologna 2027</span><i class="icon-chevron-right"></i><span style="color:var(--color-ink);font-weight:800">{{ cur.label }}</span><div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--color-line);color:var(--color-ink)"><span style="width:10px;height:10px;border-radius:50%;background:var(--color-success)"></span>Live, 212 in gioco</div></div>
+          <div style="flex:1;padding:32px 40px;display:flex;flex-direction:column;gap:20px;min-height:0">
+            <div style="display:flex;align-items:flex-end;gap:16px"><div><div style="font-size:36px;font-weight:800;letter-spacing:-1px">{{ cur.label }}</div><div style="font-size:16px;color:var(--color-ink-2);margin-top:4px">{{ cur.desc }}</div></div><div style="margin-left:auto;height:44px;padding:0 16px;border-radius:12px;background:var(--color-primary);color:var(--color-on-primary);font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px"><i class="{{ cur.ctaIcon }}"></i>{{ cur.cta }}</div></div>
+            <sc-if value="{{ cur.isOverview }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:20px">
+                <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px"><sc-for list="{{ ovStats }}" as="s" hint-placeholder-count="4"><div style="padding:20px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line)"><div style="font-size:36px;font-weight:800;letter-spacing:-1px">{{ s.v }}</div><div style="font-size:14px;color:var(--color-ink-2)">{{ s.l }}</div></div></sc-for></div>
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
+                  <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:20px;display:flex;flex-direction:column;gap:10px">
+                    <div style="font-size:16px;font-weight:800">Da sistemare</div>
+                    <sc-for list="{{ todos }}" as="t" hint-placeholder-count="3"><div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--color-line)"><i class="{{ t.icon }}" style="font-size:20px;color:{{ t.fg }}"></i><div style="flex:1;font-size:15px">{{ t.t }}</div><span style="font-size:14px;font-weight:800;color:var(--color-link)">{{ t.go }}</span></div></sc-for>
+                  </div>
+                  <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:20px;display:flex;flex-direction:column;gap:10px">
+                    <div style="font-size:16px;font-weight:800">Ultimi punti</div>
+                    <sc-for list="{{ lastPts }}" as="p" hint-placeholder-count="4"><div style="display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--color-line)"><span style="height:28px;min-width:44px;border-radius:8px;background:{{ p.bg }};color:{{ p.fg }};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">{{ p.pts }}</span><div style="flex:1;font-size:14px"><b>{{ p.who }}</b> <span style="color:var(--color-ink-2)">{{ p.by }}</span></div><span style="font-size:12px;color:var(--color-ink-2)">{{ p.ago }}</span></div></sc-for>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ cur.isOther }}" hint-placeholder-val="{{ false }}">
+              <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:28px;display:flex;gap:20px;align-items:center;max-width:760px">
+                <div style="width:64px;height:64px;border-radius:16px;background:var(--color-primary-tint);color:var(--color-link);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none"><i class="{{ cur.icon }}"></i></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="font-size:18px;font-weight:800">Contenuto della sezione</div><div style="font-size:15px;color:var(--color-ink-2);line-height:1.5">{{ cur.where }}</div></div>
+                <a href="03 Arbitro e Organizzatore.dc.html" style="font-size:15px;font-weight:800">Apri</a>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <sc-if value="{{ switchOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:16px;top:142px;width:340px;border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);box-shadow:var(--shadow-overlay);padding:8px;display:flex;flex-direction:column;gap:2px;z-index:5">
+            <div style="height:44px;border-radius:10px;border:1.5px solid var(--color-line-strong);margin:4px 4px 6px;padding:0 12px;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--color-ink-2)"><i class="icon-search"></i>Cerca partita</div>
+            <sc-for list="{{ switchGames }}" as="g" hint-placeholder-count="3"><div style="min-height:52px;padding:6px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;background:{{ g.bg }}"><span style="width:10px;height:10px;border-radius:50%;background:{{ g.dot }};flex:none"></span><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ g.name }}</div><div style="font-size:12px;color:var(--color-ink-2)">{{ g.status }}</div></div><sc-if value="{{ g.current }}"><i class="icon-check" style="color:var(--color-link)"></i></sc-if></div></sc-for>
+            <div style="border-top:1px solid var(--color-line);margin-top:4px;padding-top:4px;display:flex;flex-direction:column;gap:2px">
+              <div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700"><i class="icon-layout-grid"></i>Tutte le partite</div>
+              <div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--color-link)"><i class="icon-plus"></i>Nuova partita</div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+    <div style="font-size:14px;color:#5C5F73;line-height:1.55">Ordine delle voci = ordine di preparazione (Panoramica, Elementi, Regole, Arbitri, Controllo, Materiali, Impostazioni). I badge segnalano cose da fare (consensi in attesa), mai conteggi informativi. "Apri maxischermo" e "Vedi come giocatore" aprono una nuova scheda. Mobile: cassetto da sinistra, la voce maxischermo resta come icona nella barra in alto. Fino a 1024 px la barra laterale si riduce a sole icone con tooltip.</div>
+  </div>
+</section>
+
+<section data-theme="light" data-screen-label="Partecipante" style="padding:40px 80px 56px;border-top:1px solid #D9DCE3;display:flex;flex-direction:column;gap:14px">
+  <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px">3. Partecipante: tab e menu partita</div>
+  <div style="display:flex;gap:40px;align-items:flex-start">
+    <div data-screen-label="Partecipante menu mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column;position:relative">
+      <div style="height:48px;padding:0 28px;display:flex;align-items:center;font-size:15px;font-weight:700;flex:none">11:42</div>
+      <div style="height:60px;padding:0 12px 0 20px;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--color-ink-2)">Community Day Bologna 2027</div><div style="font-size:24px;font-weight:800;letter-spacing:-0.4px">{{ curTab.label }}</div></div><div style="width:44px;height:44px;border-radius:12px;background:var(--color-avatar-1);color:var(--color-on-avatar-1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;cursor:pointer" onClick="{{ togglePlayer }}" aria-label="Menu partita">AA</div></div>
+      <div style="padding:8px 20px;display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ skel }}" as="s" hint-placeholder-count="6"><div style="height:56px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line);display:flex;align-items:center;gap:10px;padding:0 12px"><div style="width:36px;height:36px;border-radius:9px;background:var(--color-surface-2)"></div><div style="height:12px;width:{{ s.w }}%;border-radius:4px;background:var(--color-surface-2)"></div></div></sc-for>
+      </div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:78px;background:var(--color-surface);border-top:1px solid var(--color-line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:14px">
+        <sc-for list="{{ playerTabs }}" as="t" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:{{ t.fw }};color:{{ t.fg }};cursor:pointer" onClick="{{ t.go }}"><div style="position:relative"><i class="{{ t.icon }}" style="font-size:22px"></i><sc-if value="{{ t.dot }}"><span style="position:absolute;right:-4px;top:-2px;width:10px;height:10px;border-radius:50%;background:var(--color-lime);border:2px solid var(--color-surface)"></span></sc-if></div>{{ t.label }}</div></sc-for>
+      </div>
+      <sc-if value="{{ playerOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;inset:0;background:var(--color-scrim);cursor:pointer" onClick="{{ togglePlayer }}"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;border-radius:24px 24px 0 0;background:var(--color-surface);padding:10px 16px 28px;display:flex;flex-direction:column;gap:2px">
+          <div style="width:40px;height:4px;border-radius:2px;background:var(--color-line-strong);align-self:center;margin-bottom:12px"></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:0 8px 14px"><div style="width:48px;height:48px;border-radius:12px;background:var(--color-avatar-1);color:var(--color-on-avatar-1);display:flex;align-items:center;justify-content:center;font-weight:800">AA</div><div><div style="font-size:17px;font-weight:800">async_awaiter</div><div style="font-size:13px;color:var(--color-ink-2)">5° su 212, 61 punti</div></div></div>
+          <sc-for list="{{ playerMenu }}" as="m" hint-placeholder-count="6"><div style="min-height:52px;padding:0 10px;border-radius:12px;display:flex;align-items:center;gap:12px;font-size:16px;font-weight:600;color:{{ m.fg }};border-top:{{ m.sep }}"><i class="{{ m.icon }}" style="font-size:20px"></i><span style="flex:1">{{ m.t }}</span><span style="font-size:14px;color:var(--color-ink-2)">{{ m.val }}</span></div></sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <div data-screen-label="Partecipante nav desktop" style="width:1440px;height:560px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column;position:relative">
+      <div style="height:72px;flex:none;padding:0 40px;display:flex;align-items:center;gap:24px;border-bottom:1px solid var(--color-line);background:var(--color-surface)">
+        <div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+        <div style="font-size:15px;font-weight:700;color:var(--color-ink-2)">Community Day Bologna 2027</div>
+        <div style="display:flex;gap:28px;margin-left:16px;font-size:15px;height:72px"><sc-for list="{{ playerTabs }}" as="t" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:6px;font-weight:{{ t.fw }};color:{{ t.fg }};border-bottom:3px solid {{ t.line }};cursor:pointer" onClick="{{ t.go }}">{{ t.label }}<sc-if value="{{ t.dot }}"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-lime);border:1.5px solid var(--color-on-lime)"></span></sc-if></div></sc-for></div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--color-line)"><span style="width:10px;height:10px;border-radius:50%;background:var(--color-success)"></span>Live</div>
+        <div style="height:44px;padding:0 6px 0 12px;border-radius:12px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;gap:10px;cursor:pointer" onClick="{{ togglePlayer }}"><span style="font-size:14px;font-weight:700">async_awaiter</span><div style="width:32px;height:32px;border-radius:8px;background:var(--color-avatar-1);color:var(--color-on-avatar-1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px">AA</div></div>
+      </div>
+      <div style="padding:32px 40px"><div style="font-size:36px;font-weight:800;letter-spacing:-1px">{{ curTab.label }}</div></div>
+      <sc-if value="{{ playerOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;right:40px;top:68px;width:300px;border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);box-shadow:var(--shadow-overlay);padding:8px;display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ playerMenu }}" as="m" hint-placeholder-count="6"><div style="min-height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:{{ m.fg }};border-top:{{ m.sep }}"><i class="{{ m.icon }}" style="font-size:18px"></i><span style="flex:1">{{ m.t }}</span><span style="font-size:13px;color:var(--color-ink-2)">{{ m.val }}</span></div></sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Quattro tab fisse in ordine d'uso durante il live. Il pallino lime su "Punti" segnala punti nuovi non visti. Tutto il resto (nickname, regolamento, notifiche, lingua, tema, uscita) sta nel menu dell'avatar. "Esci dalla partita" chiede conferma: la rosa resta salvata per 30 giorni su questo dispositivo. Prima del via le tab si riducono a Rosa e Regole.</div>
+</section>
+
+<section data-theme="dark" data-screen-label="Arbitro e maxischermo" style="padding:40px 80px 80px;border-top:1px solid #D9DCE3;display:flex;flex-direction:column;gap:14px">
+  <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px;color:#2B2D42">4. Arbitro e 5. Maxischermo: navigazione minima</div>
+  <div style="display:flex;gap:40px;align-items:flex-start">
+    <div data-screen-label="Arbitro menu mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column;position:relative">
+      <div style="height:48px;padding:0 28px;display:flex;align-items:center;font-size:15px;font-weight:700;flex:none">11:40</div>
+      <div style="padding:4px 20px 12px;display:flex;align-items:center;gap:10px"><div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--color-ink-2)">Sala B, passo 1 di 3</div><div style="font-size:24px;font-weight:800">Chi ha fatto qualcosa?</div></div><div style="width:64px;height:64px;border-radius:16px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer" onClick="{{ toggleRef }}" aria-label="Menu"><i class="icon-menu"></i></div></div>
+      <div style="padding:4px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px"><sc-for list="{{ refCards }}" as="r" hint-placeholder-count="6"><div style="height:132px;border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line)"></div></sc-for></div>
+      <sc-if value="{{ refOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;inset:0;background:var(--color-scrim);cursor:pointer" onClick="{{ toggleRef }}"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;border-radius:24px 24px 0 0;background:var(--color-surface);padding:10px 16px 28px;display:flex;flex-direction:column;gap:4px">
+          <div style="width:40px;height:4px;border-radius:2px;background:var(--color-line-strong);align-self:center;margin-bottom:12px"></div>
+          <div style="padding:0 8px 12px"><div style="font-size:17px;font-weight:800">Paolo, arbitro Sala B</div><div style="font-size:13px;color:var(--color-ink-2)">Community Day Bologna 2027</div></div>
+          <sc-for list="{{ refMenu }}" as="m" hint-placeholder-count="5"><div style="min-height:64px;padding:0 12px;border-radius:14px;display:flex;align-items:center;gap:14px;font-size:17px;font-weight:700;color:{{ m.fg }};border-top:{{ m.sep }}"><i class="{{ m.icon }}" style="font-size:24px"></i><span style="flex:1">{{ m.t }}</span><span style="font-size:14px;color:var(--color-ink-2)">{{ m.val }}</span></div></sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div data-screen-label="Maxischermo controlli" style="width:1280px;height:720px;flex:none;background:#5000A5;color:#FFFFFF;position:relative;overflow:hidden;border-radius:12px">
+        <div style="height:80px;padding:0 48px;display:flex;align-items:center;gap:16px"><img src="assets/logo-r.svg" alt="" style="width:44px;height:44px;object-fit:contain"><span style="font-size:30px;letter-spacing:-1.5px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span><span style="font-size:24px;font-weight:600;color:#E4D6F7;margin-left:8px">Community Day Bologna 2027</span></div>
+        <div style="padding:0 48px;display:flex;flex-direction:column;gap:12px;width:820px"><sc-for list="{{ stageMini }}" as="s" hint-placeholder-count="6"><div style="height:64px;border-radius:14px;background:#FFFFFF;color:#2B2D42;display:flex;align-items:center;gap:20px;padding:0 24px;font-size:32px;font-weight:700"><b style="font-weight:800;width:40px">{{ s.r }}</b><span style="flex:1">{{ s.n }}</span><b style="font-weight:800">{{ s.p }}</b></div></sc-for></div>
+        <div style="position:absolute;left:50%;bottom:28px;transform:translateX(-50%);height:64px;padding:0 8px;border-radius:18px;background:#1A0033;color:#EDE7F6;display:flex;align-items:center;gap:6px;box-shadow:0 16px 40px rgba(0,0,0,.4)">
+          <sc-for list="{{ stageModes }}" as="m" hint-placeholder-count="3"><div style="height:48px;padding:0 16px;border-radius:12px;display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;background:{{ m.bg }};color:{{ m.fg }}"><i class="{{ m.icon }}"></i>{{ m.t }}</div></sc-for>
+          <div style="width:1px;height:32px;background:#3A2560;margin:0 6px"></div>
+          <div style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px"><i class="icon-pause"></i></div>
+          <div style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px"><i class="icon-maximize"></i></div>
+          <div style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px"><i class="icon-x"></i></div>
+        </div>
+      </div>
+      <div style="font-size:14px;color:#5C5F73;line-height:1.55;max-width:1280px">Maxischermo: nessun menu fisso. La barra compare al movimento del mouse o alla pressione di un tasto e sparisce dopo 3 s. Modalità: Classifica, Entra adesso, Automatico (alterna secondo il programma). Tasti: F schermo intero, Spazio pausa, Esc esci.</div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Arbitro: nessuna barra di navigazione, il compito è uno. Il menu (64 px, in alto a destra) apre un pannello con Punti recenti, Regole, Tema, Aiuto e "Esci dalla console". Il cambio di sala non c'è: il perimetro lo decide il link d'invito.</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const GAME_NAV = [
+  { id:'ov', label:'Panoramica', icon:'icon-layout-dashboard', desc:"Stato della partita e cose da fare.", cta:'Copia link invito', ctaIcon:'icon-link' },
+  { id:'el', label:'Elementi', icon:'icon-users', desc:'Chi è in gioco, sorgente e consensi.', cta:'Aggiungi', ctaIcon:'icon-plus', where:'Tabella elementi con sorgente e consenso: schermata 11.', badge:6 },
+  { id:'ru', label:'Regole', icon:'icon-scale', desc:'Bonus, malus e limiti.', cta:'Nuova regola', ctaIcon:'icon-plus', where:'Elenco regole ordinabile ed editor laterale: schermata 12.' },
+  { id:'re', label:'Arbitri', icon:'icon-flag', desc:'Chi assegna i punti e dove.', cta:'Invita arbitro', ctaIcon:'icon-send', where:'Elenco arbitri con perimetro (sala), stato online e link d\'invito da revocare.' },
+  { id:'co', label:'Controllo', icon:'icon-radio', desc:'Fasi della partita e live.', cta:'Chiudi partita', ctaIcon:'icon-flag', where:'Fasi, statistiche live e bottone di fase: schermata 13.' },
+  { id:'ma', label:'Materiali', icon:'icon-qr-code', desc:'QR, poster, adesivi.', cta:'Stampa poster', ctaIcon:'icon-printer', where:'QR, link, poster A4 e adesivi: schermata 14.' },
+  { id:'se', label:'Impostazioni', icon:'icon-settings', desc:'Nome, date, rose, visibilità.', cta:'Salva', ctaIcon:'icon-check', where:'Nome e date, dimensione rosa, capitano, nascondi totali per elemento, lingua, modalità statica del maxischermo, duplica o elimina partita.' }
+];
+const PLAYER_TABS = [['lb','Classifica','icon-trophy'],['ro','Rosa','icon-layers'],['pt','Punti','icon-activity'],['ru','Regole','icon-book-open']];
+const sel = (a) => ({ bg: a ? 'var(--color-primary-tint)' : 'transparent', fg: a ? 'var(--color-link)' : 'var(--color-ink)', fw: a ? 800 : 600 });
+const area = (name, icon, who, base, bg, fg, pages) => ({ name, icon, who, base, bg, fg, pages: pages.map(([n, url, ref, ind]) => ({ name:n, url, ref: ref || '', indent: ind ? 16 : 0 })) });
+
+class Component extends DCLogic {
+  state = { pubOpen:true, orgOpen:true, switchOpen:true, acctOpen:true, playerOpen:true, refOpen:true, page:'ov', tab:'lb' };
+  t = k => () => this.setState(s => ({ [k]: !s[k] }));
+  renderVals() {
+    const s = this.state;
+    const cur0 = GAME_NAV.find(n => n.id === s.page);
+    const cur = { ...cur0, isOverview: s.page === 'ov', isOther: s.page !== 'ov', where: cur0.where || '' };
+    const gameNav = GAME_NAV.map(n => ({ ...n, ...sel(n.id === s.page), hasBadge: !!n.badge, badge: n.badge || '',
+      go: () => this.setState({ page:n.id, switchOpen:false }), goMobile: () => this.setState({ page:n.id, orgOpen:false }) }));
+    const playerTabs = PLAYER_TABS.map(([id, label, icon]) => { const a = id === s.tab;
+      return { id, label, icon, fg: a ? 'var(--color-link)' : 'var(--color-ink-2)', fw: a ? 800 : 600, line: a ? 'var(--color-primary)' : 'transparent', dot: id === 'pt' && !a, go: () => this.setState({ tab:id }) }; });
+    const menu = (items) => items.map(([t, icon, val, danger, sep]) => ({ t, icon, val: val || '', fg: danger ? 'var(--color-danger)' : 'var(--color-ink)', sep: sep ? '1px solid var(--color-line)' : 'none' }));
+    const games = [
+      { name:'Community Day Bologna 2027', status:'Live', dot:'var(--color-success)', when:'Oggi, 9:30–18:00', meta:'212 giocatori, 25 speaker, 3 arbitri', action:'Apri' },
+      { name:'FantaCalcetto del giovedì', status:'Iscrizioni aperte', dot:'var(--color-info)', when:'Dal 15 ottobre', meta:'38 giocatori, 10 squadre', action:'Apri' },
+      { name:'DevFest Modena 2026', status:'Finita', dot:'var(--color-ink-2)', when:'12 settembre', meta:'164 giocatori, vincitore: DemoGodz', action:'Risultati' }
+    ];
+    return {
+      areas: [
+        area('Sito pubblico','icon-globe','Chi scopre il prodotto','fantaroster.com','#FFFFFF','#2B2D42',[['Home','/','17'],['Come funziona','/come-funziona'],['Casi d\'uso','/casi/conferenze'],['Esempi','/esempi'],['Prezzi','/prezzi'],['Termini e privacy','/legale']]),
+        area('Accesso','icon-key-round','Organizzatore, arbitro','/accedi','#F0E8FA','#2B2D42',[['Accedi o registrati','/accedi','A'],['Controlla la posta','/accedi/inviato','B'],['Link scaduto','/accedi/scaduto','C'],['Invito arbitro','/arbitro/{token}','D'],['Consenso elemento','/consenso/{token}','18']]),
+        area('Organizzatore','icon-layout-dashboard','Chi crea e gestisce','/app','#5000A5','#FFFFFF',[['Le mie partite','/app'],['Nuova partita','/app/nuova','10',true],['Panoramica','/app/g/{id}'],['Elementi','/app/g/{id}/elementi','11',true],['Regole','/app/g/{id}/regole','12',true],['Arbitri','/app/g/{id}/arbitri','',true],['Controllo','/app/g/{id}/controllo','13',true],['Materiali','/app/g/{id}/materiali','14',true],['Impostazioni','/app/g/{id}/impostazioni','',true],['Account e piano','/app/account']]),
+        area('Partecipante','icon-smartphone','Chi gioca, senza account','/j/{codice}','#D4FF00','#2B2D42',[['Ingresso','/j/{codice}','1'],['Rosa','/p/{id}/rosa','2–3'],['Classifica','/p/{id}','4'],['Punti','/p/{id}/punti','5–6'],['Regole','/p/{id}/regole'],['Risultati','/p/{id}/finale','7']]),
+        area('Arbitro e schermo','icon-monitor','Console e proiettore','/arbitro, /schermo','#1A0033','#EDE7F6',[['Console arbitro','/arbitro/{token}/console','8'],['Punti recenti','/arbitro/{token}/recenti','9'],['Maxischermo','/schermo/{id}','15'],['Entra adesso','/schermo/{id}?modo=entra','16']])
+      ],
+      flows: [
+        { title:'Primo organizzatore', steps:['Home','Crea il tuo fanta','Accedi (email)','Link via mail','Nuova partita','Panoramica'] },
+        { title:'Partecipante', steps:['QR o codice','Nickname','Rosa','Attesa','Classifica live','Risultati'] },
+        { title:'Arbitro', steps:['Link d\'invito','Nome','Console','Punti recenti'] },
+        { title:'Elemento in gioco', steps:['Email di consenso','Pagina consenso','Sì / No'] }
+      ].map(f => ({ ...f, steps: f.steps.map((t, i, a) => ({ t, arrow: i < a.length - 1 ? 'icon-arrow-right' : '' })) })),
+      pubOpen: s.pubOpen, pubIcon: s.pubOpen ? 'icon-x' : 'icon-menu', togglePub: this.t('pubOpen'),
+      pubLinks: [{t:'Come funziona'},{t:"Casi d'uso"},{t:'Esempi'},{t:'Prezzi'}],
+      pubLinksD: [{t:'Come funziona'},{t:"Casi d'uso",menu:true,a:true},{t:'Esempi'},{t:'Prezzi'}].map(l => ({ ...l, menu: !!l.menu, ...sel(!!l.a) })),
+      megaUses: [{icon:'icon-mic',t:'Conferenze',d:'Speaker da Sessionize, punti per i momenti dei talk.',a:true},{icon:'icon-heart',t:'Matrimoni',d:'Invitati, discorsi, pista da ballo.'},{icon:'icon-trophy',t:'Tornei amatoriali',d:'Squadre, gol, cartellini.'},{icon:'icon-tv',t:'Serie e reality',d:'Concorrenti, una puntata alla volta.'}].map(u => ({ ...u, bg: u.a ? 'var(--color-surface-2)' : 'transparent' })),
+      footerCols: [
+        { t:'Prodotto', items:[{t:'Come funziona'},{t:'Prezzi'},{t:'Maxischermo'}] },
+        { t:"Casi d'uso", items:[{t:'Conferenze'},{t:'Matrimoni'},{t:'Tornei'}] },
+        { t:'Aiuto', items:[{t:'Guida organizzatori'},{t:'Contatti'},{t:'Stato del servizio'}] },
+        { t:'Legale', items:[{t:'Termini'},{t:'Privacy'},{t:'Cookie'}] }
+      ],
+      games, acctTabs: [['Partite','icon-layout-grid',true],['Modelli','icon-copy'],['Account','icon-user']].map(([label, icon, a]) => ({ label, icon, fg: a ? 'var(--color-link)' : 'var(--color-ink-2)', fw: a ? 800 : 600 })),
+      acctNav: [['Le mie partite','icon-layout-grid',true],['Modelli','icon-copy'],['Piano e fatture','icon-credit-card'],['Aiuto','icon-life-buoy']].map(([label, icon, a]) => ({ label, icon, ...sel(!!a) })),
+      gameFilters: [['Tutte 3',true],['Live 1'],['In preparazione 1'],['Finite 1']].map(([t, a]) => ({ t, bg: a ? 'var(--color-primary)' : 'transparent', fg: a ? 'var(--color-on-primary)' : 'var(--color-ink)', bd: a ? 'none' : '1.5px solid var(--color-line-strong)' })),
+      acctOpen: s.acctOpen, toggleAcct: this.t('acctOpen'), acctBg: s.acctOpen ? 'var(--color-surface-2)' : 'transparent',
+      acctMenu: menu([['Profilo','icon-user'],['Passkey','icon-fingerprint','1 attiva'],['Lingua','icon-globe','Italiano'],['Tema','icon-moon','Sistema'],['Esci','icon-log-out','',false,true]]),
+      orgOpen: s.orgOpen, toggleOrg: this.t('orgOpen'), switchOpen: s.switchOpen, toggleSwitch: this.t('switchOpen'),
+      switchBd: s.switchOpen ? 'var(--color-primary)' : 'var(--color-line-strong)', switchBg: s.switchOpen ? 'var(--color-primary-tint)' : 'transparent',
+      switchGames: games.map((g, i) => ({ ...g, current: i === 0, bg: i === 0 ? 'var(--color-surface-2)' : 'transparent' })),
+      gameNav, cur,
+      ovStats: [{v:212,l:'Giocatori'},{v:47,l:'Punti assegnati'},{v:'18/25',l:'Consensi'},{v:'3/3',l:'Arbitri online'}],
+      todos: [{icon:'icon-clock',fg:'var(--color-warning)',t:'6 speaker non hanno ancora risposto al consenso',go:'Elementi'},{icon:'icon-wifi-off',fg:'var(--color-warning)',t:'Paolo (Sala B) è offline con 2 punti in coda',go:'Arbitri'},{icon:'icon-image-off',fg:'var(--color-ink-2)',t:'2 speaker senza foto',go:'Elementi'}],
+      lastPts: [{pts:'+10',who:'Giulia',by:'da Chiara, Sala A',ago:'2 min'},{pts:'+6',who:'Francesca',by:'da Paolo, Sala B',ago:'4 min'},{pts:'−3',who:'Marco',by:'da Chiara, Sala A',ago:'12 min',neg:true},{pts:'+8',who:'Luca',by:'da Ines, Sala C',ago:'15 min'}].map(p => ({ ...p, bg: p.neg ? 'var(--color-danger-bg)' : 'var(--color-lime)', fg: p.neg ? 'var(--color-danger)' : 'var(--color-on-lime)' })),
+      playerOpen: s.playerOpen, togglePlayer: this.t('playerOpen'), playerTabs, curTab: playerTabs.find(t => t.id === s.tab),
+      playerMenu: menu([['Cambia nickname','icon-pencil-line'],['Notifiche','icon-bell','Attive'],['Lingua','icon-globe','Italiano'],['Tema','icon-moon','Sistema'],['Come si gioca','icon-circle-help','',false,true],['Esci dalla partita','icon-log-out','',true]]),
+      skel: [{w:55},{w:70},{w:45},{w:62},{w:50},{w:66}],
+      refOpen: s.refOpen, toggleRef: this.t('refOpen'), refCards: [1,2,3,4,5,6].map(i => ({ i })),
+      refMenu: menu([['Punti recenti','icon-history','2 in coda'],['Regole','icon-scale'],['Tema','icon-moon','Scuro'],['Aiuto','icon-circle-help'],['Esci dalla console','icon-log-out','',true,true]]),
+      stageMini: [['1','DemoGodz','104'],['2','LaPrimaFila','96'],['3','null_pointer_nonna','91'],['4','Zia Carla','88'],['5','async_awaiter','83'],['6','RubberDuckRita','80']].map(([r,n,p]) => ({ r, n, p })),
+      stageModes: [['Classifica','icon-trophy',true],['Entra adesso','icon-qr-code'],['Automatico','icon-repeat']].map(([t, icon, a]) => ({ t, icon, bg: a ? '#D4FF00' : 'transparent', fg: a ? '#2B2D42' : '#EDE7F6' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

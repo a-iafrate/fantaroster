@@ -1,19 +1,105 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+<div class="pub-layout">
+    <!-- Header -->
+    <header class="pub-header">
+        <div class="pub-header-mobile">
+            <a href="/" class="pub-logo">
+                <img src="/assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain">
+                <span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span>
+            </a>
+            <input type="checkbox" id="pub-menu-toggle" hidden />
+            <label for="pub-menu-toggle" class="pub-menu-btn" aria-label="Menu">
+                <i class="icon-menu icon-open"></i>
+                <i class="icon-x icon-close"></i>
+            </label>
+            <div class="pub-menu-mobile">
+                <div class="pub-menu-mobile-links">
+                    <a href="/come-funziona" class="pub-mobile-link">Come funziona<i class="icon-chevron-right"></i></a>
+                    <a href="/casi/conferenze" class="pub-mobile-link">Casi d'uso<i class="icon-chevron-right"></i></a>
+                    <a href="/esempi" class="pub-mobile-link">Esempi<i class="icon-chevron-right"></i></a>
+                    <a href="/prezzi" class="pub-mobile-link">Prezzi<i class="icon-chevron-right"></i></a>
+                </div>
+                <div class="pub-mobile-settings">
+                    <button class="pub-chip"><i class="icon-globe"></i>Italiano</button>
+                    <button class="pub-chip"><i class="icon-moon"></i>Tema</button>
+                </div>
+                <div class="pub-mobile-actions">
+                    <a href="/j" class="pub-btn-outline"><i class="icon-qr-code"></i>Ho un codice partita</a>
+                    <a href="/login" class="pub-btn-outline">Accedi</a>
+                    <a href="/app/nuova" class="pub-btn-primary">Crea il tuo fanta</a>
+                </div>
+            </div>
         </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
+        <div class="pub-header-desktop">
+            <a href="/" class="pub-logo">
+                <img src="/assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain">
+                <span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span>
+            </a>
+            <div class="pub-nav">
+                <a href="/come-funziona" class="pub-nav-link">Come funziona</a>
+                <a href="/casi/conferenze" class="pub-nav-link">Casi d'uso <i class="icon-chevron-down"></i></a>
+                <a href="/esempi" class="pub-nav-link">Esempi</a>
+                <a href="/prezzi" class="pub-nav-link">Prezzi</a>
+            </div>
+            <div class="pub-actions">
+                <a href="/j" class="pub-btn-text"><i class="icon-qr-code"></i>Ho un codice</a>
+                <a href="/login" class="pub-btn-text">Accedi</a>
+                <a href="/app/nuova" class="pub-btn-primary">Crea il tuo fanta</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pub-main">
+        @Body
     </main>
+
+    <!-- Footer -->
+    <footer class="pub-footer">
+        <div class="pub-footer-content">
+            <div class="pub-footer-brand">
+                <div class="pub-logo-white">
+                    <img src="/assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain">
+                    <span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span>
+                </div>
+                <p class="pub-footer-desc">Il fanta di qualsiasi cosa. In inglese è <span class="pub-footer-highlight">imagiroster.com</span></p>
+            </div>
+            <div class="pub-footer-links">
+                <div class="pub-footer-col">
+                    <h4>Prodotto</h4>
+                    <a href="/come-funziona">Come funziona</a>
+                    <a href="/prezzi">Prezzi</a>
+                    <a href="/schermo">Maxischermo</a>
+                </div>
+                <div class="pub-footer-col">
+                    <h4>Casi d'uso</h4>
+                    <a href="/casi/conferenze">Conferenze</a>
+                    <a href="/casi/matrimoni">Matrimoni</a>
+                    <a href="/casi/tornei">Tornei</a>
+                </div>
+                <div class="pub-footer-col">
+                    <h4>Aiuto</h4>
+                    <a href="/guida">Guida organizzatori</a>
+                    <a href="/contatti">Contatti</a>
+                    <a href="/stato">Stato del servizio</a>
+                </div>
+                <div class="pub-footer-col">
+                    <h4>Legale</h4>
+                    <a href="/termini">Termini</a>
+                    <a href="/privacy">Privacy</a>
+                    <a href="/cookie">Cookie</a>
+                </div>
+            </div>
+        </div>
+        <div class="pub-footer-bottom">
+            <span>© 2026 FantaRoster</span>
+            <div class="pub-footer-settings">
+                <button class="pub-chip-dark"><i class="icon-globe"></i>Italiano</button>
+                <button class="pub-chip-dark"><i class="icon-moon"></i>Scuro</button>
+            </div>
+        </div>
+    </footer>
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>

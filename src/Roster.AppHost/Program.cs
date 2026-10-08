@@ -1,7 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var sql = builder.AddSqlServer("sql")
-                 .AddDatabase("sqldb");
+// var sql = builder.AddSqlServer("sql")
+//                  .AddDatabase("sqldb");
 
 var storage = builder.AddAzureStorage("storage")
                      .RunAsEmulator()
@@ -12,7 +12,7 @@ var mailcatcher = builder.AddContainer("mailcatcher", "mailhog/mailhog")
                          .WithEndpoint(targetPort: 1025, name: "smtp");
 
 builder.AddProject<Projects.Roster_Web>("web")
-       .WithReference(sql)
+       // .WithReference(sql)
        .WithReference(storage)
        .WithEnvironment("Smtp__Host", "localhost")
        .WithEnvironment("Smtp__Port", "1025");

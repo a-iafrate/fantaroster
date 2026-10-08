@@ -1,0 +1,4 @@
+Id;Name;Subtitle;ImageUrl;Group
+t1;Team Alpha;New York;http://alpha.jpg;Group A
+t2;Team Beta;London;http://beta.jpg;Group A
+t3;Team Gamma;;;Group B

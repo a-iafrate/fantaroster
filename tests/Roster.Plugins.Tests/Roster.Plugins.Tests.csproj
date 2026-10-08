@@ -10,6 +10,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="NSubstitute" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
@@ -18,5 +20,10 @@
     <ProjectReference Include="..\..\src\Roster.Plugins.Abstractions\Roster.Plugins.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Roster.Plugins.Csv\Roster.Plugins.Csv.csproj" />
     <ProjectReference Include="..\..\src\Roster.Plugins.Sessionize\Roster.Plugins.Sessionize.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Fixtures\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

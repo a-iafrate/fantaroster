@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.460.0/font/lucide.css">
+<link rel="stylesheet" href="tokens/tokens.css">
+<style>body{margin:0;background:#ECEEF2;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#2B2D42;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}a{color:#5000A5}a:hover{color:#2D0060}[class^="icon-"]{font-style:normal;line-height:1;display:inline-block}</style>
+</helmet>
+
+<section data-screen-label="Intro" style="padding:56px 80px 8px">
+  <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap"><h1 style="margin:0;font-size:40px;font-weight:800;letter-spacing:-1px">Accesso: organizzatore e arbitro</h1><a href="01 Identita e Sistema.dc.html" style="font-size:15px">Sistema</a><a href="02 Partecipante.dc.html" style="font-size:15px">Partecipante</a><a href="03 Arbitro e Organizzatore.dc.html" style="font-size:15px">Arbitro e organizzatore</a></div>
+  <p style="margin:10px 0 0;font-size:16px;color:#5C5F73;max-width:1000px;line-height:1.55">Dalla documentazione: l'organizzatore entra con magic link via email (passkey in P1), senza password; l'arbitro entra con un link d'invito che vale per una sola partita; il partecipante non ha account (schermata 1). Primo accesso e registrazione sono lo stesso flusso: un'email nuova crea l'account. La tweak "Brand" cambia logotipo e voce.</p>
+</section>
+
+<section data-theme="light" data-screen-label="A Accedi" style="padding:40px 80px;display:flex;flex-direction:column;gap:14px;border-top:1px solid #D9DCE3">
+  <div style="font-size:18px;font-weight:800">A. Accedi o registrati (organizzatore)</div>
+  <div style="display:flex;gap:40px;align-items:flex-start">
+    <div data-screen-label="A Login mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+      <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>9:41</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+      <div style="padding:8px 24px 28px;display:flex;flex-direction:column;gap:22px;flex:1">
+        <div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">{{ c.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+        <div style="position:relative;height:150px;margin-top:12px">
+          <div style="position:absolute;left:50%;top:18px;width:86px;height:116px;margin-left:-112px;border-radius:12px;background:var(--color-avatar-3);transform:rotate(-12deg)"></div>
+          <div style="position:absolute;left:50%;top:18px;width:86px;height:116px;margin-left:26px;border-radius:12px;background:var(--color-avatar-2);transform:rotate(12deg)"></div>
+          <div style="position:absolute;left:50%;top:0;width:96px;height:128px;margin-left:-48px;border-radius:12px;background:var(--color-surface);border:2px solid var(--color-primary);box-shadow:var(--shadow-lift);display:flex;align-items:center;justify-content:center"><i class="icon-mail" style="font-size:34px;color:var(--color-link)"></i></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:32px;line-height:1.1;font-weight:800;letter-spacing:-0.8px">{{ c.title }}</div>
+          <div style="font-size:15px;color:var(--color-ink-2);line-height:1.5">{{ c.sub }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:14px;font-weight:700">Email</div>
+          <div style="height:52px;border-radius:12px;border:2px solid var(--color-primary);background:var(--color-surface);padding:0 14px;display:flex;align-items:center;font-size:17px;font-weight:600;outline:3px solid var(--color-focus);outline-offset:1px">chiara@dotnetemilia.it</div>
+        </div>
+        <div style="height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-send"></i>{{ c.cta }}</div>
+        <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--color-ink-2)"><div style="flex:1;height:1px;background:var(--color-line)"></div>{{ c.or }}<div style="flex:1;height:1px;background:var(--color-line)"></div></div>
+        <div style="height:56px;border-radius:14px;border:1.5px solid var(--color-line-strong);background:var(--color-surface);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-fingerprint"></i>{{ c.passkey }}</div>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center">
+          <div style="font-size:14px;color:var(--color-ink-2)">{{ c.player }} <span style="color:var(--color-link);font-weight:700">{{ c.playerLink }}</span></div>
+          <div style="font-size:12px;color:var(--color-ink-2)">{{ c.legal }}</div>
+        </div>
+      </div>
+    </div>
+    <div data-screen-label="A Login desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:grid;grid-template-columns:minmax(0,1fr) 600px">
+      <div style="background:#5000A5;color:#FFFFFF;padding:48px 72px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px"><img src="assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain"><span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">{{ c.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+        <div style="position:absolute;left:150px;top:200px;width:200px;height:270px;border-radius:20px;background:#00E5FF;transform:rotate(-14deg)"></div>
+        <div style="position:absolute;left:420px;top:200px;width:200px;height:270px;border-radius:20px;background:#007BFF;transform:rotate(14deg)"></div>
+        <div style="position:absolute;left:280px;top:160px;width:220px;height:296px;border-radius:20px;background:#FFFFFF;color:#2B2D42;box-shadow:12px 12px 0 0 #2D0060;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between"><div style="display:flex;justify-content:space-between"><i class="icon-star" style="font-size:32px;color:#5000A5"></i><span style="height:32px;padding:0 10px;border-radius:9px;background:#D4FF00;font-size:16px;font-weight:800;display:flex;align-items:center">+10</span></div><div style="font-size:20px;font-weight:800;line-height:1.2">{{ c.cardText }}</div></div>
+        <div style="position:relative;max-width:620px;display:flex;flex-direction:column;gap:12px"><div style="font-size:52px;font-weight:800;line-height:1.02;letter-spacing:-1.5px">{{ c.panelTitle }}</div><div style="font-size:18px;line-height:1.5;color:#E4D6F7">{{ c.panelSub }}</div></div>
+      </div>
+      <div style="background:var(--color-surface);padding:64px 72px;display:flex;flex-direction:column;justify-content:center;gap:22px">
+        <div style="font-size:36px;line-height:1.1;font-weight:800;letter-spacing:-1px">{{ c.title }}</div>
+        <div style="font-size:16px;color:var(--color-ink-2);line-height:1.5">{{ c.sub }}</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:14px;font-weight:700">Email</div>
+          <div style="height:52px;border-radius:12px;border:2px solid var(--color-primary);background:var(--color-surface);padding:0 14px;display:flex;align-items:center;font-size:17px;font-weight:600;outline:3px solid var(--color-focus);outline-offset:1px">chiara@dotnetemilia.it</div>
+        </div>
+        <div style="height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-send"></i>{{ c.cta }}</div>
+        <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--color-ink-2)"><div style="flex:1;height:1px;background:var(--color-line)"></div>{{ c.or }}<div style="flex:1;height:1px;background:var(--color-line)"></div></div>
+        <div style="height:56px;border-radius:14px;border:1.5px solid var(--color-line-strong);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-fingerprint"></i>{{ c.passkey }}</div>
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--color-line);display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:14px;color:var(--color-ink-2)">{{ c.player }} <span style="color:var(--color-link);font-weight:700">{{ c.playerLink }}</span></div>
+          <div style="font-size:12px;color:var(--color-ink-2)">{{ c.legal }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Un solo campo, nessuna password. "Accedi con passkey" compare solo se il browser la supporta e l'utente ne ha registrata una (P1). Email non valida: errore inline sotto il campo. Il rimando "Hai un codice partita?" porta al join dei partecipanti, che non hanno account.</div>
+</section>
+
+<section data-theme="light" data-screen-label="B Controlla la posta" style="padding:40px 80px;display:flex;flex-direction:column;gap:14px;border-top:1px solid #D9DCE3">
+  <div style="font-size:18px;font-weight:800">B. Controlla la posta (con email di esempio)</div>
+  <div style="display:flex;gap:40px;align-items:flex-start">
+    <div data-screen-label="B Sent mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+      <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>9:42</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+      <div style="padding:8px 24px 28px;display:flex;flex-direction:column;gap:20px;flex:1">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;justify-content:center;font-size:20px"><i class="icon-arrow-left"></i></div></div>
+        <div style="width:88px;height:88px;border-radius:20px;background:var(--color-lime);color:var(--color-on-lime);display:flex;align-items:center;justify-content:center;font-size:40px;margin-top:24px"><i class="icon-mail-check"></i></div>
+        <div style="font-size:30px;line-height:1.1;font-weight:800;letter-spacing:-0.8px">{{ c.sentTitle }}</div>
+        <div style="font-size:16px;line-height:1.5">{{ c.sentBody }} <b>chiara@dotnetemilia.it</b>. {{ c.sentValid }}</div>
+        <div style="padding:14px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line);font-size:14px;color:var(--color-ink-2);line-height:1.5;display:flex;gap:10px"><i class="icon-info" style="font-size:18px;color:var(--color-info)"></i><span>{{ c.sentTip }}</span></div>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+          <div style="height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-mail"></i>{{ c.openMail }}</div>
+          <div style="height:52px;border-radius:14px;background:var(--color-line);color:var(--color-ink-2);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center">{{ c.resendWait }}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--color-link);text-align:center">{{ c.wrongEmail }}</div>
+        </div>
+      </div>
+    </div>
+    <div data-screen-label="B Sent desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:grid;grid-template-columns:600px minmax(0,1fr)">
+      <div style="background:var(--color-surface);border-right:1px solid var(--color-line);padding:48px 72px;display:flex;flex-direction:column;gap:22px">
+        <div style="display:flex;align-items:center;gap:10px"><img src="assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain"><span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">{{ c.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px">
+          <div style="width:88px;height:88px;border-radius:20px;background:var(--color-lime);color:var(--color-on-lime);display:flex;align-items:center;justify-content:center;font-size:40px"><i class="icon-mail-check"></i></div>
+          <div style="font-size:40px;line-height:1.1;font-weight:800;letter-spacing:-1px">{{ c.sentTitle }}</div>
+          <div style="font-size:17px;line-height:1.55">{{ c.sentBody }} <b>chiara@dotnetemilia.it</b>. {{ c.sentValid }}</div>
+          <div style="font-size:15px;color:var(--color-ink-2);line-height:1.5">{{ c.sentTip }}</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap"><div style="height:52px;padding:0 20px;border-radius:14px;border:1.5px solid var(--color-line-strong);font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px"><i class="icon-rotate-cw"></i>{{ c.resendNow }}</div><div style="height:52px;padding:0 16px;border-radius:14px;color:var(--color-link);font-weight:700;font-size:15px;display:flex;align-items:center">{{ c.wrongEmail }}</div></div>
+        </div>
+      </div>
+      <div style="padding:56px 72px;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;background:var(--color-surface-2)">
+        <div style="align-self:stretch;max-width:600px;margin:0 auto;font-size:14px;font-weight:700;color:var(--color-ink-2)">{{ c.mailPreview }}</div>
+        <div style="width:600px;background:#FFFFFF;color:#2B2D42;border-radius:16px;border:1px solid #E3E5EA;overflow:hidden">
+          <div style="padding:16px 24px;border-bottom:1px solid #E3E5EA;font-size:13px;color:#5C5F73;display:flex;flex-direction:column;gap:2px"><span><b style="color:#2B2D42">{{ c.mailFrom }}</b> &lt;accesso@{{ c.host }}&gt;</span><span>{{ c.mailSubject }}</span></div>
+          <div style="padding:40px 40px 32px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:32px;height:32px;object-fit:contain"><span style="font-size:20px;letter-spacing:-1px"><b style="font-weight:800">{{ c.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+            <div style="font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1.15">{{ c.mailTitle }}</div>
+            <div style="font-size:16px;line-height:1.55">{{ c.mailBody }}</div>
+            <div style="width:fit-content;height:52px;padding:0 28px;border-radius:12px;background:#5000A5;color:#FFFFFF;font-weight:800;font-size:16px;display:flex;align-items:center">{{ c.mailCta }}</div>
+            <div style="font-size:13px;color:#5C5F73;line-height:1.5">{{ c.mailFoot }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">"Invia di nuovo" si attiva dopo 30 s (contatore nel bottone). Il link apre la sessione sul dispositivo che lo clicca; se viene aperto altrove, la scheda originale si aggiorna da sola. Mobile: "Apri l'app di posta" usa mailto:. L'email è in tema chiaro fisso, testo minimo 16 px, un solo bottone.</div>
+</section>
+
+<section data-theme="light" data-screen-label="C Link scaduto" style="padding:40px 80px;display:flex;flex-direction:column;gap:14px;border-top:1px solid #D9DCE3">
+  <div style="font-size:18px;font-weight:800">C. Link scaduto o già usato</div>
+  <div style="display:flex;gap:40px;align-items:flex-start">
+    <div data-screen-label="C Expired mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+      <div style="height:48px;padding:0 28px;display:flex;align-items:center;font-size:15px;font-weight:700;flex:none">10:05</div>
+      <div style="padding:8px 24px 28px;display:flex;flex-direction:column;gap:20px;flex:1">
+        <div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">{{ c.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px">
+          <div style="width:72px;height:72px;border-radius:18px;background:var(--color-warning-bg);color:var(--color-warning);display:flex;align-items:center;justify-content:center;font-size:34px"><i class="icon-clock-alert"></i></div>
+          <div style="font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-0.5px">{{ c.expTitle }}</div>
+          <div style="font-size:16px;line-height:1.5;color:var(--color-ink-2)">{{ c.expBody }}</div>
+          <div style="height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px"><i class="icon-send"></i>{{ c.expCta }}</div>
+        </div>
+      </div>
+    </div>
+    <div data-screen-label="C Expired desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+      <div style="height:80px;padding:0 72px;display:flex;align-items:center;gap:10px"><img src="assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain"><span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">{{ c.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center">
+        <div style="width:520px;padding:40px;border-radius:24px;background:var(--color-surface);border:1px solid var(--color-line);display:flex;flex-direction:column;gap:16px">
+          <div style="width:72px;height:72px;border-radius:18px;background:var(--color-warning-bg);color:var(--color-warning);display:flex;align-items:center;justify-content:center;font-size:34px"><i class="icon-clock-alert"></i></div>
+          <div style="font-size:32px;line-height:1.15;font-weight:800;letter-spacing:-0.8px">{{ c.expTitle }}</div>
+          <div style="font-size:16px;line-height:1.5;color:var(--color-ink-2)">{{ c.expBody }}</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px"><div style="font-size:14px;font-weight:700">Email</div><div style="height:52px;border-radius:12px;border:1.5px solid var(--color-line-strong);padding:0 14px;display:flex;align-items:center;font-size:17px;font-weight:600">chiara@dotnetemilia.it</div></div>
+          <div style="height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-send"></i>{{ c.expCta }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Validità 15 minuti, uso singolo. Email già compilata se il token la contiene. Stessa schermata per link già usato, con titolo diverso.</div>
+</section>
+
+<section data-theme="dark" data-screen-label="D Invito arbitro" style="padding:40px 80px 80px;display:flex;flex-direction:column;gap:14px;border-top:1px solid #D9DCE3">
+  <div style="font-size:18px;font-weight:800;color:#2B2D42">D. Invito arbitro (tema scuro, come la console)</div>
+  <div style="display:flex;gap:40px;align-items:flex-start">
+    <div data-screen-label="D Referee mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+      <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>9:15</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+      <div style="padding:8px 24px 28px;display:flex;flex-direction:column;gap:20px;flex:1">
+        <div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">{{ c.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+        <div style="padding:18px;border-radius:18px;background:var(--color-surface);border:1px solid var(--color-line);display:flex;flex-direction:column;gap:12px;margin-top:16px">
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:52px;height:52px;border-radius:12px;background:var(--color-primary);color:var(--color-on-primary);display:flex;align-items:center;justify-content:center;font-size:26px"><i class="icon-flag"></i></div><div><div style="font-size:13px;font-weight:700;color:var(--color-ink-2)">{{ c.refInvited }}</div><div style="font-size:17px;font-weight:800">{{ c.refGame }}</div></div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="height:30px;padding:0 10px;border-radius:999px;background:var(--color-surface-2);border:1px solid var(--color-line);font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px"><i class="icon-map-pin"></i>{{ c.refScope }}</span><span style="height:30px;padding:0 10px;border-radius:999px;background:var(--color-surface-2);border:1px solid var(--color-line);font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px"><i class="icon-users"></i>{{ c.refEls }}</span></div>
+        </div>
+        <div style="font-size:30px;line-height:1.1;font-weight:800;letter-spacing:-0.8px">{{ c.refTitle }}</div>
+        <div style="font-size:16px;line-height:1.5;color:var(--color-ink-2)">{{ c.refBody }}</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:14px;font-weight:700">{{ c.refNameLabel }}</div>
+          <div style="height:64px;border-radius:14px;border:2px solid var(--color-primary);background:var(--color-surface);padding:0 16px;display:flex;align-items:center;font-size:18px;font-weight:600;outline:3px solid var(--color-focus);outline-offset:1px">Paolo</div>
+          <div style="font-size:13px;color:var(--color-ink-2)">{{ c.refNameHint }}</div>
+        </div>
+        <div style="margin-top:auto;height:72px;border-radius:18px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;gap:10px"><i class="icon-arrow-right"></i>{{ c.refCta }}</div>
+        <div style="font-size:12px;color:var(--color-ink-2);text-align:center;line-height:1.5">{{ c.refFoot }}</div>
+      </div>
+    </div>
+    <div data-screen-label="D Referee desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+      <div style="height:80px;padding:0 72px;display:flex;align-items:center;gap:10px"><img src="assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain"><span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">{{ c.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+      <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:72px;padding:40px 72px 72px;align-items:center">
+        <div style="display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;align-items:center;gap:14px"><div style="width:64px;height:64px;border-radius:16px;background:var(--color-primary);color:var(--color-on-primary);display:flex;align-items:center;justify-content:center;font-size:30px"><i class="icon-flag"></i></div><div><div style="font-size:15px;font-weight:700;color:var(--color-ink-2)">{{ c.refInvited }}</div><div style="font-size:22px;font-weight:800">{{ c.refGame }}</div></div></div>
+          <div style="font-size:56px;line-height:1.02;font-weight:800;letter-spacing:-1.5px">{{ c.refTitle }}</div>
+          <div style="font-size:18px;line-height:1.5;color:var(--color-ink-2);max-width:620px">{{ c.refBody }}</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><span style="height:36px;padding:0 14px;border-radius:999px;background:var(--color-surface);border:1px solid var(--color-line);font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px"><i class="icon-map-pin"></i>{{ c.refScope }}</span><span style="height:36px;padding:0 14px;border-radius:999px;background:var(--color-surface);border:1px solid var(--color-line);font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px"><i class="icon-users"></i>{{ c.refEls }}</span><span style="height:36px;padding:0 14px;border-radius:999px;background:var(--color-surface);border:1px solid var(--color-line);font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px"><i class="icon-scale"></i>{{ c.refRules }}</span></div>
+        </div>
+        <div style="padding:32px;border-radius:24px;background:var(--color-surface);border:1px solid var(--color-line);display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:14px;font-weight:700">{{ c.refNameLabel }}</div>
+            <div style="height:64px;border-radius:14px;border:2px solid var(--color-primary);background:var(--color-bg);padding:0 16px;display:flex;align-items:center;font-size:18px;font-weight:600;outline:3px solid var(--color-focus);outline-offset:1px">Paolo</div>
+            <div style="font-size:13px;color:var(--color-ink-2)">{{ c.refNameHint }}</div>
+          </div>
+          <div style="height:72px;border-radius:18px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;gap:10px"><i class="icon-arrow-right"></i>{{ c.refCta }}</div>
+          <div style="font-size:13px;color:var(--color-ink-2);line-height:1.5">{{ c.refFoot }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Nessun account: il link d'invito contiene un token limitato a partita e perimetro (es. Sala B). Il nome serve solo al registro dei punti. Link revocato o partita chiusa: stessa struttura della C, con "Chiedi un nuovo link a chi organizza".</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;brand&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;FantaRoster&quot;,&quot;ImagiRoster&quot;],&quot;default&quot;:&quot;FantaRoster&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const COPY = {
+  fanta: { prefix:'fanta', host:'fantaroster.com', title:'Entra per organizzare', sub:'Ti mandiamo un link via email: niente password da ricordare. Se è la prima volta, creiamo il tuo account.', cta:'Inviami il link', or:'oppure', passkey:'Accedi con passkey', player:'Devi solo giocare?', playerLink:'Hai un codice partita', legal:'Continuando accetti termini e privacy.', cardText:'Il tuo prossimo fanta', panelTitle:'Il fanta di qualsiasi cosa', panelSub:'Crea la partita, importa gli elementi, apri il QR. Al resto pensa la classifica.',
+    sentTitle:'Controlla la posta', sentBody:'Abbiamo mandato il link a', sentValid:'Vale 15 minuti.', sentTip:'Non lo trovi? Guarda in Spam o Promozioni. Il mittente è accesso@fantaroster.com.', openMail:"Apri l'app di posta", resendWait:'Invia di nuovo tra 24 s', resendNow:'Invia di nuovo', wrongEmail:'Email sbagliata? Cambiala', mailPreview:"Anteprima dell'email", mailFrom:'FantaRoster', mailSubject:'Il tuo link per entrare in FantaRoster', mailTitle:'Ecco il tuo link', mailBody:'Tocca il bottone per entrare. Il link vale 15 minuti e si usa una volta sola.', mailCta:'Entra in FantaRoster', mailFoot:"Non hai chiesto tu questo link? Ignora l'email: senza clic non succede niente.",
+    expTitle:'Questo link è scaduto', expBody:'I link valgono 15 minuti e si usano una volta. Te ne mandiamo uno nuovo in un attimo.', expCta:'Mandami un nuovo link',
+    refInvited:'Chiara ti ha invitato come arbitro', refGame:'Community Day Bologna 2027', refScope:'Sala B', refEls:'8 speaker', refRules:'11 regole', refTitle:'Sei tu che dai i punti', refBody:'Assegni bonus e malus dal telefono in tre tocchi. Non serve un account: questo link vale solo per questa partita.', refNameLabel:'Come ti chiami?', refNameHint:'Lo vede solo chi organizza, nel registro dei punti.', refCta:'Apri la console', refFoot:'Tieni il telefono carico: la console funziona anche offline e invia i punti appena torna la rete.' },
+  imagi: { prefix:'imagi', host:'imagiroster.com', title:'Sign in to host a game', sub:"We'll email you a link: no password to remember. First time here? We'll create your account.", cta:'Email me a link', or:'or', passkey:'Sign in with a passkey', player:'Just playing?', playerLink:'I have a game code', legal:'By continuing you accept the terms and privacy policy.', cardText:'Your next game', panelTitle:'Fantasy for anything', panelSub:'Create a game, add who is in play, share the QR. The leaderboard does the rest.',
+    sentTitle:'Check your inbox', sentBody:'We sent the link to', sentValid:'It works for 15 minutes.', sentTip:"Can't find it? Look in Spam or Promotions. It comes from access@imagiroster.com.", openMail:'Open mail app', resendWait:'Resend in 24 s', resendNow:'Resend', wrongEmail:'Wrong email? Change it', mailPreview:'Email preview', mailFrom:'ImagiRoster', mailSubject:'Your ImagiRoster sign-in link', mailTitle:'Here is your link', mailBody:'Tap the button to sign in. The link works for 15 minutes and only once.', mailCta:'Sign in to ImagiRoster', mailFoot:"Didn't ask for this? Ignore this email: nothing happens without a click.",
+    expTitle:'This link has expired', expBody:'Links work for 15 minutes and only once. We can send you a fresh one right away.', expCta:'Send me a new link',
+    refInvited:'Dev invited you to referee', refGame:"Sara & Dev's Wedding", refScope:'Reception', refEls:'40 guests', refRules:'9 rules', refTitle:'You hand out the points', refBody:'Award bonuses and penalties from your phone in three taps. No account needed: this link only works for this game.', refNameLabel:"What's your name?", refNameHint:'Only the host sees it, in the points log.', refCta:'Open the console', refFoot:'Keep your phone charged: the console works offline and sends points once you are back online.' }
+};
+class Component extends DCLogic {
+  renderVals() { return { c: (this.props.brand ?? 'FantaRoster') === 'ImagiRoster' ? COPY.imagi : COPY.fanta }; }
+}
+</script>
+</body>
+</html>

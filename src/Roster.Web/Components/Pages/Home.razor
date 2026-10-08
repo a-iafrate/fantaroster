@@ -1,7 +1,195 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>FantaRoster - Il fanta di qualsiasi cosa</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Il fanta di qualsiasi cosa</h1>
+        <p class="hero-subtitle">Conferenze, matrimoni, tornei. Scegli cosa è in gioco e apri un QR. Al resto pensa la classifica.</p>
+        <div class="hero-actions">
+            <a href="/app/nuova" class="btn-primary-large">Crea il tuo fanta</a>
+            <a href="/j" class="btn-outline-large"><i class="icon-qr-code"></i> Ho un codice partita</a>
+        </div>
+    </div>
+    
+    <div class="hero-illustration">
+        <!-- Abstract representation or illustration -->
+        <div class="illustration-card card-cyan"></div>
+        <div class="illustration-card card-blue"></div>
+        <div class="illustration-card card-main">
+            <div class="card-header">
+                <i class="icon-star"></i>
+                <span class="badge-lime">+10</span>
+            </div>
+            <div class="card-title">Il tuo prossimo fanta</div>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+<style>
+    .hero-section {
+        display: flex;
+        flex-direction: column;
+        gap: 48px;
+        padding: 64px 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    @@media (min-width: 1024px) {
+        .hero-section {
+            flex-direction: row;
+            align-items: center;
+            padding: 120px 72px;
+            gap: 80px;
+        }
+    }
+    
+    .hero-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .hero-title {
+        font-size: 56px;
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -1.5px;
+        margin: 0;
+    }
+    
+    @@media (min-width: 1024px) {
+        .hero-title {
+            font-size: 72px;
+        }
+    }
+    
+    .hero-subtitle {
+        font-size: 20px;
+        color: var(--color-ink-2);
+        line-height: 1.5;
+        max-width: 540px;
+        margin: 0;
+    }
+    
+    .hero-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 16px;
+    }
+    
+    @@media (min-width: 768px) {
+        .hero-actions {
+            flex-direction: row;
+            align-items: center;
+        }
+    }
+    
+    .btn-primary-large {
+        height: 64px;
+        padding: 0 32px;
+        border-radius: 16px;
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        font-size: 18px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+    
+    .btn-outline-large {
+        height: 64px;
+        padding: 0 32px;
+        border-radius: 16px;
+        border: 2px solid var(--color-line-strong);
+        color: var(--color-ink);
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+    
+    .hero-illustration {
+        flex: 1;
+        position: relative;
+        height: 400px;
+        display: none;
+    }
+    
+    @@media (min-width: 1024px) {
+        .hero-illustration {
+            display: block;
+        }
+    }
+    
+    .illustration-card {
+        position: absolute;
+        width: 240px;
+        height: 320px;
+        border-radius: 24px;
+    }
+    
+    .card-cyan {
+        background: var(--color-cyan);
+        transform: rotate(-14deg);
+        left: 0;
+        top: 40px;
+    }
+    
+    .card-blue {
+        background: var(--color-blue);
+        transform: rotate(14deg);
+        right: 40px;
+        top: 40px;
+    }
+    
+    .card-main {
+        background: var(--color-surface);
+        box-shadow: 16px 16px 0 0 var(--color-primary-tint);
+        border: 2px solid var(--color-line);
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .card-header i {
+        font-size: 40px;
+        color: var(--color-primary);
+    }
+    
+    .badge-lime {
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 10px;
+        background: var(--color-lime);
+        color: var(--color-on-lime);
+        font-size: 18px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+    }
+    
+    .card-title {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+</style>
