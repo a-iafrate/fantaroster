@@ -1,0 +1,27 @@
+{
+  "brand": {
+    "name": "ImagiRoster",
+    "prefix": "imagi",
+    "tagline": "Fantasy for anything",
+    "culture": "en",
+    "host": "imagiroster.com"
+  },
+  "color": {
+    "light": {
+      "brand-primary": "#5000A5",
+      "brand-secondary": "#007BFF",
+      "brand-night": "#1A0033",
+      "brand-shadow": "#2D0060",
+      "brand-cyan": "#00E5FF",
+      "brand-lime": "#D4FF00"
+    },
+    "dark": {
+      "brand-primary": "#B794FF",
+      "brand-secondary": "#007BFF",
+      "brand-night": "#1A0033",
+      "brand-shadow": "#2D0060",
+      "brand-cyan": "#00E5FF",
+      "brand-lime": "#D4FF00"
+    }
+  }
+}

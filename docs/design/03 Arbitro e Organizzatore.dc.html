@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.460.0/font/lucide.css">
+<link rel="stylesheet" href="tokens/tokens.css">
+<style>body{margin:0;background:#ECEEF2;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#2B2D42;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}a{color:#5000A5}a:hover{color:#2D0060}[class^="icon-"]{font-style:normal;line-height:1;display:inline-block}</style>
+</helmet>
+
+<section data-screen-label="Intro" style="padding:56px 80px 8px">
+  <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap"><h1 style="margin:0;font-size:40px;font-weight:800;letter-spacing:-1px">Arbitro (8–9) e organizzatore (10–14)</h1><a href="01 Identita e Sistema.dc.html" style="font-size:15px">Sistema</a><a href="02 Partecipante.dc.html" style="font-size:15px">Partecipante</a><a href="04 Maxischermo e Pubblico.dc.html" style="font-size:15px">Maxischermo e pubblico</a></div>
+  <p style="margin:10px 0 0;font-size:16px;color:#5C5F73;max-width:980px;line-height:1.55">Arbitro: tema scuro di default (sala buia), target 64 px, tre tocchi per un punto. Organizzatore: desktop 1440×900 con varianti mobile 390×844. Ogni sezione è renderizzata nei temi scelti dalla tweak "Temi".</p>
+</section>
+
+<sc-for list="{{ themes }}" as="t" hint-placeholder-count="1">
+<section data-theme="{{ t.id }}" data-screen-label="{{ t.label }}" style="padding:40px 80px 56px;display:flex;flex-direction:column;gap:48px;border-top:1px solid #D9DCE3">
+  <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px;color:#2B2D42">{{ t.label }}</div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800;color:#2B2D42">8. Assegna un punto: elemento → regola → conferma (interattiva)</div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div data-screen-label="08 Referee mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column;position:relative">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>11:40</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+        <div style="padding:4px 20px 12px;display:flex;flex-direction:column;gap:12px;flex:none">
+          <div style="display:flex;align-items:center;gap:10px"><sc-if value="{{ canBack }}"><div style="width:64px;height:64px;border-radius:16px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer" onClick="{{ back }}" aria-label="Indietro"><i class="icon-arrow-left"></i></div></sc-if><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--color-ink-2)">Sala B, passo {{ stepN }} di 3</div><div style="font-size:24px;font-weight:800;letter-spacing:-0.4px">{{ stepTitle }}</div></div><div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;height:32px;padding:0 10px;border-radius:999px;border:1px solid var(--color-line)"><span style="width:10px;height:10px;border-radius:50%;background:var(--color-success)"></span>Live</div></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><sc-for list="{{ stepBars }}" as="b" hint-placeholder-count="3"><div style="height:6px;border-radius:3px;background:{{ b.bg }}"></div></sc-for></div>
+        </div>
+        <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;overflow:auto;padding:4px 20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start">
+            <sc-for list="{{ refEls }}" as="e" hint-placeholder-count="6">
+              <div style="height:132px;border-radius:16px;background:var(--color-surface);border:{{ e.border }};padding:14px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer" onClick="{{ e.pick }}">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="width:52px;height:52px;border-radius:12px;background:var(--color-avatar-{{ e.av }});color:var(--color-on-avatar-{{ e.av }});display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px">{{ e.ini }}</div><sc-if value="{{ e.onStage }}"><span style="font-size:12px;font-weight:800;padding:3px 8px;border-radius:999px;background:var(--color-cyan);color:var(--color-on-lime)">Sul palco</span></sc-if></div>
+                <div style="font-size:16px;font-weight:700;line-height:1.25">{{ e.name }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;overflow:auto;padding:4px 20px 24px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:var(--color-surface-2)"><div style="width:40px;height:40px;border-radius:9px;background:var(--color-avatar-{{ selEl.av }});color:var(--color-on-avatar-{{ selEl.av }});display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">{{ selEl.ini }}</div><div style="font-size:16px;font-weight:700">{{ selEl.name }}</div></div>
+            <sc-for list="{{ refRules }}" as="r" hint-placeholder-count="6">
+              <div style="min-height:64px;border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onClick="{{ r.pick }}">
+                <div style="flex:1;font-size:16px;font-weight:700;line-height:1.3">{{ r.label }}</div>
+                <div style="height:40px;min-width:60px;border-radius:10px;background:{{ r.bg }};color:{{ r.fg }};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800">{{ r.pts }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;padding:12px 20px 24px;display:flex;flex-direction:column;gap:16px">
+            <div style="border-radius:20px;background:var(--color-surface);border:2px solid var(--color-primary);padding:24px;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+              <div style="width:80px;height:80px;border-radius:16px;background:var(--color-avatar-{{ selEl.av }});color:var(--color-on-avatar-{{ selEl.av }});display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px">{{ selEl.ini }}</div>
+              <div style="font-size:22px;font-weight:800">{{ selEl.name }}</div>
+              <div style="font-size:16px;color:var(--color-ink-2)">{{ selRule.label }}</div>
+              <div style="height:64px;min-width:110px;padding:0 18px;border-radius:16px;background:{{ selRule.bg }};color:{{ selRule.fg }};display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800">{{ selRule.pts }}</div>
+            </div>
+            <div style="margin-top:auto;height:72px;border-radius:18px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer" onClick="{{ confirm }}">Assegna {{ selRule.pts }}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showUndo }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:12px;right:12px;bottom:24px;border-radius:18px;background:var(--color-ink);color:var(--color-bg);padding:12px 12px 12px 18px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-overlay);overflow:hidden">
+            <div style="position:absolute;left:0;bottom:0;height:4px;width:{{ undoPct }}%;background:var(--color-cyan);transition:width 1s linear"></div>
+            <i class="icon-check" style="font-size:22px"></i>
+            <div style="flex:1;font-size:15px;font-weight:700">{{ lastLabel }}</div>
+            <div style="height:64px;padding:0 18px;border-radius:14px;border:2px solid var(--color-bg);display:flex;align-items:center;font-weight:800;font-size:16px;cursor:pointer" onClick="{{ undo }}">Annulla {{ undoS }} s</div>
+          </div>
+        </sc-if>
+      </div>
+      <div data-screen-label="08 Referee desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:80px;flex:none;padding:0 32px;display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--color-line);background:var(--color-surface)">
+          <img src="assets/logo-r.svg" alt="" style="width:27px;height:27px;object-fit:contain">
+          <div><div style="font-size:14px;color:var(--color-ink-2);font-weight:600">Console arbitro</div><div style="font-size:20px;font-weight:800">Sala B</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--color-line)"><span style="width:10px;height:10px;border-radius:50%;background:var(--color-success)"></span>Live, 47 punti assegnati</div>
+        </div>
+        <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 360px">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:14px;border-right:1px solid var(--color-line);min-height:0">
+            <div style="font-size:18px;font-weight:800">1. Chi</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow:auto;align-content:start">
+              <sc-for list="{{ refEls }}" as="e" hint-placeholder-count="6">
+                <div style="height:120px;border-radius:16px;background:{{ e.bgD }};border:{{ e.border }};padding:14px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer" onClick="{{ e.pick }}">
+                  <div style="display:flex;justify-content:space-between"><div style="width:48px;height:48px;border-radius:11px;background:var(--color-avatar-{{ e.av }});color:var(--color-on-avatar-{{ e.av }});display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px">{{ e.ini }}</div><sc-if value="{{ e.onStage }}"><span style="height:24px;font-size:12px;font-weight:800;padding:0 8px;border-radius:999px;background:var(--color-cyan);color:var(--color-on-lime);display:flex;align-items:center">Sul palco</span></sc-if></div>
+                  <div style="font-size:16px;font-weight:700">{{ e.name }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="padding:24px;display:flex;flex-direction:column;gap:12px;border-right:1px solid var(--color-line);min-height:0">
+            <div style="font-size:18px;font-weight:800">2. Cosa</div>
+            <sc-for list="{{ refRules }}" as="r" hint-placeholder-count="6">
+              <div style="min-height:64px;border-radius:16px;background:{{ r.bgD }};border:{{ r.border }};padding:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onClick="{{ r.pick }}">
+                <div style="flex:1;font-size:16px;font-weight:700">{{ r.label }}</div>
+                <div style="height:40px;min-width:60px;border-radius:10px;background:{{ r.bg }};color:{{ r.fg }};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800">{{ r.pts }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px;background:var(--color-surface)">
+            <div style="font-size:18px;font-weight:800">3. Conferma</div>
+            <div style="border-radius:16px;border:1.5px dashed var(--color-line-strong);padding:20px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:15px;color:var(--color-ink-2)">Elemento</div><div style="font-size:20px;font-weight:800">{{ selEl.name }}</div>
+              <div style="font-size:15px;color:var(--color-ink-2);margin-top:6px">Regola</div><div style="font-size:17px;font-weight:700">{{ selRule.label }}</div>
+            </div>
+            <div style="height:72px;border-radius:18px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer" onClick="{{ confirm }}">Assegna {{ selRule.pts }}</div>
+            <div style="font-size:13px;color:var(--color-ink-2);line-height:1.5">Scorciatoie: 1–9 elemento, Q–P regola, Invio conferma, Z annulla.</div>
+            <sc-if value="{{ showUndo }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:auto;border-radius:16px;background:var(--color-ink);color:var(--color-bg);padding:14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden"><div style="position:absolute;left:0;bottom:0;height:4px;width:{{ undoPct }}%;background:var(--color-cyan);transition:width 1s linear"></div><div style="flex:1;font-size:14px;font-weight:700">{{ lastLabel }}</div><div style="height:48px;padding:0 14px;border-radius:12px;border:2px solid var(--color-bg);display:flex;align-items:center;font-weight:800;cursor:pointer" onClick="{{ undo }}">Annulla {{ undoS }} s</div></div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:#5C5F73;line-height:1.55">Mobile: un passo per schermata, card 132 px, rule row 64 px, CTA 72 px. L'elemento "Sul palco" (dal programma) è primo in griglia. Dopo "Assegna" il toast resta 10 s con barra ciano che si consuma; poi il punto è definitivo (si può solo annullare dalla 9). Desktop/tablet: tre colonne, tutto in vista.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800;color:#2B2D42">9. Punti recenti, annullo e offline</div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div data-screen-label="09 Recent mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>11:46</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi-off"></i><i class="icon-battery-medium"></i></span></div>
+        <div style="padding:4px 20px 12px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:24px;font-weight:800">Punti recenti</div>
+          <div style="padding:14px;border-radius:14px;background:var(--color-warning-bg);color:var(--color-warning);display:flex;gap:12px;align-items:center"><i class="icon-wifi-off" style="font-size:24px"></i><div style="flex:1"><div style="font-size:15px;font-weight:800">Offline, 2 punti in attesa</div><div style="font-size:13px;font-weight:600">Partono da soli appena torna la rete.</div></div></div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:0 20px 20px;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ recent }}" as="r" hint-placeholder-count="6">
+            <div style="min-height:72px;border-radius:16px;background:var(--color-surface);border:{{ r.border }};padding:10px 10px 10px 14px;display:flex;align-items:center;gap:12px;opacity:{{ r.op }}">
+              <div style="height:36px;min-width:52px;border-radius:9px;background:{{ r.bg }};color:{{ r.fg }};display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;text-decoration:{{ r.deco }}">{{ r.pts }}</div>
+              <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">{{ r.who }}</div><div style="font-size:13px;color:var(--color-ink-2);display:flex;gap:6px;align-items:center"><i class="{{ r.sIcon }}"></i>{{ r.status }}</div></div>
+              <sc-if value="{{ r.canVoid }}"><div style="height:64px;padding:0 14px;border-radius:14px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;font-size:14px;font-weight:800;color:var(--color-danger)">Annulla</div></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div data-screen-label="09 Recent desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:80px;flex:none;padding:0 32px;display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--color-line);background:var(--color-surface)">
+          <img src="assets/logo-r.svg" alt="" style="width:27px;height:27px;object-fit:contain">
+          <div style="font-size:20px;font-weight:800">Punti recenti, Sala B</div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;height:36px;padding:0 14px;border-radius:999px;background:var(--color-warning-bg);color:var(--color-warning)"><i class="icon-wifi-off"></i>Offline, 2 punti in attesa</div>
+        </div>
+        <div style="flex:1;padding:24px 32px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:grid;grid-template-columns:80px minmax(0,1.2fr) minmax(0,1.6fr) 200px 140px;gap:16px;padding:0 16px;font-size:13px;font-weight:700;color:var(--color-ink-2)"><div>Punti</div><div>Elemento</div><div>Regola</div><div>Stato</div><div></div></div>
+          <sc-for list="{{ recent }}" as="r" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:80px minmax(0,1.2fr) minmax(0,1.6fr) 200px 140px;gap:16px;align-items:center;padding:12px 16px;border-radius:14px;background:var(--color-surface);border:{{ r.border }};opacity:{{ r.op }}">
+              <div style="height:36px;border-radius:9px;background:{{ r.bg }};color:{{ r.fg }};display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;text-decoration:{{ r.deco }}">{{ r.pts }}</div>
+              <div style="font-size:16px;font-weight:700">{{ r.who }}</div>
+              <div style="font-size:15px;color:var(--color-ink-2)">{{ r.rule }}</div>
+              <div style="font-size:14px;font-weight:700;display:flex;gap:6px;align-items:center;color:{{ r.sFg }}"><i class="{{ r.sIcon }}"></i>{{ r.status }}</div>
+              <div><sc-if value="{{ r.canVoid }}"><div style="height:48px;padding:0 14px;border-radius:12px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--color-danger)">Annulla punto</div></sc-if></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:#5C5F73;line-height:1.55">I punti offline restano in coda locale con stato "In attesa" (orologio) e si annullano senza conferma, perché nessuno li ha ancora visti. Un punto già pubblicato chiede conferma (dialog del sistema). I punti annullati restano in lista, barrati.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800;color:#2B2D42">10. Crea partita: wizard in 6 passi</div>
+    <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+      <div data-screen-label="10 Wizard mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>9:41</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+        <div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:16px;flex:1">
+          <div style="display:flex;align-items:center;gap:10px"><i class="icon-x" style="font-size:24px"></i><div style="flex:1;font-size:14px;font-weight:700;color:var(--color-ink-2)">Passo 1 di 6</div></div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px"><div style="height:5px;border-radius:3px;background:var(--color-primary)"></div><div style="height:5px;border-radius:3px;background:var(--color-line)"></div><div style="height:5px;border-radius:3px;background:var(--color-line)"></div><div style="height:5px;border-radius:3px;background:var(--color-line)"></div><div style="height:5px;border-radius:3px;background:var(--color-line)"></div><div style="height:5px;border-radius:3px;background:var(--color-line)"></div></div>
+          <div style="font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1.15">Di cosa è il fanta?</div>
+          <sc-for list="{{ domains }}" as="d" hint-placeholder-count="4">
+            <div style="min-height:76px;border-radius:16px;background:var(--color-surface);border:{{ d.border }};padding:14px;display:flex;align-items:center;gap:14px">
+              <div style="width:48px;height:48px;border-radius:12px;background:{{ d.iconBg }};color:{{ d.iconFg }};display:flex;align-items:center;justify-content:center;font-size:24px;flex:none"><i class="{{ d.icon }}"></i></div>
+              <div style="flex:1"><div style="font-size:16px;font-weight:800">{{ d.name }}</div><div style="font-size:13px;color:var(--color-ink-2)">{{ d.desc }}</div></div>
+            </div>
+          </sc-for>
+          <div style="margin-top:auto;height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center">Continua</div>
+        </div>
+      </div>
+      <div data-screen-label="10 Wizard source desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:72px;flex:none;padding:0 40px;display:flex;align-items:center;gap:24px;border-bottom:1px solid var(--color-line);background:var(--color-surface)">
+          <i class="icon-x" style="font-size:22px"></i><div style="font-size:16px;font-weight:800">Nuova partita</div>
+          <div style="margin-left:40px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600">
+            <sc-for list="{{ wizSteps3 }}" as="s" hint-placeholder-count="6"><div style="display:flex;align-items:center;gap:8px;color:{{ s.fg }}"><span style="width:26px;height:26px;border-radius:7px;background:{{ s.bg }};color:{{ s.numFg }};border:{{ s.bd }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">{{ s.n }}</span>{{ s.label }}<span style="width:20px;height:2px;background:var(--color-line-strong);margin-left:4px"></span></div></sc-for>
+          </div>
+        </div>
+        <div style="flex:1;padding:48px 0;display:flex;justify-content:center">
+          <div style="width:880px;display:flex;flex-direction:column;gap:24px">
+            <div style="font-size:40px;font-weight:800;letter-spacing:-1px">Da dove prendiamo gli speaker?</div>
+            <div style="font-size:17px;color:var(--color-ink-2)">Puoi cambiare sorgente fino alla pubblicazione. Gli elementi importati si sincronizzano ogni 15 minuti.</div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+              <div style="border-radius:16px;border:2px solid var(--color-primary);background:var(--color-primary-tint);padding:20px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between"><i class="icon-calendar-range" style="font-size:28px;color:var(--color-link)"></i><span style="width:24px;height:24px;border-radius:50%;background:var(--color-primary);color:var(--color-on-primary);display:flex;align-items:center;justify-content:center;font-size:14px"><i class="icon-check"></i></span></div><div style="font-size:18px;font-weight:800">Sessionize</div><div style="font-size:14px;color:var(--color-ink-2)">Speaker, sessioni e sale dall'API del tuo evento.</div></div>
+              <div style="border-radius:16px;border:1px solid var(--color-line);background:var(--color-surface);padding:20px;display:flex;flex-direction:column;gap:10px"><i class="icon-file-spreadsheet" style="font-size:28px"></i><div style="font-size:18px;font-weight:800">CSV</div><div style="font-size:14px;color:var(--color-ink-2)">Una riga per elemento. Scarica il modello.</div></div>
+              <div style="border-radius:16px;border:1px solid var(--color-line);background:var(--color-surface);padding:20px;display:flex;flex-direction:column;gap:10px"><i class="icon-pencil-line" style="font-size:28px"></i><div style="font-size:18px;font-weight:800">A mano</div><div style="font-size:14px;color:var(--color-ink-2)">Fino a 50 elementi, nome e foto.</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">ID API Sessionize</div><div style="height:52px;border-radius:12px;border:2px solid var(--color-primary);background:var(--color-surface);padding:0 14px;display:flex;align-items:center;font-size:16px;font-family:ui-monospace,monospace">k3x9vq2m</div><div style="font-size:13px;color:var(--color-success);font-weight:700;display:flex;gap:6px;align-items:center"><i class="icon-check"></i>Trovati 25 speaker, 24 sessioni, 3 sale</div></div>
+            <div style="margin-top:auto;display:flex;justify-content:space-between"><div style="height:52px;padding:0 20px;border-radius:14px;border:1.5px solid var(--color-line-strong);font-weight:700;display:flex;align-items:center">Indietro</div><div style="height:52px;padding:0 24px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;display:flex;align-items:center">Importa e continua</div></div>
+          </div>
+        </div>
+      </div>
+      <div data-screen-label="10 Wizard review desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:72px;flex:none;padding:0 40px;display:flex;align-items:center;gap:24px;border-bottom:1px solid var(--color-line);background:var(--color-surface)">
+          <i class="icon-x" style="font-size:22px"></i><div style="font-size:16px;font-weight:800">Nuova partita</div>
+          <div style="margin-left:40px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600">
+            <sc-for list="{{ wizSteps4 }}" as="s" hint-placeholder-count="6"><div style="display:flex;align-items:center;gap:8px;color:{{ s.fg }}"><span style="width:26px;height:26px;border-radius:7px;background:{{ s.bg }};color:{{ s.numFg }};border:{{ s.bd }};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">{{ s.n }}</span>{{ s.label }}<span style="width:20px;height:2px;background:var(--color-line-strong);margin-left:4px"></span></div></sc-for>
+          </div>
+        </div>
+        <div style="flex:1;padding:40px 0;display:flex;justify-content:center;min-height:0">
+          <div style="width:1080px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between"><div><div style="font-size:40px;font-weight:800;letter-spacing:-1px">Controlla chi entra in gioco</div><div style="font-size:16px;color:var(--color-ink-2);margin-top:6px">25 importati. Invieremo una richiesta di consenso a ognuno: chi rifiuta non è selezionabile.</div></div><div style="height:44px;padding:0 14px;border-radius:12px;border:1.5px solid var(--color-line-strong);font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><i class="icon-refresh-cw"></i>Sincronizza</div></div>
+            <div style="padding:12px 16px;border-radius:12px;background:var(--color-warning-bg);color:var(--color-warning);font-size:14px;font-weight:700;display:flex;gap:10px;align-items:center"><i class="icon-triangle-alert"></i>2 speaker senza foto useranno le iniziali. 1 sessione senza sala: assegnala o resterà in "Tutte".</div>
+            <div style="border:1px solid var(--color-line);border-radius:14px;overflow:hidden;background:var(--color-surface)">
+              <div style="display:grid;grid-template-columns:40px 56px minmax(0,1.2fr) minmax(0,1.6fr) 90px 150px;gap:14px;padding:12px 16px;background:var(--color-surface-2);font-size:13px;font-weight:700;color:var(--color-ink-2)"><div></div><div></div><div>Nome</div><div>Sessione</div><div>Sala</div><div>Avvisi</div></div>
+              <sc-for list="{{ reviewRows }}" as="r" hint-placeholder-count="7">
+                <div style="display:grid;grid-template-columns:40px 56px minmax(0,1.2fr) minmax(0,1.6fr) 90px 150px;gap:14px;padding:10px 16px;border-top:1px solid var(--color-line);align-items:center;font-size:15px">
+                  <div style="width:22px;height:22px;border-radius:6px;background:var(--color-primary);color:var(--color-on-primary);display:flex;align-items:center;justify-content:center;font-size:14px"><i class="icon-check"></i></div>
+                  <div style="width:40px;height:40px;border-radius:9px;background:var(--color-avatar-{{ r.av }});color:var(--color-on-avatar-{{ r.av }});display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">{{ r.ini }}</div>
+                  <div style="font-weight:700">{{ r.name }}</div>
+                  <div style="color:var(--color-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sub }}</div>
+                  <div>{{ r.room }}</div>
+                  <div style="font-size:13px;font-weight:700;color:var(--color-warning)">{{ r.warn }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:auto;display:flex;justify-content:space-between"><div style="height:52px;padding:0 20px;border-radius:14px;border:1.5px solid var(--color-line-strong);font-weight:700;display:flex;align-items:center">Indietro</div><div style="height:52px;padding:0 24px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;display:flex;align-items:center">Continua con 25</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:#5C5F73;line-height:1.55">Passi: Ambito, Impostazioni, Sorgente, Elementi, Regole, Pubblica. Lo stepper desktop è cliccabile sui passi già completati. Mobile: barra a 6 segmenti, un passo per schermata, CTA in fondo. Il passo "Regole" riusa l'editor della 12; "Pubblica" riepiloga e genera i materiali della 14.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800;color:#2B2D42">11. Gestione elementi: sorgente e consenso</div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div data-screen-label="11 Elements mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>9:41</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+        <div style="padding:4px 20px 12px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:24px;font-weight:800">Elementi</div>
+          <div style="padding:12px 14px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line);display:flex;gap:10px;align-items:center;font-size:14px"><i class="icon-calendar-range" style="font-size:20px;color:var(--color-link)"></i><div style="flex:1"><b>Sessionize</b><div style="color:var(--color-ink-2);font-size:13px">Sincronizzato 4 minuti fa</div></div><i class="icon-refresh-cw" style="font-size:20px"></i></div>
+          <div style="display:flex;gap:8px"><div style="height:36px;padding:0 12px;border-radius:999px;background:var(--color-primary);color:var(--color-on-primary);font-size:13px;font-weight:700;display:flex;align-items:center">Tutti 25</div><div style="height:36px;padding:0 12px;border-radius:999px;border:1.5px solid var(--color-line-strong);font-size:13px;font-weight:600;display:flex;align-items:center">In attesa 6</div><div style="height:36px;padding:0 12px;border-radius:999px;border:1.5px solid var(--color-line-strong);font-size:13px;font-weight:600;display:flex;align-items:center">Rifiutati 1</div></div>
+        </div>
+        <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:8px;overflow:hidden">
+          <sc-for list="{{ elRows }}" as="r" hint-placeholder-count="7">
+            <div style="display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line)">
+              <div style="width:40px;height:40px;border-radius:9px;background:var(--color-avatar-{{ r.av }});color:var(--color-on-avatar-{{ r.av }});display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex:none">{{ r.ini }}</div>
+              <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">{{ r.name }}</div><div style="font-size:13px;font-weight:700;display:flex;gap:4px;align-items:center;color:{{ r.cFg }}"><i class="{{ r.cIcon }}"></i>{{ r.consent }}</div></div>
+              <i class="icon-ellipsis-vertical" style="font-size:20px;color:var(--color-ink-2)"></i>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div data-screen-label="11 Elements desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:grid;grid-template-columns:248px minmax(0,1fr)">
+        <div style="background:var(--color-surface);border-right:1px solid var(--color-line);padding:24px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 8px 20px"><img src="assets/logo-r.svg" alt="" style="width:24px;height:24px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+          <div style="font-size:13px;font-weight:700;color:var(--color-ink-2);padding:0 10px 6px">Community Day Bologna 2027</div>
+          <sc-for list="{{ nav11 }}" as="n" hint-placeholder-count="6"><div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:{{ n.fw }};background:{{ n.bg }};color:{{ n.fg }}"><i class="{{ n.icon }}" style="font-size:18px"></i>{{ n.label }}</div></sc-for>
+        </div>
+        <div style="padding:32px 40px;display:flex;flex-direction:column;gap:18px;min-height:0">
+          <div style="display:flex;align-items:center;gap:16px"><div style="font-size:36px;font-weight:800;letter-spacing:-1px">Elementi</div><div style="margin-left:auto;display:flex;gap:10px"><div style="height:44px;padding:0 14px;border-radius:12px;border:1.5px solid var(--color-line-strong);font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><i class="icon-send"></i>Sollecita 6 in attesa</div><div style="height:44px;padding:0 14px;border-radius:12px;background:var(--color-primary);color:var(--color-on-primary);font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><i class="icon-plus"></i>Aggiungi</div></div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+            <div style="padding:16px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line);display:flex;gap:12px;align-items:center"><i class="icon-calendar-range" style="font-size:24px;color:var(--color-link)"></i><div><div style="font-size:15px;font-weight:800">Sessionize</div><div style="font-size:13px;color:var(--color-ink-2)">Sincronizzato 4 min fa</div></div></div>
+            <div style="padding:16px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line)"><div style="font-size:28px;font-weight:800">18</div><div style="font-size:13px;color:var(--color-success);font-weight:700;display:flex;gap:4px;align-items:center"><i class="icon-check"></i>Accettato</div></div>
+            <div style="padding:16px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line)"><div style="font-size:28px;font-weight:800">6</div><div style="font-size:13px;color:var(--color-warning);font-weight:700;display:flex;gap:4px;align-items:center"><i class="icon-clock"></i>In attesa</div></div>
+            <div style="padding:16px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line)"><div style="font-size:28px;font-weight:800">1</div><div style="font-size:13px;color:var(--color-danger);font-weight:700;display:flex;gap:4px;align-items:center"><i class="icon-x"></i>Rifiutato</div></div>
+          </div>
+          <div style="border:1px solid var(--color-line);border-radius:14px;overflow:hidden;background:var(--color-surface)">
+            <div style="display:grid;grid-template-columns:56px minmax(0,1.2fr) minmax(0,1.6fr) 80px 170px 160px 44px;gap:14px;padding:12px 16px;background:var(--color-surface-2);font-size:13px;font-weight:700;color:var(--color-ink-2)"><div></div><div>Nome</div><div>Sessione</div><div>Sala</div><div>Sorgente</div><div>Consenso</div><div></div></div>
+            <sc-for list="{{ elRows }}" as="r" hint-placeholder-count="7">
+              <div style="display:grid;grid-template-columns:56px minmax(0,1.2fr) minmax(0,1.6fr) 80px 170px 160px 44px;gap:14px;padding:10px 16px;border-top:1px solid var(--color-line);align-items:center;font-size:15px">
+                <div style="width:40px;height:40px;border-radius:9px;background:var(--color-avatar-{{ r.av }});color:var(--color-on-avatar-{{ r.av }});display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">{{ r.ini }}</div>
+                <div style="font-weight:700">{{ r.name }}</div>
+                <div style="color:var(--color-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sub }}</div>
+                <div>{{ r.room }}</div>
+                <div style="font-size:13px;color:var(--color-ink-2);display:flex;gap:6px;align-items:center"><i class="{{ r.srcIcon }}"></i>{{ r.src }}</div>
+                <div style="font-size:14px;font-weight:700;display:flex;gap:6px;align-items:center;color:{{ r.cFg }}"><i class="{{ r.cIcon }}"></i>{{ r.consent }}</div>
+                <i class="icon-ellipsis-vertical" style="font-size:20px;color:var(--color-ink-2)"></i>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:#5C5F73;line-height:1.55">Sorgente: icona + testo ("Sessionize", "Modificato a mano" quando un campo è sovrascritto e non verrà più sincronizzato). Consenso sempre con icona + parola. Sotto 1024 px la sidebar diventa un menu in alto e la tabella una lista.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800;color:#2B2D42">12. Editor regole</div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div data-screen-label="12 Rules mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column;position:relative">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>9:41</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+        <div style="padding:4px 20px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:24px;font-weight:800;margin-bottom:6px">Regole</div>
+          <sc-for list="{{ ruleRows }}" as="r" hint-placeholder-count="5"><div style="display:flex;gap:10px;align-items:center;padding:12px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line)"><div style="flex:1;font-size:14px;font-weight:700">{{ r.label }}</div><div style="height:28px;min-width:44px;border-radius:8px;background:{{ r.bg }};color:{{ r.fg }};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">{{ r.pts }}</div></div></sc-for>
+        </div>
+        <div style="position:absolute;inset:0;background:var(--color-scrim)"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;border-radius:24px 24px 0 0;background:var(--color-surface);padding:12px 20px 28px;display:flex;flex-direction:column;gap:14px">
+          <div style="width:40px;height:4px;border-radius:2px;background:var(--color-line-strong);align-self:center"></div>
+          <div style="font-size:20px;font-weight:800">Modifica regola</div>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Cosa succede</div><div style="min-height:52px;border-radius:12px;border:2px solid var(--color-primary);padding:12px 14px;font-size:16px;box-sizing:border-box">La demo fallisce e la salva dal vivo</div></div>
+          <div style="display:flex;padding:4px;border-radius:12px;background:var(--color-surface-2);border:1px solid var(--color-line);gap:4px"><div style="flex:1;height:44px;border-radius:9px;background:var(--color-lime);color:var(--color-on-lime);font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px"><i class="icon-plus"></i>Bonus</div><div style="flex:1;height:44px;border-radius:9px;font-size:15px;font-weight:600;color:var(--color-ink-2);display:flex;align-items:center;justify-content:center;gap:6px"><i class="icon-minus"></i>Malus</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><div style="font-size:14px;font-weight:700">Punti</div><div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;justify-content:center;font-size:20px"><i class="icon-minus"></i></div><div style="font-size:28px;font-weight:800;min-width:48px;text-align:center">10</div><div style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;justify-content:center;font-size:20px"><i class="icon-plus"></i></div></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:15px"><span>Massimo una volta per sessione</span><div style="width:48px;height:28px;border-radius:999px;background:var(--color-lime);padding:3px;display:flex;justify-content:flex-end;border:1.5px solid var(--color-on-lime);box-sizing:border-box"><div style="width:20px;height:20px;border-radius:50%;background:var(--color-on-lime)"></div></div></div>
+          <div style="height:56px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center">Salva regola</div>
+        </div>
+      </div>
+      <div data-screen-label="12 Rules desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:grid;grid-template-columns:248px minmax(0,1fr) 440px">
+        <div style="background:var(--color-surface);border-right:1px solid var(--color-line);padding:24px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 8px 20px"><img src="assets/logo-r.svg" alt="" style="width:24px;height:24px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+          <div style="font-size:13px;font-weight:700;color:var(--color-ink-2);padding:0 10px 6px">Community Day Bologna 2027</div>
+          <sc-for list="{{ nav12 }}" as="n" hint-placeholder-count="6"><div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:{{ n.fw }};background:{{ n.bg }};color:{{ n.fg }}"><i class="{{ n.icon }}" style="font-size:18px"></i>{{ n.label }}</div></sc-for>
+        </div>
+        <div style="padding:32px 40px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;margin-bottom:8px"><div style="font-size:36px;font-weight:800;letter-spacing:-1px">Regole</div><div style="margin-left:auto;height:44px;padding:0 14px;border-radius:12px;background:var(--color-primary);color:var(--color-on-primary);font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><i class="icon-plus"></i>Nuova regola</div></div>
+          <div style="font-size:14px;color:var(--color-ink-2);line-height:1.5;padding:12px 14px;border-radius:12px;background:var(--color-info-bg);color:var(--color-info);font-weight:600;display:flex;gap:8px"><i class="icon-info"></i>Premia momenti, mai la qualità del talk o l'aspetto delle persone.</div>
+          <sc-for list="{{ ruleRows }}" as="r" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:24px minmax(0,1fr) 180px 70px;gap:14px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--color-surface);border:{{ r.border }}">
+              <i class="icon-grip-vertical" style="color:var(--color-ink-2)"></i>
+              <div style="font-size:15px;font-weight:700">{{ r.label }}</div>
+              <div style="font-size:13px;color:var(--color-ink-2)">{{ r.limit }}</div>
+              <div style="height:30px;border-radius:8px;background:{{ r.bg }};color:{{ r.fg }};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">{{ r.pts }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:var(--color-surface);border-left:1px solid var(--color-line);padding:32px;display:flex;flex-direction:column;gap:18px">
+          <div style="font-size:22px;font-weight:800">Modifica regola</div>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Cosa succede</div><div style="min-height:52px;border-radius:12px;border:2px solid var(--color-primary);padding:12px 14px;font-size:16px;box-sizing:border-box">La demo fallisce e la salva dal vivo</div><div style="font-size:13px;color:var(--color-ink-2)">Scritto come lo vede chi gioca. Max 60 caratteri.</div></div>
+          <div style="display:flex;padding:4px;border-radius:12px;background:var(--color-surface-2);border:1px solid var(--color-line);gap:4px"><div style="flex:1;height:44px;border-radius:9px;background:var(--color-lime);color:var(--color-on-lime);font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px"><i class="icon-plus"></i>Bonus</div><div style="flex:1;height:44px;border-radius:9px;font-size:15px;font-weight:600;color:var(--color-ink-2);display:flex;align-items:center;justify-content:center;gap:6px"><i class="icon-minus"></i>Malus</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><div style="font-size:14px;font-weight:700">Punti</div><div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;justify-content:center;font-size:20px"><i class="icon-minus"></i></div><div style="font-size:28px;font-weight:800;min-width:48px;text-align:center">10</div><div style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;justify-content:center;font-size:20px"><i class="icon-plus"></i></div></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:15px"><span>Massimo una volta per sessione</span><div style="width:48px;height:28px;border-radius:999px;background:var(--color-lime);padding:3px;display:flex;justify-content:flex-end;border:1.5px solid var(--color-on-lime);box-sizing:border-box"><div style="width:20px;height:20px;border-radius:50%;background:var(--color-on-lime)"></div></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:15px"><span>Il capitano raddoppia</span><div style="width:48px;height:28px;border-radius:999px;background:var(--color-lime);padding:3px;display:flex;justify-content:flex-end;border:1.5px solid var(--color-on-lime);box-sizing:border-box"><div style="width:20px;height:20px;border-radius:50%;background:var(--color-on-lime)"></div></div></div>
+          <div style="margin-top:auto;display:flex;gap:10px"><div style="height:52px;padding:0 16px;border-radius:14px;color:var(--color-danger);font-weight:700;display:flex;align-items:center">Elimina</div><div style="flex:1;height:52px;border-radius:14px;background:var(--color-primary);color:var(--color-on-primary);font-weight:800;display:flex;align-items:center;justify-content:center">Salva regola</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:#5C5F73;line-height:1.55">Ordine trascinabile = ordine nella console arbitro (le più usate in alto). A partita live le modifiche ai punti valgono solo per i punti futuri: avviso inline prima del salvataggio.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800;color:#2B2D42">13. Controllo partita (interattiva: avanza lo stato)</div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div data-screen-label="13 Control mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>11:40</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+        <div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="font-size:14px;font-weight:700;color:var(--color-ink-2)">Community Day Bologna 2027</div>
+          <div style="font-size:28px;font-weight:800;letter-spacing:-0.5px">Controllo partita</div>
+          <div style="display:flex;flex-direction:column;gap:0;border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);overflow:hidden">
+            <sc-for list="{{ phases }}" as="p" hint-placeholder-count="4"><div style="display:flex;gap:12px;align-items:center;padding:14px 16px;border-top:1px solid var(--color-line);background:{{ p.bg }}"><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:{{ p.dotBg }};color:{{ p.dotFg }};border:{{ p.dotBd }};font-size:14px;font-weight:800"><i class="{{ p.icon }}"></i></span><div style="flex:1"><div style="font-size:15px;font-weight:{{ p.fw }}">{{ p.label }}</div><div style="font-size:12px;color:var(--color-ink-2)">{{ p.note }}</div></div></div></sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4"><div style="padding:14px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line)"><div style="font-size:28px;font-weight:800">{{ s.v }}</div><div style="font-size:13px;color:var(--color-ink-2)">{{ s.l }}</div></div></sc-for>
+          </div>
+          <div style="margin-top:auto;height:64px;border-radius:16px;background:{{ ctrl.bg }};color:{{ ctrl.fg }};font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" onClick="{{ advance }}"><i class="{{ ctrl.icon }}"></i>{{ ctrl.label }}</div>
+          <div style="font-size:13px;color:var(--color-ink-2);text-align:center">{{ ctrl.note }}</div>
+        </div>
+      </div>
+      <div data-screen-label="13 Control desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:grid;grid-template-columns:248px minmax(0,1fr)">
+        <div style="background:var(--color-surface);border-right:1px solid var(--color-line);padding:24px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 8px 20px"><img src="assets/logo-r.svg" alt="" style="width:24px;height:24px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+          <div style="font-size:13px;font-weight:700;color:var(--color-ink-2);padding:0 10px 6px">Community Day Bologna 2027</div>
+          <sc-for list="{{ nav13 }}" as="n" hint-placeholder-count="6"><div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:{{ n.fw }};background:{{ n.bg }};color:{{ n.fg }}"><i class="{{ n.icon }}" style="font-size:18px"></i>{{ n.label }}</div></sc-for>
+        </div>
+        <div style="padding:32px 40px;display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;align-items:center;gap:16px"><div style="font-size:36px;font-weight:800;letter-spacing:-1px">Controllo partita</div><div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--color-line)"><span style="width:10px;height:10px;border-radius:50%;background:{{ ctrl.dot }}"></span>{{ ctrl.state }}</div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+            <sc-for list="{{ phases }}" as="p" hint-placeholder-count="4"><div style="padding:16px;border-radius:14px;background:{{ p.bg }};border:{{ p.cardBd }};display:flex;flex-direction:column;gap:8px"><span style="width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:{{ p.dotBg }};color:{{ p.dotFg }};border:{{ p.dotBd }};font-size:16px"><i class="{{ p.icon }}"></i></span><div style="font-size:16px;font-weight:{{ p.fw }}">{{ p.label }}</div><div style="font-size:13px;color:var(--color-ink-2)">{{ p.note }}</div></div></sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+            <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4"><div style="padding:20px;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-line)"><div style="font-size:40px;font-weight:800;letter-spacing:-1px">{{ s.v }}</div><div style="font-size:14px;color:var(--color-ink-2)">{{ s.l }}</div></div></sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:16px;flex:1;min-height:0">
+            <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:20px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:16px;font-weight:800">Ingressi negli ultimi 60 minuti</div>
+              <div style="flex:1;display:flex;align-items:flex-end;gap:6px"><sc-for list="{{ bars }}" as="b" hint-placeholder-count="12"><div style="flex:1;height:{{ b.h }}%;border-radius:6px 6px 0 0;background:var(--color-primary)"></div></sc-for></div>
+            </div>
+            <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:20px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:16px;font-weight:800">Arbitri</div>
+              <div style="display:flex;justify-content:space-between;font-size:15px"><span>Sala A, Chiara</span><span style="color:var(--color-success);font-weight:700;display:flex;gap:4px;align-items:center"><i class="icon-check"></i>Online</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:15px"><span>Sala B, Paolo</span><span style="color:var(--color-warning);font-weight:700;display:flex;gap:4px;align-items:center"><i class="icon-wifi-off"></i>Offline, 2 in coda</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:15px"><span>Sala C, Ines</span><span style="color:var(--color-success);font-weight:700;display:flex;gap:4px;align-items:center"><i class="icon-check"></i>Online</span></div>
+              <div style="margin-top:auto;height:64px;border-radius:16px;background:{{ ctrl.bg }};color:{{ ctrl.fg }};font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" onClick="{{ advance }}"><i class="{{ ctrl.icon }}"></i>{{ ctrl.label }}</div>
+              <div style="font-size:13px;color:var(--color-ink-2);text-align:center">{{ ctrl.note }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:#5C5F73;line-height:1.55">Un solo bottone primario che cambia con la fase: Apri iscrizioni, Avvia live, Chiudi partita. "Chiudi" è distruttivo e chiede conferma digitando il codice partita. Le fasi sono sempre visibili come sequenza, con quella attuale evidenziata.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:18px;font-weight:800;color:#2B2D42">14. Materiali per l'ingresso</div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div data-screen-label="14 Materials mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:flex;flex-direction:column">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;flex:none"><span>9:41</span><span style="display:flex;gap:6px;font-size:16px"><i class="icon-signal"></i><i class="icon-wifi"></i><i class="icon-battery-full"></i></span></div>
+        <div style="padding:4px 20px 24px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div style="font-size:24px;font-weight:800">Fai entrare la gente</div>
+          <div style="padding:20px;border-radius:20px;background:var(--color-surface);border:1px solid var(--color-line);display:flex;flex-direction:column;align-items:center;gap:12px">
+            <div style="background:#FFFFFF;padding:10px;border-radius:12px"><img src="https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=0&color=2B2D42&data=https://fantaroster.com/j/CDB27" alt="QR" style="width:200px;height:200px;display:block"></div>
+            <div style="font-size:30px;font-weight:800;letter-spacing:3px">CDB27</div>
+          </div>
+          <div style="height:52px;border-radius:12px;border:1.5px solid var(--color-line-strong);background:var(--color-surface);padding:0 6px 0 14px;display:flex;align-items:center;gap:8px;font-size:15px"><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">fantaroster.com/j/CDB27</span><div style="height:40px;padding:0 12px;border-radius:10px;background:var(--color-primary);color:var(--color-on-primary);font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><i class="icon-copy"></i>Copia</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="height:56px;border-radius:14px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;gap:12px;padding:0 16px;font-weight:700"><i class="icon-file-text" style="font-size:20px"></i><span style="flex:1">Poster A4</span><i class="icon-download"></i></div>
+            <div style="height:56px;border-radius:14px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;gap:12px;padding:0 16px;font-weight:700"><i class="icon-sticker" style="font-size:20px"></i><span style="flex:1">Adesivi badge, foglio da 24</span><i class="icon-download"></i></div>
+            <div style="height:56px;border-radius:14px;border:1.5px solid var(--color-line-strong);display:flex;align-items:center;gap:12px;padding:0 16px;font-weight:700"><i class="icon-monitor" style="font-size:20px"></i><span style="flex:1">Apri il maxischermo</span><i class="icon-external-link"></i></div>
+          </div>
+        </div>
+      </div>
+      <div data-screen-label="14 Materials desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);display:grid;grid-template-columns:248px minmax(0,1fr)">
+        <div style="background:var(--color-surface);border-right:1px solid var(--color-line);padding:24px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 8px 20px"><img src="assets/logo-r.svg" alt="" style="width:24px;height:24px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+          <div style="font-size:13px;font-weight:700;color:var(--color-ink-2);padding:0 10px 6px">Community Day Bologna 2027</div>
+          <sc-for list="{{ nav14 }}" as="n" hint-placeholder-count="6"><div style="height:44px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:{{ n.fw }};background:{{ n.bg }};color:{{ n.fg }}"><i class="{{ n.icon }}" style="font-size:18px"></i>{{ n.label }}</div></sc-for>
+        </div>
+        <div style="padding:32px 40px;display:flex;flex-direction:column;gap:20px">
+          <div style="font-size:36px;font-weight:800;letter-spacing:-1px">Materiali per l'ingresso</div>
+          <div style="display:grid;grid-template-columns:320px minmax(0,1fr) 300px;gap:20px;flex:1;min-height:0">
+            <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:24px;display:flex;flex-direction:column;gap:14px;align-items:center">
+              <div style="background:#FFFFFF;padding:10px;border-radius:12px"><img src="https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=0&color=2B2D42&data=https://fantaroster.com/j/CDB27" alt="QR" style="width:240px;height:240px;display:block"></div>
+              <div style="font-size:32px;font-weight:800;letter-spacing:3px">CDB27</div>
+              <div style="width:100%;height:48px;border-radius:12px;border:1.5px solid var(--color-line-strong);padding:0 6px 0 12px;display:flex;align-items:center;gap:8px;font-size:14px;box-sizing:border-box"><span style="flex:1">fantaroster.com/j/CDB27</span><div style="height:36px;padding:0 10px;border-radius:9px;background:var(--color-primary);color:var(--color-on-primary);font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><i class="icon-copy"></i>Copia</div></div>
+              <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="height:44px;border-radius:12px;border:1.5px solid var(--color-line-strong);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px"><i class="icon-download"></i>PNG</div><div style="height:44px;border-radius:12px;border:1.5px solid var(--color-line-strong);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px"><i class="icon-download"></i>SVG</div></div>
+            </div>
+            <div style="border-radius:16px;background:var(--color-surface-2);border:1px solid var(--color-line);padding:24px;display:flex;flex-direction:column;gap:14px;align-items:center">
+              <div style="align-self:flex-start;font-size:16px;font-weight:800">Poster A4</div>
+              <div style="width:420px;height:594px;background:#F8F9FA;border:1px solid #E3E5EA;box-shadow:0 8px 24px rgba(26,0,51,.12);padding:32px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;color:#2B2D42;position:relative;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:27px;height:27px;object-fit:contain"><span style="font-size:20px;letter-spacing:-1px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+                <div><div style="font-size:15px;font-weight:600;color:#5C5F73">Community Day Bologna 2027</div><div style="font-size:52px;font-weight:800;line-height:.95;letter-spacing:-2px;margin-top:6px">Gioca il fanta degli speaker</div><div style="font-size:15px;margin-top:10px;line-height:1.45">Scegli 3 speaker, il capitano vale doppio. Classifica live sul maxischermo.</div></div>
+                <div style="display:flex;align-items:flex-end;justify-content:space-between"><div style="background:#FFFFFF;padding:8px;border-radius:10px;border:1px solid #E3E5EA"><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&color=2B2D42&data=https://fantaroster.com/j/CDB27" alt="" style="width:136px;height:136px;display:block"></div><div style="text-align:right"><div style="font-size:13px;color:#5C5F73">oppure vai su</div><div style="font-size:15px;font-weight:800">fantaroster.com</div><div style="font-size:28px;font-weight:800;letter-spacing:2px;margin-top:2px">CDB27</div></div></div>
+                <div style="position:absolute;right:-30px;top:120px;width:90px;height:120px;border-radius:12px;background:#D4FF00;transform:rotate(14deg)"></div>
+              </div>
+              <div style="display:flex;gap:10px"><div style="height:44px;padding:0 14px;border-radius:12px;background:var(--color-primary);color:var(--color-on-primary);font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><i class="icon-printer"></i>Stampa poster</div></div>
+            </div>
+            <div style="border-radius:16px;background:var(--color-surface);border:1px solid var(--color-line);padding:24px;display:flex;flex-direction:column;gap:14px;align-items:center">
+              <div style="align-self:flex-start;font-size:16px;font-weight:800">Adesivo badge, 50×50 mm</div>
+              <div style="width:200px;height:200px;border-radius:24px;background:#5000A5;color:#FFFFFF;padding:16px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:space-between">
+                <span style="font-size:15px;letter-spacing:-0.7px"><b style="font-weight:800">fanta</b>roster</span>
+                <div style="background:#FFFFFF;padding:6px;border-radius:8px"><img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&color=2B2D42&data=https://fantaroster.com/j/CDB27" alt="" style="width:100px;height:100px;display:block"></div>
+                <span style="font-size:15px;font-weight:800;letter-spacing:2px">CDB27</span>
+              </div>
+              <div style="font-size:13px;color:var(--color-ink-2);text-align:center;line-height:1.5">Foglio A4 con 24 adesivi, margini di taglio 3 mm.</div>
+              <div style="margin-top:auto;height:44px;padding:0 14px;border-radius:12px;border:1.5px solid var(--color-line-strong);font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px"><i class="icon-download"></i>Scarica PDF</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:#5C5F73;line-height:1.55">Poster e adesivi sono sempre chiari (stampa economica) e usano solo inchiostro, viola e lime. QR con margine di quiete 4 moduli, minimo 30 mm stampato. Il codice è a 5 caratteri senza 0/O e 1/I.</div>
+  </div>
+</section>
+</sc-for>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;themes&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Entrambi&quot;,&quot;Solo scuro&quot;,&quot;Solo chiaro&quot;],&quot;default&quot;:&quot;Entrambi&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const REF_ELS = [
+  { id:'fd', name:'Francesca Delli Santi', ini:'FD', av:3, onStage:true },
+  { id:'ao', name:'Aisha Okafor', ini:'AO', av:4 },
+  { id:'sk', name:'Sofia Kowalczyk', ini:'SK', av:3 },
+  { id:'gb', name:'Giulia Bertoldi-Mancuso', ini:'GB', av:1 },
+  { id:'me', name:'Marco Esposito', ini:'ME', av:2 },
+  { id:'lp', name:'Luca Pellegrino', ini:'LP', av:5 }
+];
+const REF_RULES = [
+  { id:'r1', label:'La demo fallisce e la salva dal vivo', pts:'+10' },
+  { id:'r2', label:'Live coding funziona al primo colpo', pts:'+8' },
+  { id:'r3', label:'Domanda che la mette in difficoltà', pts:'+6' },
+  { id:'r4', label:'"It works on my machine"', pts:'+5' },
+  { id:'r5', label:'Finisce in perfetto orario', pts:'+3' },
+  { id:'r6', label:'Sfora di 5 minuti', pts:'−3' }
+];
+const chip = p => p.startsWith('−') ? { bg:'var(--color-danger-bg)', fg:'var(--color-danger)' } : { bg:'var(--color-lime)', fg:'var(--color-on-lime)' };
+const NAV = ['Panoramica:icon-layout-dashboard','Elementi:icon-users','Regole:icon-scale','Controllo:icon-radio','Materiali:icon-qr-code','Arbitri:icon-flag'];
+const nav = active => NAV.map(s => { const [label, icon] = s.split(':'); const a = label === active; return { label, icon, bg: a ? 'var(--color-primary-tint)' : 'transparent', fg: a ? 'var(--color-link)' : 'var(--color-ink)', fw: a ? 800 : 600 }; });
+const STEPS = ['Ambito','Impostazioni','Sorgente','Elementi','Regole','Pubblica'];
+const steps = cur => STEPS.map((label, i) => { const n = i + 1, done = n < cur, now = n === cur;
+  return { n: done ? '✓' : n, label, bg: done || now ? 'var(--color-primary)' : 'transparent', numFg: done || now ? 'var(--color-on-primary)' : 'var(--color-ink-2)', bd: done || now ? 'none' : '1.5px solid var(--color-line-strong)', fg: now ? 'var(--color-ink)' : 'var(--color-ink-2)' }; });
+const EL_ROWS = [
+  ['Francesca Delli Santi','FD',3,'Il mio LLM ha mentito in produzione','B','ok'],
+  ['Giulia Bertoldi-Mancuso','GB',1,'Blazor senza paura: dal server al browser','A','ok'],
+  ['Marco Esposito','ME',2,'Kubernetes per chi ha fretta','A','ok','manual'],
+  ['Aisha Okafor','AO',4,'Accessibilità che regge in produzione','B','wait'],
+  ['Elena Vitale','EV',1,'Testare quello che non vedi','A','wait'],
+  ['Tommaso Ricci','TR',2,'Monoliti felici','C','no'],
+  ['Sofia Kowalczyk','SK',3,'Event sourcing senza drammi','C','ok']
+];
+const PH = [['Bozza','Regole e elementi pronti'],['Iscrizioni aperte','Si entra, si sceglie la rosa'],['Live','Rose bloccate, punti attivi'],['Finita','Classifica definitiva']];
+const CTRL = [
+  { label:'Apri iscrizioni', icon:'icon-door-open', note:'Il QR inizia a funzionare.', state:'Bozza', dot:'var(--color-ink-2)', primary:true },
+  { label:'Avvia live', icon:'icon-play', note:'Le rose si bloccano per tutti.', state:'Iscrizioni aperte', dot:'var(--color-info)', primary:true },
+  { label:'Chiudi partita', icon:'icon-flag', note:'Chiede conferma con il codice CDB27.', state:'Live', dot:'var(--color-success)', danger:true },
+  { label:'Riapri come bozza', icon:'icon-rotate-ccw', note:'Solo per una nuova edizione.', state:'Finita', dot:'var(--color-ink-2)' }
+];
+
+class Component extends DCLogic {
+  state = { step:1, el:'fd', rule:'r1', undoLeft:0, last:null, voided:false, phase:2 };
+  componentWillUnmount() { clearInterval(this.iv); }
+  confirm = () => {
+    clearInterval(this.iv);
+    const e = REF_ELS.find(x => x.id === this.state.el), r = REF_RULES.find(x => x.id === this.state.rule);
+    this.setState({ undoLeft:10, last:`${r.pts} a ${e.name.split(' ')[0]}`, step:1 });
+    this.iv = setInterval(() => this.setState(s => { if (s.undoLeft <= 1) { clearInterval(this.iv); return { undoLeft:0 }; } return { undoLeft: s.undoLeft - 1 }; }), 1000);
+  };
+  renderVals() {
+    const { step, el, rule, undoLeft, last, phase } = this.state;
+    const mode = this.props.themes ?? 'Entrambi';
+    const all = [{ id:'dark', label:'Tema scuro (default arbitro)' }, { id:'light', label:'Tema chiaro (default organizzatore)' }];
+    const themes = mode === 'Solo scuro' ? [all[0]] : mode === 'Solo chiaro' ? [all[1]] : all;
+    const selEl = REF_ELS.find(x => x.id === el), r0 = REF_RULES.find(x => x.id === rule), selRule = { ...r0, ...chip(r0.pts) };
+    const refEls = REF_ELS.map(e => ({ ...e, onStage: !!e.onStage, pick: () => this.setState({ el:e.id, step:2 }),
+      border: e.id === el ? '2px solid var(--color-primary)' : '1px solid var(--color-line)', bgD: e.id === el ? 'var(--color-primary-tint)' : 'var(--color-surface)' }));
+    const refRules = REF_RULES.map(r => ({ ...r, ...chip(r.pts), pick: () => this.setState({ rule:r.id, step:3 }),
+      border: r.id === rule ? '2px solid var(--color-primary)' : '1px solid var(--color-line)', bgD: r.id === rule ? 'var(--color-primary-tint)' : 'var(--color-surface)' }));
+    const titles = ['Chi ha fatto qualcosa?','Cosa ha fatto?','Confermi?'];
+    const recentSrc = [
+      { who:'Francesca Delli Santi', rule:'Domanda che la mette in difficoltà', pts:'+6', st:'pending' },
+      { who:'Sofia Kowalczyk', rule:'Finisce in perfetto orario', pts:'+3', st:'pending' },
+      { who:'Aisha Okafor', rule:'"It works on my machine"', pts:'+5', st:'sent' },
+      { who:'Marco Esposito', rule:'"It works on my machine"', pts:'+5', st:'void' },
+      { who:'Giulia Bertoldi-Mancuso', rule:'La demo fallisce e la salva dal vivo', pts:'+10', st:'sent' },
+      { who:'Marco Esposito', rule:'Sfora di 5 minuti', pts:'−3', st:'sent' }
+    ];
+    const recent = recentSrc.map(x => { const v = x.st === 'void', p = x.st === 'pending', c = chip(x.pts);
+      return { ...x, bg: v ? 'transparent' : c.bg, fg: v ? 'var(--color-ink-2)' : c.fg, deco: v ? 'line-through' : 'none', op: v ? .65 : 1,
+        border: v ? '1px dashed var(--color-line-strong)' : p ? '1.5px solid var(--color-warning)' : '1px solid var(--color-line)',
+        status: v ? 'Annullato' : p ? 'In attesa di rete' : 'Pubblicato, 11:3' + (recentSrc.indexOf(x)), sIcon: v ? 'icon-undo-2' : p ? 'icon-clock' : 'icon-check',
+        sFg: v ? 'var(--color-ink-2)' : p ? 'var(--color-warning)' : 'var(--color-success)', canVoid: !v }; });
+    const consent = { ok:['Accettato','icon-check','var(--color-success)'], wait:['In attesa','icon-clock','var(--color-warning)'], no:['Rifiutato','icon-x','var(--color-danger)'] };
+    const elRows = EL_ROWS.map(([name,ini,av,sub,room,c,src]) => ({ name, ini, av, sub, room:'Sala ' + room, consent: consent[c][0], cIcon: consent[c][1], cFg: consent[c][2],
+      src: src === 'manual' ? 'Modificato a mano' : 'Sessionize', srcIcon: src === 'manual' ? 'icon-pencil-line' : 'icon-calendar-range' }));
+    const reviewRows = EL_ROWS.map(([name,ini,av,sub,room], i) => ({ name, ini, av, sub, room: i === 5 ? '—' : 'Sala ' + room, warn: i === 2 || i === 4 ? 'Senza foto' : i === 5 ? 'Senza sala' : '' }));
+    const ruleRows = [...REF_RULES, { label:'Slide con meme approvato dalla sala', pts:'+4' }, { label:'Microfono spento per i primi 30 secondi', pts:'−2' }]
+      .map((r, i) => ({ ...r, ...chip(r.pts), limit: i === 0 ? 'Max 1 per sessione' : i === 5 ? 'Ogni 5 minuti' : 'Illimitata', border: i === 0 ? '2px solid var(--color-primary)' : '1px solid var(--color-line)' }));
+    const phases = PH.map(([label, note], i) => { const done = i < phase, now = i === phase;
+      return { label, note, icon: done ? 'icon-check' : now ? 'icon-circle-dot' : 'icon-circle', fw: now ? 800 : 600,
+        bg: now ? 'var(--color-primary-tint)' : 'var(--color-surface)', cardBd: now ? '2px solid var(--color-primary)' : '1px solid var(--color-line)',
+        dotBg: done || now ? 'var(--color-primary)' : 'transparent', dotFg: done || now ? 'var(--color-on-primary)' : 'var(--color-ink-2)', dotBd: done || now ? 'none' : '1.5px solid var(--color-line-strong)' }; });
+    const c = CTRL[phase];
+    const ctrl = { ...c, bg: c.danger ? 'var(--color-danger)' : c.primary ? 'var(--color-primary)' : 'var(--color-surface-2)', fg: c.danger ? 'var(--color-bg)' : c.primary ? 'var(--color-on-primary)' : 'var(--color-ink)' };
+    const statsBy = [[0,0,0,3],[148,0,0,3],[212,47,2,3],[212,63,3,3]][phase];
+    const stats = [{ v: statsBy[0], l:'Giocatori entrati' }, { v: statsBy[1], l:'Punti assegnati' }, { v: statsBy[2], l:'Punti annullati' }, { v: statsBy[3], l:'Arbitri attivi' }];
+    return {
+      themes, stepN: step, stepTitle: titles[step - 1], isStep1: step === 1, isStep2: step === 2, isStep3: step === 3, canBack: step > 1,
+      back: () => this.setState({ step: Math.max(1, step - 1) }),
+      stepBars: [1,2,3].map(n => ({ bg: n <= step ? 'var(--color-primary)' : 'var(--color-line)' })),
+      refEls, refRules, selEl, selRule, confirm: this.confirm,
+      showUndo: undoLeft > 0, undoS: undoLeft, undoPct: undoLeft * 10, lastLabel: last ? `${last}. Assegnato.` : '',
+      undo: () => { clearInterval(this.iv); this.setState({ undoLeft:0 }); },
+      recent,
+      domains: [
+        { name:'Conferenza', desc:'Speaker e sessioni, anche da Sessionize', icon:'icon-mic', sel:true },
+        { name:'Matrimonio', desc:'Invitati, momenti, discorsi', icon:'icon-heart' },
+        { name:'Torneo', desc:'Squadre e giocatori', icon:'icon-trophy' },
+        { name:'Qualsiasi cosa', desc:'Parti da zero, decidi tu', icon:'icon-sparkles' }
+      ].map(d => ({ ...d, border: d.sel ? '2px solid var(--color-primary)' : '1px solid var(--color-line)', iconBg: d.sel ? 'var(--color-primary)' : 'var(--color-surface-2)', iconFg: d.sel ? 'var(--color-on-primary)' : 'var(--color-ink)' })),
+      wizSteps3: steps(3), wizSteps4: steps(4), reviewRows, elRows, ruleRows,
+      nav11: nav('Elementi'), nav12: nav('Regole'), nav13: nav('Controllo'), nav14: nav('Materiali'),
+      phases, ctrl, stats, advance: () => this.setState({ phase: (phase + 1) % 4 }),
+      bars: [12,18,30,46,62,80,95,70,52,40,28,20].map(h => ({ h: phase === 0 ? 2 : h }))
+    };
+  }
+}
+</script>
+</body>
+</html>

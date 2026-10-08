@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.460.0/font/lucide.css">
+<link rel="stylesheet" href="tokens/tokens.css">
+<style>body{margin:0;background:#ECEEF2;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#2B2D42;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}a{color:#5000A5}a:hover{color:#2D0060}[class^="icon-"]{font-style:normal;line-height:1;display:inline-block}</style>
+</helmet>
+
+<section data-screen-label="Intro" style="padding:56px 80px 8px">
+  <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap"><h1 style="margin:0;font-size:40px;font-weight:800;letter-spacing:-1px">Maxischermo (15–16), pubblico (17–18), domande aperte</h1><a href="01 Identita e Sistema.dc.html" style="font-size:15px">Sistema</a><a href="02 Partecipante.dc.html" style="font-size:15px">Partecipante</a><a href="03 Arbitro e Organizzatore.dc.html" style="font-size:15px">Arbitro e organizzatore</a></div>
+  <p style="margin:10px 0 0;font-size:16px;color:#5C5F73;max-width:980px;line-height:1.55">Maxischermo 1920×1080 in tema "stage": fondo viola pieno (regge i proiettori slavati meglio di un nero), carte bianche, testo minimo 32 px. Premi "Simula cambio" per il rimescolamento orchestrato. Pagine pubbliche: desktop 1440 e mobile 390, landing per entrambi i brand.</p>
+</section>
+
+<section data-screen-label="15 Big screen" style="padding:40px 80px;display:flex;flex-direction:column;gap:14px;border-top:1px solid #D9DCE3">
+  <div style="display:flex;align-items:center;gap:16px"><div style="font-size:18px;font-weight:800">15. Classifica con ticker e QR, momento del cambio</div><div style="height:44px;padding:0 16px;border-radius:12px;background:#5000A5;color:#FFFFFF;font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;cursor:pointer" onClick="{{ simulate }}"><i class="icon-shuffle"></i>Simula cambio</div></div>
+  <div data-screen-label="15 Big screen frame" style="width:1920px;height:1080px;background:#5000A5;color:#FFFFFF;position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 520px;grid-template-rows:120px minmax(0,1fr) 120px">
+    <div style="grid-column:1 / 3;display:flex;align-items:center;gap:24px;padding:0 72px">
+      <img src="assets/logo-r.svg" alt="" style="width:60px;height:60px;object-fit:contain">
+      <span style="font-size:44px;letter-spacing:-2.2px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span>
+      <span style="font-size:36px;font-weight:600;color:#E4D6F7;margin-left:16px">Community Day Bologna 2027</span>
+      <div style="margin-left:auto;height:60px;padding:0 24px;border-radius:999px;background:#FFFFFF;color:#2B2D42;display:flex;align-items:center;gap:12px;font-size:32px;font-weight:800"><span style="width:18px;height:18px;border-radius:50%;background:#1F7A3A"></span>Live</div>
+    </div>
+    <div style="padding:8px 48px 24px 72px;position:relative">
+      <sc-for list="{{ stageRows }}" as="r" hint-placeholder-count="8">
+        <div style="position:absolute;left:72px;right:48px;top:{{ r.top }}px;height:96px;border-radius:20px;background:#FFFFFF;color:#2B2D42;display:grid;grid-template-columns:96px 120px 72px minmax(0,1fr) 160px;gap:24px;align-items:center;padding:0 32px;box-shadow:{{ r.shadow }};transform:{{ r.tf }};z-index:{{ r.z }};outline:{{ r.ol }};transition:top 900ms cubic-bezier(.2,0,0,1), transform 450ms cubic-bezier(.34,1.4,.64,1), box-shadow 300ms">
+          <div style="font-size:56px;font-weight:800;letter-spacing:-1.5px">{{ r.rank }}</div>
+          <div style="height:52px;border-radius:12px;font-size:32px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:4px;background:{{ r.dBg }};color:{{ r.dFg }}"><i class="{{ r.dIcon }}"></i>{{ r.dN }}</div>
+          <div style="width:72px;height:72px;border-radius:14px;background:var(--color-avatar-{{ r.av }});color:var(--color-on-avatar-{{ r.av }});display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px">{{ r.ini }}</div>
+          <div style="font-size:48px;font-weight:700;letter-spacing:-1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.nick }}</div>
+          <div style="font-size:64px;font-weight:800;letter-spacing:-1.5px;text-align:right">{{ r.score }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:8px 72px 24px 0;display:flex;flex-direction:column;gap:24px">
+      <div style="border-radius:24px;background:#FFFFFF;color:#2B2D42;padding:32px;display:flex;flex-direction:column;align-items:center;gap:16px">
+        <div style="font-size:36px;font-weight:800">Entra nel fanta</div>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=520x520&margin=0&color=2B2D42&data=https://fantaroster.com/j/CDB27" alt="QR" style="width:300px;height:300px;display:block">
+        <div style="font-size:32px;font-weight:600">fantaroster.com</div>
+        <div style="font-size:56px;font-weight:800;letter-spacing:6px">CDB27</div>
+      </div>
+      <div style="border-radius:24px;border:3px solid #FFFFFF;padding:24px 28px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:32px;font-weight:600;color:#E4D6F7">In gioco</div>
+        <div style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1">212</div>
+      </div>
+    </div>
+    <div style="grid-column:1 / 3;background:#1A0033;display:flex;align-items:center;gap:56px;padding:0 72px;overflow:hidden;white-space:nowrap">
+      <div style="height:64px;padding:0 20px;border-radius:14px;background:#00E5FF;color:#2B2D42;font-size:32px;font-weight:800;display:flex;align-items:center;flex:none">Ultimi punti</div>
+      <sc-for list="{{ ticker }}" as="k" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:16px;flex:none;font-size:36px;font-weight:700;color:#EDE7F6"><span style="height:56px;padding:0 14px;border-radius:12px;background:{{ k.bg }};color:{{ k.fg }};font-weight:800;display:flex;align-items:center">{{ k.pts }}</span>{{ k.who }}<span style="font-weight:500;color:#B3A6CC">{{ k.rule }}</span></div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ moment }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:72px;top:132px;height:72px;padding:0 24px;border-radius:16px;background:#D4FF00;color:#2B2D42;font-size:40px;font-weight:800;display:flex;align-items:center;gap:12px;z-index:20;box-shadow:8px 8px 0 0 #2D0060"><i class="icon-arrow-up"></i>{{ momentText }}</div>
+    </sc-if>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55;max-width:1920px">Mostra i primi 8, nessuno scroll. Il cambio di posizione è l'unico momento orchestrato: la carta che sale si solleva (scala 1,04, contorno lime, ombra diagonale viola), il chip "Sale di N" appare in alto per 3 s, le altre carte scivolano in 900 ms. Il ticker scorre a 60 px/s e si ferma durante il rimescolamento. Prefers-reduced-motion o "modalità statica" (impostazione organizzatore): aggiornamento istantaneo, chip invariato. Su 1280×720 la colonna QR si stringe a 360 px e si mostrano i primi 6.</div>
+</section>
+
+<section data-screen-label="16 Join now" style="padding:40px 80px;display:flex;flex-direction:column;gap:14px;border-top:1px solid #D9DCE3">
+  <div style="font-size:18px;font-weight:800">16. "Entra adesso" tra una sessione e l'altra</div>
+  <div style="width:1920px;height:1080px;background:#5000A5;color:#FFFFFF;position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 760px;padding:96px 120px;box-sizing:border-box;gap:80px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:40px">
+      <div style="display:flex;align-items:center;gap:20px"><img src="assets/logo-r.svg" alt="" style="width:72px;height:72px;object-fit:contain"><span style="font-size:52px;letter-spacing:-2.6px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+      <div style="font-size:150px;font-weight:800;line-height:.92;letter-spacing:-5px">Sei ancora<br>in tempo.</div>
+      <div style="font-size:44px;font-weight:600;line-height:1.3;color:#FFFFFF;max-width:900px">Inquadra, scegli 3 speaker, scegli il capitano. Il prossimo talk inizia alle 14:00 in Sala A.</div>
+      <div style="display:flex;gap:20px">
+        <div style="height:80px;padding:0 28px;border-radius:18px;background:#FFFFFF;color:#2B2D42;display:flex;align-items:center;gap:14px;font-size:36px;font-weight:800"><i class="icon-users"></i>212 in gioco</div>
+        <div style="height:80px;padding:0 28px;border-radius:18px;background:#D4FF00;color:#2B2D42;display:flex;align-items:center;gap:14px;font-size:36px;font-weight:800"><i class="icon-clock"></i>Rose aperte fino alle 14:00</div>
+      </div>
+    </div>
+    <div style="position:relative;height:860px">
+      <div style="position:absolute;left:40px;top:120px;width:560px;height:700px;border-radius:40px;background:#00E5FF;transform:rotate(-10deg)"></div>
+      <div style="position:absolute;left:150px;top:110px;width:560px;height:700px;border-radius:40px;background:#007BFF;transform:rotate(6deg)"></div>
+      <div style="position:absolute;left:100px;top:60px;width:580px;height:740px;border-radius:40px;background:#FFFFFF;color:#2B2D42;box-shadow:24px 24px 0 0 #2D0060;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=800x800&margin=0&color=2B2D42&data=https://fantaroster.com/j/CDB27" alt="QR" style="width:440px;height:440px;display:block">
+        <div style="font-size:40px;font-weight:600">fantaroster.com</div>
+        <div style="font-size:80px;font-weight:800;letter-spacing:10px;line-height:1">CDB27</div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Si attiva in automatico nelle pause del programma importato (o a mano dalla 13). QR grande almeno 1/3 dell'altezza schermo: leggibile da 15 m. Il codice è sempre scritto per chi non inquadra.</div>
+</section>
+
+<section data-screen-label="17 Landing" style="padding:40px 80px;display:flex;flex-direction:column;gap:32px;border-top:1px solid #D9DCE3">
+  <div style="font-size:18px;font-weight:800">17. Landing page, per brand</div>
+  <sc-for list="{{ landings }}" as="l" hint-placeholder-count="2">
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <div data-screen-label="17 Landing mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:#F8F9FA;color:#2B2D42;border:1px solid #E3E5EA;display:flex;flex-direction:column">
+        <div style="height:48px;padding:0 28px;display:flex;align-items:center;font-size:15px;font-weight:700;flex:none">9:41</div>
+        <div style="padding:4px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:24px;height:24px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">{{ l.prefix }}</b><span style="font-weight:500">roster</span></span></div><i class="icon-menu" style="font-size:24px"></i></div>
+        <div style="padding:24px 20px;display:flex;flex-direction:column;gap:18px">
+          <div style="font-size:44px;font-weight:800;line-height:1;letter-spacing:-1.5px">{{ l.h1 }}</div>
+          <div style="font-size:16px;color:#5C5F73;line-height:1.5">{{ l.sub }}</div>
+          <div style="height:56px;border-radius:14px;background:#5000A5;color:#FFFFFF;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center">{{ l.cta }}</div>
+          <div style="font-size:14px;font-weight:700;color:#5000A5;text-align:center">{{ l.cta2 }}</div>
+          <div style="position:relative;height:200px;margin-top:4px">
+            <div style="position:absolute;left:40px;top:30px;width:120px;height:160px;border-radius:14px;background:#00E5FF;transform:rotate(-12deg)"></div>
+            <div style="position:absolute;left:190px;top:30px;width:120px;height:160px;border-radius:14px;background:#007BFF;transform:rotate(12deg)"></div>
+            <div style="position:absolute;left:115px;top:10px;width:130px;height:172px;border-radius:14px;background:#FFFFFF;border:2px solid #5000A5;box-shadow:6px 6px 0 0 rgba(45,0,96,.2);padding:12px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between"><i class="icon-star" style="font-size:24px;color:#5000A5"></i><div style="font-size:14px;font-weight:700">{{ l.card }}</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ l.steps }}" as="s" hint-placeholder-count="3"><div style="display:flex;gap:12px;align-items:flex-start"><span style="width:32px;height:32px;border-radius:9px;background:#5000A5;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none">{{ s.n }}</span><div><div style="font-size:16px;font-weight:800">{{ s.t }}</div><div style="font-size:14px;color:#5C5F73">{{ s.d }}</div></div></div></sc-for>
+          </div>
+        </div>
+      </div>
+      <div data-screen-label="17 Landing desktop" style="width:1440px;flex:none;border-radius:16px;overflow:hidden;background:#F8F9FA;color:#2B2D42;border:1px solid #E3E5EA">
+        <div style="height:80px;padding:0 72px;display:flex;align-items:center;gap:32px">
+          <div style="display:flex;align-items:center;gap:10px"><img src="assets/logo-r.svg" alt="" style="width:30px;height:30px;object-fit:contain"><span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">{{ l.prefix }}</b><span style="font-weight:500">roster</span></span></div>
+          <div style="display:flex;gap:28px;font-size:15px;font-weight:600;margin-left:24px"><span>{{ l.nav1 }}</span><span>{{ l.nav2 }}</span><span>{{ l.nav3 }}</span></div>
+          <div style="margin-left:auto;display:flex;gap:12px;align-items:center"><span style="font-size:15px;font-weight:700">{{ l.login }}</span><div style="height:44px;padding:0 18px;border-radius:12px;background:#5000A5;color:#FFFFFF;font-weight:800;font-size:15px;display:flex;align-items:center">{{ l.cta }}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 560px;gap:48px;padding:72px 72px 88px;align-items:center">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <div style="font-size:88px;font-weight:800;line-height:.95;letter-spacing:-3px;text-wrap:balance">{{ l.h1 }}</div>
+            <div style="font-size:20px;color:#5C5F73;line-height:1.5;max-width:600px">{{ l.sub }}</div>
+            <div style="display:flex;gap:12px;align-items:center"><div style="height:60px;padding:0 28px;border-radius:14px;background:#5000A5;color:#FFFFFF;font-weight:800;font-size:18px;display:flex;align-items:center">{{ l.cta }}</div><div style="height:60px;padding:0 24px;border-radius:14px;border:1.5px solid #C9CCD5;font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px;background:#FFFFFF"><i class="icon-qr-code"></i>{{ l.cta2 }}</div></div>
+          </div>
+          <div style="position:relative;height:420px">
+            <div style="position:absolute;left:30px;top:70px;width:220px;height:300px;border-radius:22px;background:#00E5FF;transform:rotate(-14deg)"></div>
+            <div style="position:absolute;left:300px;top:70px;width:220px;height:300px;border-radius:22px;background:#007BFF;transform:rotate(14deg)"></div>
+            <div style="position:absolute;left:165px;top:30px;width:240px;height:320px;border-radius:22px;background:#FFFFFF;border:2px solid #5000A5;box-shadow:12px 12px 0 0 rgba(45,0,96,.2);padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between"><div style="display:flex;justify-content:space-between"><i class="icon-star" style="font-size:36px;color:#5000A5"></i><span style="height:34px;padding:0 12px;border-radius:10px;background:#D4FF00;font-size:18px;font-weight:800;display:flex;align-items:center">+10</span></div><div style="font-size:22px;font-weight:800;line-height:1.2">{{ l.card }}</div></div>
+          </div>
+        </div>
+        <div style="padding:64px 72px;background:#FFFFFF;border-top:1px solid #E3E5EA;display:flex;flex-direction:column;gap:32px">
+          <div style="font-size:40px;font-weight:800;letter-spacing:-1px">{{ l.howTitle }}</div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+            <sc-for list="{{ l.steps }}" as="s" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:12px"><span style="width:48px;height:48px;border-radius:12px;background:#5000A5;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px">{{ s.n }}</span><div style="font-size:22px;font-weight:800">{{ s.t }}</div><div style="font-size:16px;color:#5C5F73;line-height:1.5">{{ s.d }}</div></div></sc-for>
+          </div>
+        </div>
+        <div style="padding:64px 72px;display:flex;flex-direction:column;gap:28px">
+          <div style="font-size:40px;font-weight:800;letter-spacing:-1px">{{ l.domTitle }}</div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+            <sc-for list="{{ l.domains }}" as="d" hint-placeholder-count="4"><div style="border-radius:16px;background:#FFFFFF;border:1px solid #E3E5EA;padding:24px;display:flex;flex-direction:column;gap:10px"><i class="{{ d.icon }}" style="font-size:28px;color:#5000A5"></i><div style="font-size:19px;font-weight:800">{{ d.t }}</div><div style="font-size:15px;color:#5C5F73;line-height:1.45">{{ d.d }}</div></div></sc-for>
+          </div>
+        </div>
+        <div style="padding:56px 72px 72px;background:#1A0033;color:#EDE7F6;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:stretch">
+          <div style="display:flex;flex-direction:column;gap:10px;justify-content:center"><div style="font-size:40px;font-weight:800;letter-spacing:-1px;color:#FFFFFF">{{ l.priceTitle }}</div><div style="font-size:16px;color:#B3A6CC;line-height:1.5">{{ l.priceSub }}</div></div>
+          <div style="border-radius:16px;background:#241044;border:1px solid #3A2560;padding:24px;display:flex;flex-direction:column;gap:8px"><div style="font-size:18px;font-weight:800">{{ l.free }}</div><div style="font-size:44px;font-weight:800;color:#FFFFFF">0 €</div><div style="font-size:15px;color:#B3A6CC">{{ l.freeD }}</div></div>
+          <div style="border-radius:16px;background:#FFFFFF;color:#2B2D42;padding:24px;display:flex;flex-direction:column;gap:8px"><div style="font-size:18px;font-weight:800;display:flex;justify-content:space-between">{{ l.pro }}<span style="height:28px;padding:0 10px;border-radius:8px;background:#D4FF00;font-size:13px;display:flex;align-items:center">{{ l.proTag }}</span></div><div style="font-size:44px;font-weight:800">{{ l.proPrice }}</div><div style="font-size:15px;color:#5C5F73">{{ l.proD }}</div></div>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Stessa struttura, voce diversa. Prezzi e piani sono segnaposto da confermare (vedi domande). Sotto 768 px: hero a una colonna, passi in verticale, domini in carosello orizzontale.</div>
+</section>
+
+<section data-screen-label="18 Consent" style="padding:40px 80px;display:flex;flex-direction:column;gap:14px;border-top:1px solid #D9DCE3">
+  <div style="font-size:18px;font-weight:800">18. Pagina consenso per chi è in gioco</div>
+  <div style="display:flex;gap:32px;align-items:flex-start">
+    <div data-screen-label="18 Consent mobile" style="width:390px;height:844px;flex:none;border-radius:44px;overflow:hidden;background:#F8F9FA;color:#2B2D42;border:1px solid #E3E5EA;display:flex;flex-direction:column">
+      <div style="height:48px;padding:0 28px;display:flex;align-items:center;font-size:15px;font-weight:700;flex:none">9:41</div>
+      <div style="padding:8px 24px 28px;display:flex;flex-direction:column;gap:18px;flex:1">
+        <div style="display:flex;align-items:center;gap:8px"><img src="assets/logo-r.svg" alt="" style="width:24px;height:24px;object-fit:contain"><span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+        <div style="font-size:15px;font-weight:600;color:#5C5F73">Ciao Francesca,</div>
+        <div style="font-size:28px;font-weight:800;line-height:1.15;letter-spacing:-0.5px">Il Community Day Bologna ti vorrebbe in gioco</div>
+        <div style="font-size:15px;line-height:1.55">I partecipanti potranno sceglierti nella loro rosa e fare punti con i momenti del tuo talk.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ consentPoints }}" as="c" hint-placeholder-count="4"><div style="display:flex;gap:10px;font-size:14px;line-height:1.45"><i class="{{ c.icon }}" style="font-size:20px;color:#5000A5;flex:none"></i><span>{{ c.t }}</span></div></sc-for>
+        </div>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+          <div style="height:56px;border-radius:14px;background:#5000A5;color:#FFFFFF;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center">Sì, mettimi in gioco</div>
+          <div style="height:56px;border-radius:14px;border:1.5px solid #C9CCD5;background:#FFFFFF;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center">No, grazie</div>
+          <div style="font-size:12px;color:#5C5F73;text-align:center">Scelta valida solo per questo evento. Organizzatore: DotNet Emilia User Group.</div>
+        </div>
+      </div>
+    </div>
+    <div data-screen-label="18 Consent desktop" style="width:1440px;height:900px;flex:none;border-radius:16px;overflow:hidden;background:#F8F9FA;color:#2B2D42;border:1px solid #E3E5EA;display:grid;grid-template-columns:minmax(0,1fr) 640px">
+      <div style="padding:56px 72px;display:flex;flex-direction:column;gap:28px">
+        <div style="display:flex;align-items:center;gap:10px"><img src="assets/logo-r.svg" alt="" style="width:30px;height:30px;object-fit:contain"><span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span></div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;max-width:640px">
+          <div style="font-size:18px;font-weight:600;color:#5C5F73">Ciao Francesca,</div>
+          <div style="font-size:52px;font-weight:800;line-height:1.05;letter-spacing:-1.5px">Il Community Day Bologna ti vorrebbe in gioco</div>
+          <div style="font-size:18px;line-height:1.55">I partecipanti potranno sceglierti nella loro rosa e fare punti con i momenti del tuo talk "Il mio LLM ha mentito in produzione".</div>
+          <div style="display:flex;gap:12px;margin-top:8px"><div style="height:60px;padding:0 28px;border-radius:14px;background:#5000A5;color:#FFFFFF;font-weight:800;font-size:18px;display:flex;align-items:center">Sì, mettimi in gioco</div><div style="height:60px;padding:0 28px;border-radius:14px;border:1.5px solid #C9CCD5;background:#FFFFFF;font-weight:700;font-size:18px;display:flex;align-items:center">No, grazie</div></div>
+          <div style="font-size:14px;color:#5C5F73">Scelta valida solo per questo evento. Organizzatore: DotNet Emilia User Group.</div>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border-left:1px solid #E3E5EA;padding:56px 48px;display:flex;flex-direction:column;justify-content:center;gap:20px">
+        <div style="font-size:22px;font-weight:800">Cosa significa</div>
+        <sc-for list="{{ consentPoints }}" as="c" hint-placeholder-count="4"><div style="display:flex;gap:14px;font-size:16px;line-height:1.5;padding:14px 0;border-top:1px solid #E3E5EA"><i class="{{ c.icon }}" style="font-size:24px;color:#5000A5;flex:none"></i><span>{{ c.t }}</span></div></sc-for>
+        <div style="padding:16px;border-radius:14px;background:#F1F2F5;display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:700">Esempi di regole di questa partita</div><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="height:32px;padding:0 4px 0 12px;border-radius:10px;background:#FFFFFF;border:1px solid #E3E5EA;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600">La demo fallisce e la salvi dal vivo<b style="height:24px;padding:0 8px;border-radius:7px;background:#D4FF00;display:flex;align-items:center">+10</b></span><span style="height:32px;padding:0 4px 0 12px;border-radius:10px;background:#FFFFFF;border:1px solid #E3E5EA;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600">Sfori di 5 minuti<b style="height:24px;padding:0 8px;border-radius:7px;background:#FFE3E8;color:#C2183A;display:flex;align-items:center">−3</b></span></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:14px;color:#5C5F73;line-height:1.55">Tono rispettoso, nessuna pressione: i due bottoni hanno lo stesso peso visivo in larghezza, il "No" non è un link nascosto. Dopo la scelta: conferma su una riga ("Sei in gioco" / "Non sei in gioco") con link per cambiare idea.</div>
+</section>
+
+<section data-screen-label="Domande aperte" style="padding:40px 80px 96px;border-top:1px solid #D9DCE3;display:flex;flex-direction:column;gap:16px">
+  <div style="font-size:26px;font-weight:800;letter-spacing:-0.5px">Domande aperte</div>
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,640px));gap:12px">
+    <sc-for list="{{ questions }}" as="q" hint-placeholder-count="8"><div style="display:flex;gap:14px;padding:16px 18px;border-radius:14px;background:#FFFFFF;border:1px solid #E3E5EA;font-size:15px;line-height:1.5"><b style="color:#5000A5;flex:none">{{ q.n }}</b><span>{{ q.t }}</span></div></sc-for>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const P = [
+  { id:'dg', nick:'DemoGodz', ini:'DG', av:4, score:104 },
+  { id:'lpf', nick:'LaPrimaFila', ini:'LP', av:2, score:96 },
+  { id:'np', nick:'null_pointer_nonna', ini:'NP', av:5, score:91 },
+  { id:'zc', nick:'Zia Carla', ini:'ZC', av:3, score:88 },
+  { id:'rb', nick:'RubberDuckRita', ini:'RR', av:1, score:84 },
+  { id:'ks', nick:'Kevin dal Sud', ini:'KS', av:2, score:80 },
+  { id:'aa', nick:'async_awaiter', ini:'AA', av:1, score:77, mover:true },
+  { id:'ft', nick:'FilaTre', ini:'FT', av:4, score:71 }
+];
+const STEPS = {
+  fanta: [{ n:1, t:'Scegli cosa è in gioco', d:'Speaker, squadre, invitati. Importali o scrivili.' }, { n:2, t:'Fai entrare la gente', d:'Un QR, un nickname, nessun account.' }, { n:3, t:'Assegna i punti dal vivo', d:'Gli arbitri premiano i momenti, la classifica si rimescola.' }],
+  imagi: [{ n:1, t:'Imagine who is in play', d:'Speakers, teams, wedding guests. Import or type them.' }, { n:2, t:'Invite your people', d:'One QR code, one nickname, no accounts.' }, { n:3, t:'Score the moments', d:'Referees award points live and the leaderboard reshuffles.' }]
+};
+class Component extends DCLogic {
+  state = { bonus:0, prev:null, lifted:false };
+  componentWillUnmount() { clearTimeout(this.t1); }
+  rank(b) { const l = P.map(p => ({ ...p, score: p.score + (p.mover ? b : 0) })).sort((a,c) => c.score - a.score); const r = {}; l.forEach((p,i) => r[p.id] = i + 1); return { l, r }; }
+  simulate = () => {
+    clearTimeout(this.t1);
+    const prev = this.rank(this.state.bonus).r, nb = this.state.bonus ? 0 : 16;
+    this.setState({ bonus: nb, prev, lifted: nb > 0 });
+    this.t1 = setTimeout(() => this.setState({ lifted:false }), 3000);
+  };
+  renderVals() {
+    const { bonus, prev, lifted } = this.state;
+    const { l, r } = this.rank(bonus);
+    const stageRows = P.map(p0 => { const i = l.findIndex(x => x.id === p0.id); const p = l[i]; const d = (prev ? prev[p.id] : r[p.id]) - r[p.id], up = d > 0, dn = d < 0, lift = lifted && p.mover;
+      return { ...p, rank: r[p.id], top: 8 + i * 112, dIcon: up ? 'icon-arrow-up' : dn ? 'icon-arrow-down' : 'icon-minus', dN: up ? d : dn ? -d : '',
+        dBg: up ? '#D4FF00' : dn ? '#FFE3E8' : '#F1F2F5', dFg: up ? '#2B2D42' : dn ? '#C2183A' : '#5C5F73',
+        shadow: lift ? '12px 12px 0 0 #2D0060' : 'none', tf: lift ? 'scale(1.04) rotate(-0.6deg)' : 'none', z: lift ? 10 : 1, ol: lift ? '6px solid #D4FF00' : 'none' }; });
+    const moverRank = r['aa'], was = prev ? prev['aa'] : moverRank;
+    return {
+      simulate: this.simulate, stageRows, moment: lifted, momentText: `async_awaiter sale di ${was - moverRank}: ora è ${moverRank}°`,
+      ticker: [{ pts:'+10', who:'Giulia Bertoldi-Mancuso', rule:'la demo fallisce e la salva dal vivo' }, { pts:'+6', who:'Francesca Delli Santi', rule:'domanda che la mette in difficoltà' }, { pts:'−3', who:'Marco Esposito', rule:'sfora di 5 minuti', neg:true }]
+        .map(k => ({ ...k, bg: k.neg ? '#FFE3E8' : '#D4FF00', fg: k.neg ? '#C2183A' : '#2B2D42' })),
+      landings: [
+        { prefix:'fanta', h1:'Il fanta di qualsiasi cosa', sub:'Conferenze, matrimoni, tornei, il reality del giovedì. Scegli cosa è in gioco, apri un QR e lascia che la classifica faccia il resto.', cta:'Crea il tuo fanta', cta2:'Ho un codice', card:'Giulia, la demo salvata dal vivo', nav1:'Come funziona', nav2:'Esempi', nav3:'Prezzi', login:'Accedi', howTitle:'Come funziona, in tre passi', domTitle:'Funziona con', steps:STEPS.fanta,
+          domains:[{ icon:'icon-mic', t:'Conferenze', d:'Speaker da Sessionize, punti per i momenti dei talk.' }, { icon:'icon-heart', t:'Matrimoni', d:'Chi piange per primo, chi balla sul tavolo.' }, { icon:'icon-trophy', t:'Tornei amatoriali', d:'Squadre e giocatori, gol e cartellini.' }, { icon:'icon-tv', t:'Serie e reality', d:'Concorrenti in gioco, una puntata alla volta.' }],
+          priceTitle:'Si parte gratis', priceSub:'Paghi solo quando il fanta diventa grande.', free:'Gratis', freeD:'Fino a 50 giocatori, 1 arbitro', pro:'Evento', proTag:'Più scelto', proPrice:'49 €', proD:'Fino a 1.000 giocatori, maxischermo, materiali stampabili' },
+        { prefix:'imagi', h1:'Fantasy for anything', sub:'Conferences, weddings, five-a-side, your favourite show. Imagine who is in play, share a QR code and let the leaderboard do the rest.', cta:'Start a game', cta2:'I have a code', card:'Nonna Rita, first on the dance floor', nav1:'How it works', nav2:'Examples', nav3:'Pricing', login:'Log in', howTitle:'How it works, in three steps', domTitle:'Works for', steps:STEPS.imagi,
+          domains:[{ icon:'icon-mic', t:'Conferences', d:'Speakers from Sessionize, points for talk moments.' }, { icon:'icon-heart', t:'Weddings', d:'Who cries first, who dances on the table.' }, { icon:'icon-trophy', t:'Amateur leagues', d:'Teams and players, goals and cards.' }, { icon:'icon-tv', t:'Shows', d:'Contestants in play, one episode at a time.' }],
+          priceTitle:'Start for free', priceSub:'Pay only when your game gets big.', free:'Free', freeD:'Up to 50 players, 1 referee', pro:'Event', proTag:'Most picked', proPrice:'€49', proD:'Up to 1,000 players, big screen, printables' }
+      ],
+      consentPoints: [
+        { icon:'icon-sparkles', t:'Si premiano momenti divertenti, mai la qualità del talk o il tuo aspetto.' },
+        { icon:'icon-eye', t:'Vedranno solo nome, foto e titolo che hai già dato all\'evento.' },
+        { icon:'icon-log-out', t:'Puoi uscire quando vuoi, anche durante la partita: sparisci dalle rose.' },
+        { icon:'icon-ban', t:'Se dici no, non compari da nessuna parte. Nessuno lo saprà.' }
+      ],
+      questions: [
+        'Il file del logo è una vettorializzazione con aloni di colore: potete fornire il sorgente pulito (6 colori, tela quadrata) per favicon e app icon 48/192/512?',
+        'Il blu #007BFF su bianco è 4,0:1: va bene limitarlo a grafica e testo ≥ 24 px, usando #0062CC per testo piccolo?',
+        'Il brief chiede fratelli e non cloni, ma la palette è unica: ImagiRoster può avere un accento proprio (es. ciano dominante) o resta solo logotipo e voce?',
+        'Arbitro: tre tocchi o vogliamo anche il "punto rapido" (tieni premuto sull\'elemento → ultima regola usata)?',
+        'Il capitano raddoppia sempre, o ogni regola decide (toggle già previsto nell\'editor)?',
+        'Il maxischermo deve mostrare i nickname di tutti o solo chi ha dato il consenso a comparire in pubblico?',
+        'Piani e prezzi della landing sono segnaposto: quali limiti e cifre reali?',
+        'Notifiche push per i punti ricevuti: le vogliamo nella PWA (richiede permesso) o solo in-app?',
+        'Social card: includere la foto del capitano (serve il suo consenso esplicito alla condivisione) o solo il nome?',
+        'Schermata 9 in ImagiRoster: il brand cambia solo il logo nella testata, quindi la versione è identica; confermate che basta?'
+      ].map((t, i) => ({ n: String(i + 1).padStart(2, '0'), t }))
+    };
+  }
+}
+</script>
+</body>
+</html>
