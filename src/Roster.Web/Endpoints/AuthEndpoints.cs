@@ -25,7 +25,7 @@ public static class AuthEndpoints
             ILoggerFactory loggerFactory) =>
         {
             var logger = loggerFactory.CreateLogger("AuthEndpoints");
-            
+
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)
             {
@@ -43,7 +43,7 @@ public static class AuthEndpoints
             await userManager.UpdateSecurityStampAsync(user);
 
             await signInManager.SignInAsync(user, isPersistent: true);
-            
+
             return Results.Redirect("/organizer");
         })
         .WithName("VerifyMagicLink")

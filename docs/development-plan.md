@@ -176,7 +176,7 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Goal:** an organizer can create, configure and publish a game from a laptop.
 
 **Tasks**
-- [x] Organizer authentication: ASP.NET Core Identity with **magic link** sign-in (email via Azure Communication Services; local mail catcher in development); anti-enumeration and rate limiting.
+- [x] Organizer authentication: ASP.NET Core Identity with **magic link** sign-in (email via Azure Communication Services; output to console in development); anti-enumeration and rate limiting.
 - [x] Create-game wizard (labels come from the selected domain pack): choose domain pack → name and settings → connect a source (plugin form generated from `ConfigSchema`) → review imported elements → review and edit rules → publish.
 - [ ] Element management: edit, hide, mark as not selectable, show source state and consent status.
 - [ ] Consent flow: generate consent invitations (link per element, optional email), public consent page (accept/decline), status visible in the console.
@@ -263,7 +263,7 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Tasks**
 - [ ] Brand resolution middleware and `BrandOptions` (FantaRoster, ImagiRoster); theme token layers per brand; brand assets (logo, icons, social image).
 - [ ] Complete EN and IT resources; culture selection (brand default → user choice); date/number formats.
-- [ ] Import the tokens from `docs/design/tokens/` into `Roster.Ui` and apply the mockups in `docs/design/screens/` to every screen. *(Login and Public site layouts done)*
+- [ ] Import the tokens from `docs/design/tokens/` into `Roster.Ui` and apply the mockups in `docs/design/screens/` to every screen. *(Login, Public site layouts, and base tokens applied. Next: Organizer Console UI)*
 - [ ] Security review: OWASP ASVS L1 checklist, rate limits, input validation, upload policies, signed tokens rotation, security headers, CSP compatible with Blazor.
 - [ ] Privacy: privacy notice and terms (EN, IT), data retention job (photos 30 days after end), organizer data export and deletion.
 - [ ] Accessibility audit (automated with axe in Playwright + manual pass) to WCAG 2.2 AA.

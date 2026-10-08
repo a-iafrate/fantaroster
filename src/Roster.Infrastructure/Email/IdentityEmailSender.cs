@@ -1,5 +1,4 @@
 using System;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using Azure.Communication.Email;
 using Microsoft.AspNetCore.Identity;
@@ -37,46 +36,36 @@ public sealed partial class IdentityEmailSender : IEmailSender<OrganizerUser>
 
     private async Task SendEmailAsync(string toEmail, string subject, string textBody)
     {
-        var smtpHost = _configuration["Smtp:Host"];
-        if (!string.IsNullOrEmpty(smtpHost))
+#if DEBUG
+        LogDebugEmail(_logger, toEmail, subject, textBody);
+        await Task.CompletedTask;
+#else
+        var acsConnectionString = _configuration["AzureCommunicationServices:ConnectionString"];
+        if (!string.IsNullOrEmpty(acsConnectionString))
         {
-            var smtpPort = _configuration.GetValue<int>("Smtp:Port", 1025);
-            LogSendingSmtp(_logger, toEmail, smtpHost, smtpPort);
-
-#pragma warning disable SYSLIB0014 // Type or member is obsolete
-            using var client = new SmtpClient(smtpHost, smtpPort);
-            using var message = new MailMessage("noreply@fantaroster.local", toEmail, subject, textBody);
-            await client.SendMailAsync(message);
-#pragma warning restore SYSLIB0014 // Type or member is obsolete
+            LogSendingAcs(_logger, toEmail);
+            var emailClient = new EmailClient(acsConnectionString);
+            var senderAddress = _configuration["AzureCommunicationServices:SenderAddress"] ?? "donotreply@fantaroster.com";
+            
+            var emailMessage = new EmailMessage(
+                senderAddress: senderAddress,
+                recipientAddress: toEmail,
+                content: new EmailContent(subject)
+                {
+                    PlainText = textBody
+                });
+                
+            await emailClient.SendAsync(Azure.WaitUntil.Completed, emailMessage);
         }
         else
         {
-            var acsConnectionString = _configuration["AzureCommunicationServices:ConnectionString"];
-            if (!string.IsNullOrEmpty(acsConnectionString))
-            {
-                LogSendingAcs(_logger, toEmail);
-                var emailClient = new EmailClient(acsConnectionString);
-                var senderAddress = _configuration["AzureCommunicationServices:SenderAddress"] ?? "donotreply@fantaroster.com";
-                
-                var emailMessage = new EmailMessage(
-                    senderAddress: senderAddress,
-                    recipientAddress: toEmail,
-                    content: new EmailContent(subject)
-                    {
-                        PlainText = textBody
-                    });
-                    
-                await emailClient.SendAsync(Azure.WaitUntil.Completed, emailMessage);
-            }
-            else
-            {
-                LogNoEmailConfiguration(_logger, toEmail);
-            }
+            LogNoEmailConfiguration(_logger, toEmail);
         }
+#endif
     }
 
-    [LoggerMessage(LogLevel.Information, "Sending email to {ToEmail} via SMTP {SmtpHost}:{SmtpPort}")]
-    private static partial void LogSendingSmtp(ILogger logger, string toEmail, string smtpHost, int smtpPort);
+    [LoggerMessage(LogLevel.Information, "=== EMAIL (DEBUG) ===\nTo: {ToEmail}\nSubject: {Subject}\nBody: {Body}\n=====================")]
+    private static partial void LogDebugEmail(ILogger logger, string toEmail, string subject, string body);
 
     [LoggerMessage(LogLevel.Information, "Sending email to {ToEmail} via Azure Communication Services")]
     private static partial void LogSendingAcs(ILogger logger, string toEmail);

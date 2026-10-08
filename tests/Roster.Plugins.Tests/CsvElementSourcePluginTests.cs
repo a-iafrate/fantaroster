@@ -46,7 +46,7 @@ public class CsvElementSourcePluginTests
     public async Task ImportAsync_WithValidSemicolonCsv_ShouldMapCorrectly()
     {
         var csvContent = await File.ReadAllTextAsync("Fixtures/sample.csv");
-        
+
         var config = new PluginConfig(new Dictionary<string, string>
         {
             { "CsvContent", csvContent },
@@ -69,7 +69,7 @@ public class CsvElementSourcePluginTests
         first.Subtitle.ShouldBe("New York");
         first.ImageUrl.ShouldBe("http://alpha.jpg");
         first.Group.ShouldBe("Group A");
-        
+
         var third = result.Elements[2];
         third.ExternalId.ShouldBe("t3");
         third.Name.ShouldBe("Team Gamma");
@@ -81,7 +81,7 @@ public class CsvElementSourcePluginTests
     public async Task ImportAsync_WithMissingNameColumn_ShouldProduceWarningsAndSkip()
     {
         var csvContent = "Id;Subtitle\n1;Sub1\n2;Sub2";
-        
+
         var config = new PluginConfig(new Dictionary<string, string>
         {
             { "CsvContent", csvContent },

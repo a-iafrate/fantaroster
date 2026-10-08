@@ -19,7 +19,7 @@ public class GameWizardState
 
     // Step 3
     public string SourceType { get; set; } = "sessionize"; // "sessionize", "csv", "manual"
-    
+
     // For Sessionize
     public string? SessionizeApiId { get; set; }
 }
