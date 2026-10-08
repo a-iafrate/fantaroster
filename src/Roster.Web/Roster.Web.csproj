@@ -4,6 +4,9 @@
     <ProjectReference Include="..\Roster.ServiceDefaults\Roster.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Roster.Infrastructure\Roster.Infrastructure.csproj" />
     <ProjectReference Include="..\Roster.Application\Roster.Application.csproj" />
+    <ProjectReference Include="..\Roster.Plugins.Csv\Roster.Plugins.Csv.csproj" />
+    <ProjectReference Include="..\Roster.Plugins.Sessionize\Roster.Plugins.Sessionize.csproj" />
+    <ProjectReference Include="..\Roster.DomainPacks\Roster.DomainPacks.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -53,7 +53,7 @@ public sealed class CsvElementSourcePlugin : IElementSourcePlugin
     {
         if (!config.Values.TryGetValue("CsvContent", out var content) || string.IsNullOrWhiteSpace(content))
         {
-            return Task.FromResult(new ImportResult(Array.Empty<ImportedElement>(), new[] { "No CSV content provided." }));
+            return Task.FromResult(new ImportResult(Array.Empty<ImportedElement>(), ["No CSV content provided."]));
         }
 
         var delimiterStr = config.Values.GetValueOrDefault("Delimiter");
@@ -68,7 +68,7 @@ public sealed class CsvElementSourcePlugin : IElementSourcePlugin
         var rows = SimpleCsvParser.Parse(content, delimiter);
         if (rows.Count == 0)
         {
-            return Task.FromResult(new ImportResult(Array.Empty<ImportedElement>(), new[] { "CSV is empty." }));
+            return Task.FromResult(new ImportResult(Array.Empty<ImportedElement>(), ["CSV is empty."]));
         }
 
         var elements = new List<ImportedElement>();
@@ -112,7 +112,7 @@ public sealed class CsvElementSourcePlugin : IElementSourcePlugin
             }
 
             var name = row[nameIdx].Trim();
-            
+
             // Generate a fallback external ID if none is provided or mapped.
             // A stable ID is required for resync. If the CSV doesn't have one, we use a hash of the name.
             string extId = string.Empty;

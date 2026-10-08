@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Roster.Application.Ports;
+using Roster.Application.Ports.Data;
 using Roster.Infrastructure.Data.Repositories;
 using Roster.Infrastructure.Plugins;
 
@@ -14,7 +15,8 @@ public static class DependencyInjection
         services.AddScoped<IElementRepository, ElementRepository>();
         services.AddScoped<IParticipantRepository, ParticipantRepository>();
         services.AddScoped<IScoreEntryRepository, ScoreEntryRepository>();
-        
+        services.AddScoped<ISourceBindingRepository, SourceBindingRepository>();
+
         services.AddSingleton<IPluginRegistry, PluginRegistry>();
 
         return services;

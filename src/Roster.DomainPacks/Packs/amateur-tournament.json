@@ -1,0 +1,41 @@
+{
+  "id": "amateur-tournament",
+  "name": {
+    "en": "Amateur Tournament",
+    "it": "Torneo Amatoriale"
+  },
+  "description": {
+    "en": "For five-a-side, padel or volleyball tournaments.",
+    "it": "Per tornei di calcetto, padel o pallavolo."
+  },
+  "requiresConsent": true,
+  "recommendedPlugins": [ "csv" ],
+  "terminology": {
+    "en": {
+      "elementSingular": "Team",
+      "elementPlural": "Teams",
+      "groupLabel": "Group"
+    },
+    "it": {
+      "elementSingular": "Squadra",
+      "elementPlural": "Squadre",
+      "groupLabel": "Girone"
+    }
+  },
+  "defaultRules": [
+    {
+      "label": {
+        "en": "Comeback win",
+        "it": "Vittoria in rimonta"
+      },
+      "points": 8
+    },
+    {
+      "label": {
+        "en": "Yellow card",
+        "it": "Cartellino giallo"
+      },
+      "points": -2
+    }
+  ]
+}

@@ -55,7 +55,7 @@ internal sealed class SimpleCsvParser
                     {
                         i++;
                     }
-                    
+
                     currentLine.Add(currentField.ToString());
                     currentField.Clear();
                     result.Add(currentLine.ToArray());
@@ -83,19 +83,19 @@ internal sealed class SimpleCsvParser
 
         return result;
     }
-    
+
     public static char DetectDelimiter(string csvContent)
     {
         // Simple heuristic: find the first line, count commas and semicolons.
         var firstLineEnd = csvContent.IndexOf('\n');
         if (firstLineEnd < 0) firstLineEnd = csvContent.Length;
-        
+
         var firstLine = csvContent.Substring(0, firstLineEnd);
-        
+
         int commas = 0;
         int semicolons = 0;
         int tabs = 0;
-        
+
         bool inQuotes = false;
         foreach (var c in firstLine)
         {
@@ -107,7 +107,7 @@ internal sealed class SimpleCsvParser
                 if (c == '\t') tabs++;
             }
         }
-        
+
         if (tabs > commas && tabs > semicolons) return '\t';
         if (semicolons > commas) return ';';
         return ',';

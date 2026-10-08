@@ -1,0 +1,48 @@
+{
+  "id": "tech-conference",
+  "name": {
+    "en": "Tech Conference",
+    "it": "Conferenza Tech"
+  },
+  "description": {
+    "en": "For developer conferences and community days.",
+    "it": "Per conferenze di sviluppatori e community days."
+  },
+  "requiresConsent": true,
+  "recommendedPlugins": [ "sessionize", "csv" ],
+  "terminology": {
+    "en": {
+      "elementSingular": "Speaker",
+      "elementPlural": "Speakers",
+      "groupLabel": "Room"
+    },
+    "it": {
+      "elementSingular": "Speaker",
+      "elementPlural": "Speaker",
+      "groupLabel": "Sala"
+    }
+  },
+  "defaultRules": [
+    {
+      "label": {
+        "en": "The demo fails and the speaker rescues it live",
+        "it": "La demo fallisce e lo speaker la salva dal vivo"
+      },
+      "points": 10
+    },
+    {
+      "label": {
+        "en": "Live coding works on the first try",
+        "it": "Il live coding funziona al primo colpo"
+      },
+      "points": 8
+    },
+    {
+      "label": {
+        "en": "The speaker runs over by more than 5 minutes",
+        "it": "Lo speaker sfora di oltre 5 minuti"
+      },
+      "points": -3
+    }
+  ]
+}

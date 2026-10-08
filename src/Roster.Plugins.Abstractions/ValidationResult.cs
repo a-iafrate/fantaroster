@@ -33,7 +33,7 @@ public sealed record ValidationResult
     /// <param name="errors">The validation errors.</param>
     /// <returns>A failed validation result.</returns>
     public static ValidationResult Failure(IEnumerable<string> errors) => new(false, errors.ToArray());
-    
+
     /// <summary>
     /// Creates a failed validation result with a single error.
     /// </summary>

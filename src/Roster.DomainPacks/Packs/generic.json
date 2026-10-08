@@ -1,0 +1,41 @@
+{
+  "id": "generic",
+  "name": {
+    "en": "Generic",
+    "it": "Generico"
+  },
+  "description": {
+    "en": "A flexible foundation for any game.",
+    "it": "Una base flessibile per qualsiasi gioco."
+  },
+  "requiresConsent": false,
+  "recommendedPlugins": [ "csv" ],
+  "terminology": {
+    "en": {
+      "elementSingular": "Element",
+      "elementPlural": "Elements",
+      "groupLabel": "Group"
+    },
+    "it": {
+      "elementSingular": "Elemento",
+      "elementPlural": "Elementi",
+      "groupLabel": "Gruppo"
+    }
+  },
+  "defaultRules": [
+    {
+      "label": {
+        "en": "First place",
+        "it": "Primo posto"
+      },
+      "points": 10
+    },
+    {
+      "label": {
+        "en": "Participation",
+        "it": "Partecipazione"
+      },
+      "points": 2
+    }
+  ]
+}

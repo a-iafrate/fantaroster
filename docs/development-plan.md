@@ -151,15 +151,15 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Goal:** elements arrive from external sources and can be resynced safely.
 
 **Tasks**
-- [ ] Define `Roster.Plugins.Abstractions`: `IElementSourcePlugin`, `PluginCapabilities`, `ConfigSchema`, `PluginConfig`, `ImportedElement`, `ImportResult`, `ValidationResult`; mark the assembly version as the contract version.
-- [ ] Plugin registry in `Roster.Infrastructure` (DI-based discovery, lookup by plugin ID).
-- [ ] **CSV plugin:** delimiter detection, header row, column mapping (name, subtitle, image URL, group, external ID), validation with line-level warnings, size limits.
-- [ ] **Sessionize plugin:** typed `HttpClient` with resilience; read `https://sessionize.com/api/v2/{endpointId}/view/All`; map speakers (and optionally sessions) to elements with stable external IDs; surface a clear error when the endpoint is not enabled. Never call undocumented endpoints.
-- [ ] Resync service: match by external ID, add/update/mark missing, never delete elements with lineups or points; produce a change summary.
-- [ ] Background job for scheduled resync (optional per binding).
+- [x] Define `Roster.Plugins.Abstractions`: `IElementSourcePlugin`, `PluginCapabilities`, `ConfigSchema`, `PluginConfig`, `ImportedElement`, `ImportResult`, `ValidationResult`; mark the assembly version as the contract version.
+- [x] Plugin registry in `Roster.Infrastructure` (DI-based discovery, lookup by plugin ID).
+- [x] **CSV plugin:** delimiter detection, header row, column mapping (name, subtitle, image URL, group, external ID), validation with line-level warnings, size limits.
+- [x] **Sessionize plugin:** typed `HttpClient` with resilience; read `https://sessionize.com/api/v2/{endpointId}/view/All`; map speakers (and optionally sessions) to elements with stable external IDs; surface a clear error when the endpoint is not enabled. Never call undocumented endpoints.
+- [x] Resync service: match by external ID, add/update/mark missing, never delete elements with lineups or points; produce a change summary.
+- [x] Background job for scheduled resync (optional per binding).
 - [ ] **Plugin contract test suite** in `Roster.Plugins.Tests`, run against every plugin with recorded sample data (no live network in CI).
-- [ ] Domain packs: JSON schema and loader in `Roster.DomainPacks`; create the `generic` pack first (the foundation), then `tech-conference` (terminology EN/IT, default rules from the project description §6.1, recommended plugins). Add a test-only `amateur-tournament` pack (rules from §6.2) used by tests.
-- [ ] Make sure every context-specific UI word (element name in singular/plural, group label, consent wording) is defined by the pack, with sensible defaults in `generic`.
+- [x] Domain packs: JSON schema and loader in `Roster.DomainPacks`; create the `generic` pack first (the foundation), then `tech-conference` (terminology EN/IT, default rules from the project description §6.1, recommended plugins). Add a test-only `amateur-tournament` pack (rules from §6.2) used by tests.
+- [x] Make sure every context-specific UI word (element name in singular/plural, group label, consent wording) is defined by the pack, with sensible defaults in `generic`.
 
 **Deliverables:** two working plugins, resync, two domain packs.
 
