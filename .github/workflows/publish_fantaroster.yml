@@ -63,3 +63,4 @@ jobs:
           app-name: 'fantaroster'
           slot-name: 'Production'
           package: ./publish-output
+          startup-command: 'dotnet Roster.Web.dll'
