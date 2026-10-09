@@ -73,7 +73,8 @@ builder.Services.AddSingleton<Roster.DomainPacks.IDomainPackLoader, Roster.Domai
 // Add services to the container.
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
 
 var app = builder.Build();
 
@@ -103,7 +104,9 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(Roster.Web.Client._Imports).Assembly);
 
 app.MapAuthEndpoints();
 

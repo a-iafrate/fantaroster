@@ -7,9 +7,11 @@
     <ProjectReference Include="..\Roster.Plugins.Csv\Roster.Plugins.Csv.csproj" />
     <ProjectReference Include="..\Roster.Plugins.Sessionize\Roster.Plugins.Sessionize.csproj" />
     <ProjectReference Include="..\Roster.DomainPacks\Roster.DomainPacks.csproj" />
+    <ProjectReference Include="..\Roster.Web.Client\Roster.Web.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
