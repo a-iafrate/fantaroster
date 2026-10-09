@@ -140,7 +140,7 @@
             <EditForm Model="this" OnValidSubmit="HandleSubmit" FormName="login-form">
                 <div class="input-group">
                     <label for="email" class="input-label">Email</label>
-                    <InputText id="email" @bind-Value="Email" class="input-field" type="email" required placeholder="es. chiara@dotnetemilia.it" />
+                    <InputText id="email" @bind-Value="Email" class="input-field" type="email" required placeholder="es. user@mail.com" />
                 </div>
                 
                 <button type="submit" disabled="@_isSubmitting" class="btn-primary">

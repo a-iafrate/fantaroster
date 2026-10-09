@@ -1,15 +1,17 @@
 @page "/games/{GameId:guid}/activity"
+@rendermode ParticipantRenderMode.Instance
 @inject HttpClient Http
 @inject Roster.Web.Client.Services.ParticipantAuthState AuthState
 @inject NavigationManager Navigation
+@inject IStringLocalizer<ParticipantResource> Loc
 
-<PageTitle>Activity Feed</PageTitle>
+<PageTitle>@Loc["ActivityPageTitle"]</PageTitle>
 
 @if (_isLoading)
 {
     <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
         <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">@Loc["Loading"]</span>
         </div>
     </div>
 }
@@ -17,21 +19,21 @@ else if (_error != null)
 {
     <div class="container mt-5">
         <div class="alert alert-danger">@_error</div>
-        <a href="/games/@GameId" class="btn btn-outline-primary">Back to Dashboard</a>
+        <a href="/games/@GameId" class="btn btn-outline-primary">@Loc["BackToDashboard"]</a>
     </div>
 }
 else
 {
     <div class="container mt-4 pb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">Activity Feed</h2>
-            <a href="/games/@GameId" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+            <h2 class="mb-0">@Loc["ActivityFeed"]</h2>
+            <a href="/games/@GameId" class="btn btn-sm btn-outline-secondary">@Loc["Dashboard"]</a>
         </div>
 
         @if (_feed.Count == 0)
         {
             <div class="text-center text-muted mt-5">
-                <p>No activity yet.</p>
+                <p>@Loc["NoActivityYet"]</p>
             </div>
         }
         else
@@ -44,12 +46,12 @@ else
                             <span class="text-muted small">@item.CreatedAt.ToLocalTime().ToString("g")</span>
                             @if (item.Status == "Voided")
                             {
-                                <span class="badge bg-danger">Voided</span>
+                                <span class="badge bg-danger">@Loc["Voided"]</span>
                             }
                             else
                             {
                                 <span class="badge @(item.Points > 0 ? "bg-success" : "bg-warning text-dark")">
-                                    @(item.Points > 0 ? "+" : "")@item.Points pts
+                                    @(item.Points > 0 ? "+" : "")@string.Format(Loc["PointsShort"], item.Points)
                                 </span>
                             }
                         </div>
@@ -64,7 +66,7 @@ else
                             }
                             else
                             {
-                                <span>Unknown</span>
+                                <span>@Loc["Unknown"]</span>
                             }
                         </h5>
                         <p class="mb-0 text-muted">@item.RuleLabel</p>
@@ -113,12 +115,12 @@ else
             }
             else
             {
-                _error = "Could not load the activity feed.";
+                _error = Loc["ActivityLoadFailed"];
             }
         }
         catch (Exception)
         {
-            _error = "Network error while loading activity feed.";
+            _error = Loc["ActivityNetworkError"];
         }
         finally
         {

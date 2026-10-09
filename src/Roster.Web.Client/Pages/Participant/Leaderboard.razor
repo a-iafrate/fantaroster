@@ -1,15 +1,17 @@
 @page "/games/{GameId:guid}/leaderboard"
+@rendermode ParticipantRenderMode.Instance
 @inject HttpClient Http
 @inject Roster.Web.Client.Services.ParticipantAuthState AuthState
 @inject NavigationManager Navigation
+@inject IStringLocalizer<ParticipantResource> Loc
 
-<PageTitle>Leaderboard</PageTitle>
+<PageTitle>@Loc["LeaderboardPageTitle"]</PageTitle>
 
 @if (_isLoading)
 {
     <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
         <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">@Loc["Loading"]</span>
         </div>
     </div>
 }
@@ -17,28 +19,28 @@ else if (_error != null)
 {
     <div class="container mt-5">
         <div class="alert alert-danger">@_error</div>
-        <a href="/games/@GameId" class="btn btn-outline-primary">Back to Dashboard</a>
+        <a href="/games/@GameId" class="btn btn-outline-primary">@Loc["BackToDashboard"]</a>
     </div>
 }
 else if (_leaderboard != null)
 {
     <div class="container mt-4 pb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">Leaderboard</h2>
-            <a href="/games/@GameId" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+            <h2 class="mb-0">@Loc["Leaderboard"]</h2>
+            <a href="/games/@GameId" class="btn btn-sm btn-outline-secondary">@Loc["Dashboard"]</a>
         </div>
 
         @if (_leaderboard.MyPosition != null)
         {
             <div class="card shadow-sm mb-4 border-primary">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">My Position</h5>
-                    <span class="badge bg-light text-primary fs-6">Rank @_leaderboard.MyPosition.Rank</span>
+                    <h5 class="mb-0">@Loc["MyPosition"]</h5>
+                    <span class="badge bg-light text-primary fs-6">@string.Format(Loc["RankValue"], _leaderboard.MyPosition.Rank)</span>
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="mb-0">@_leaderboard.MyPosition.Nickname</h4>
-                        <h4 class="mb-0 fw-bold">@_leaderboard.MyPosition.TotalScore pts</h4>
+                        <h4 class="mb-0 fw-bold">@string.Format(Loc["PointsShort"], _leaderboard.MyPosition.TotalScore)</h4>
                     </div>
                     
                     @if (_leaderboard.MyPosition.ElementScores.Any())
@@ -51,7 +53,7 @@ else if (_leaderboard != null)
                                         @es.Name
                                         @if (es.IsCaptain)
                                         {
-                                            <span class="badge bg-warning text-dark ms-1">Captain</span>
+                                            <span class="badge bg-warning text-dark ms-1">@Loc["Captain"]</span>
                                         }
                                     </div>
                                     <span class="fw-bold">@es.Score</span>
@@ -61,13 +63,13 @@ else if (_leaderboard != null)
                     }
                     else
                     {
-                        <p class="text-muted mb-0">No lineup saved yet.</p>
+                        <p class="text-muted mb-0">@Loc["NoLineupSaved"]</p>
                     }
                 </div>
             </div>
         }
 
-        <h4 class="mb-3">Top Positions</h4>
+        <h4 class="mb-3">@Loc["TopPositions"]</h4>
         <div class="list-group shadow-sm">
             @foreach (var pos in _leaderboard.TopPositions)
             {
@@ -82,7 +84,7 @@ else if (_leaderboard != null)
             }
             @if (!_leaderboard.TopPositions.Any())
             {
-                <div class="list-group-item text-center text-muted">No scores yet.</div>
+                <div class="list-group-item text-center text-muted">@Loc["NoScoresYet"]</div>
             }
         </div>
     </div>
@@ -122,12 +124,12 @@ else if (_leaderboard != null)
             }
             else
             {
-                _error = "Could not load the leaderboard.";
+                _error = Loc["LeaderboardLoadFailed"];
             }
         }
         catch (Exception)
         {
-            _error = "Network error while loading leaderboard.";
+            _error = Loc["LeaderboardNetworkError"];
         }
         finally
         {

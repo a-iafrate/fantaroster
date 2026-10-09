@@ -1,0 +1,103 @@
+@using Microsoft.Extensions.Localization
+@using Roster.Application.Services
+@using Roster.Domain.Games
+@inject GameSettingsService SettingsService
+@inject IStringLocalizer<SharedResource> Loc
+
+<div class="mg-section">
+    <div class="mg-section-title">@Loc["SettingsTitle"]</div>
+    <div class="mg-section-desc">@Loc["SettingsDesc"]</div>
+
+    @if (_canEdit is null)
+    {
+        <div>@Loc["Loading"]</div>
+    }
+    else
+    {
+        @if (_canEdit == false)
+        {
+            <div class="mg-alert-info">@Loc["SettingsLockedNotice"]</div>
+        }
+
+        <div class="settings-form">
+            <div class="settings-field">
+                <label for="settings-name">@Loc["CreateGameNameLabel"]</label>
+                <input id="settings-name" class="settings-input" @bind="_name" maxlength="100" />
+            </div>
+            <div class="settings-field">
+                <label for="settings-size">@Loc["CreateGameLineupSizeLabel"]</label>
+                <input id="settings-size" type="number" min="1" class="settings-input" @bind="_lineupSize" disabled="@(_canEdit != true)" />
+            </div>
+
+            @if (_saved)
+            {
+                <div class="settings-saved" role="status">@Loc["SettingsSaved"]</div>
+            }
+
+            <div>
+                <button type="button" class="mg-btn-primary" @onclick="SaveAsync" disabled="@_isSaving">@Loc["BtnSave"]</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Game Game { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnSaved { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnError { get; set; }
+
+    private bool? _canEdit;
+    private bool _isSaving;
+    private bool _saved;
+    private string _name = string.Empty;
+    private int _lineupSize;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _name = Game.Name;
+        _lineupSize = Game.LineupSize;
+
+        try
+        {
+            _canEdit = await SettingsService.CanEditAsync(Game.Id);
+        }
+        catch (Exception ex)
+        {
+            _canEdit = false;
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        _saved = false;
+
+        if (string.IsNullOrWhiteSpace(_name) || _lineupSize < 1)
+        {
+            await OnError.InvokeAsync(Loc["SettingsInvalid"]);
+            return;
+        }
+
+        _isSaving = true;
+        try
+        {
+            await SettingsService.UpdateAsync(Game.Id, _name, _lineupSize);
+            _saved = true;
+            await OnError.InvokeAsync(string.Empty);
+            await OnSaved.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+}

@@ -1,27 +1,29 @@
 @page "/games/{GameId:guid}/lineup"
+@rendermode ParticipantRenderMode.Instance
 @inject HttpClient Http
 @inject Roster.Web.Client.Services.ParticipantAuthState AuthState
 @inject NavigationManager Navigation
+@inject IStringLocalizer<ParticipantResource> Loc
 
-<PageTitle>Build Lineup</PageTitle>
+<PageTitle>@Loc["LineupPageTitle"]</PageTitle>
 
 @if (_isLoading)
 {
     <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
         <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">@Loc["Loading"]</span>
         </div>
     </div>
 }
 else
 {
     <div class="container mt-4 mb-5">
-        <h2 class="mb-4">Build Your Lineup</h2>
+        <h2 class="mb-4">@Loc["LineupTitle"]</h2>
 
         @if (_isLiveOrEnded)
         {
             <div class="alert alert-info">
-                The game is live or ended. Your lineup is locked and cannot be modified.
+                @Loc["LineupLocked"]
             </div>
         }
 
@@ -29,9 +31,9 @@ else
             <div class="col-md-8">
                 <!-- Search & Filters -->
                 <div class="mb-3 d-flex gap-2">
-                    <input type="text" class="form-control" placeholder="Search elements..." @bind="_searchText" @bind:event="oninput" />
+                    <input type="text" class="form-control" placeholder="@Loc["SearchPlaceholder"]" @bind="_searchText" @bind:event="oninput" />
                     <select class="form-select" style="max-width: 200px;" @bind="_selectedGroup">
-                        <option value="">All Groups</option>
+                        <option value="">@Loc["AllGroups"]</option>
                         @foreach (var group in _availableGroups)
                         {
                             <option value="@group">@group</option>
@@ -62,14 +64,14 @@ else
                 <!-- Cart / Selection -->
                 <div class="card shadow-sm sticky-top" style="top: 20px;">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Your Lineup</h5>
+                        <h5 class="mb-0">@Loc["YourLineup"]</h5>
                         <span class="badge bg-light text-primary">@_selectedElementIds.Count / @_lineupSize</span>
                     </div>
                     <div class="card-body p-0">
                         @if (_selectedElementIds.Count == 0)
                         {
                             <div class="p-4 text-center text-muted">
-                                No elements selected yet.
+                                @Loc["NoElementsSelected"]
                             </div>
                         }
                         else
@@ -87,13 +89,13 @@ else
                                                 {
                                                     <div class="form-check form-check-inline mt-1">
                                                         <input class="form-check-input" type="radio" name="captainRadio" id="cap_@el.Id" checked="@(_captainElementId == el.Id)" @onchange="() => SetCaptain(el.Id)" disabled="@_isLiveOrEnded">
-                                                        <label class="form-check-label small" for="cap_@el.Id">Captain</label>
+                                                        <label class="form-check-label small" for="cap_@el.Id">@Loc["Captain"]</label>
                                                     </div>
                                                 }
                                             </div>
                                             @if (!_isLiveOrEnded)
                                             {
-                                                <button type="button" class="btn-close" aria-label="Remove" @onclick="() => ToggleElement(el.Id)"></button>
+                                                <button type="button" class="btn-close" aria-label="@Loc["Remove"]" @onclick="() => ToggleElement(el.Id)"></button>
                                             }
                                         </li>
                                     }
@@ -108,7 +110,7 @@ else
                         }
                         @if (_saveSuccess)
                         {
-                            <div class="alert alert-success py-2 mb-2">Saved successfully!</div>
+                            <div class="alert alert-success py-2 mb-2">@Loc["SavedSuccessfully"]</div>
                         }
                         @if (!_isLiveOrEnded)
                         {
@@ -116,11 +118,11 @@ else
                                 @if (_isSaving)
                                 {
                                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span> Saving...</span>
+                                    <span> @Loc["Saving"]</span>
                                 }
                                 else
                                 {
-                                    <span>Save Lineup</span>
+                                    <span>@Loc["SaveLineup"]</span>
                                 }
                             </button>
                         }
@@ -141,8 +143,8 @@ else
     private string? _saveError;
     private bool _saveSuccess = false;
 
-    private int _lineupSize = 5; // Should ideally come from Game details, hardcoded default for now until we fetch game info
-    private bool _captainEnabled = true; // Same
+    private int _lineupSize;
+    private bool _captainEnabled;
 
     private List<AvailableElementViewModel> _elements = new();
     private List<string> _availableGroups = new();
@@ -172,10 +174,12 @@ else
 
         try
         {
-            // We'll just fetch elements and lineup. We should also fetch Game configuration for LineupSize and CaptainEnabled.
-            // For now, we assume size 5 and captain enabled.
-            // Wait, we can get LineupSize from the backend if we had an endpoint, but the user didn't ask for a game details endpoint yet.
-            // I'll leave them as default and assume 5.
+            var game = await Http.GetFromJsonAsync<GameInfoViewModel>($"/api/games/{GameId}");
+            if (game != null)
+            {
+                _lineupSize = game.LineupSize;
+                _captainEnabled = game.CaptainEnabled;
+            }
 
             var requestElements = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/elements");
             var resElements = await Http.SendAsync(requestElements);
@@ -289,17 +293,24 @@ else
             else
             {
                 var err = await response.Content.ReadFromJsonAsync<ErrorResponse>();
-                _saveError = err?.Error ?? "Failed to save lineup.";
+                _saveError = err?.Error ?? Loc["SaveFailed"];
             }
         }
         catch (Exception)
         {
-            _saveError = "Network error while saving.";
+            _saveError = Loc["SaveNetworkError"];
         }
         finally
         {
             _isSaving = false;
         }
+    }
+
+    public class GameInfoViewModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public int LineupSize { get; set; }
+        public bool CaptainEnabled { get; set; }
     }
 
     public class AvailableElementViewModel

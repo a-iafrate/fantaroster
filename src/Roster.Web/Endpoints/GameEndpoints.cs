@@ -14,6 +14,19 @@ public static class GameEndpoints
     {
         var group = app.MapGroup("/api/games/{gameId}").WithTags("Games");
 
+        group.MapGet("/", async (
+            [FromRoute] Guid gameId,
+            Roster.Application.Ports.Data.IGameRepository repository,
+            CancellationToken cancellationToken) =>
+        {
+            var game = await repository.GetByIdAsync(gameId, cancellationToken);
+            return game is null
+                ? Results.NotFound()
+                : Results.Ok(new GameInfoResponse(game.Name, game.LineupSize, game.CaptainEnabled, game.State.ToString()));
+        })
+        .WithName("GetGameInfo")
+        .AllowAnonymous();
+
         group.MapGet("/elements", async (
             [FromRoute] Guid gameId,
             ElementManagementService service,
@@ -24,6 +37,17 @@ public static class GameEndpoints
             return Results.Ok(elements);
         })
         .WithName("GetAvailableElements")
+        .AllowAnonymous();
+
+        app.MapGet("/api/join-codes/{joinCode}", async (
+            [FromRoute] string joinCode,
+            Roster.Application.Ports.Data.IGameRepository repository,
+            CancellationToken cancellationToken) =>
+        {
+            var game = await repository.GetByJoinCodeAsync(joinCode.Trim().ToUpperInvariant(), cancellationToken);
+            return game is null ? Results.NotFound() : Results.Ok(new JoinCodeResponse(game.Id));
+        })
+        .WithName("ResolveJoinCode")
         .AllowAnonymous();
 
         app.MapGet("/join/{joinCode}", async (
@@ -45,3 +69,7 @@ public static class GameEndpoints
         return app;
     }
 }
+
+public sealed record JoinCodeResponse(Guid GameId);
+
+public sealed record GameInfoResponse(string Name, int LineupSize, bool CaptainEnabled, string State);

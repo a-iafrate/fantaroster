@@ -1,17 +1,39 @@
 @page "/games/{GameId:guid}/join"
-@using System.ComponentModel.DataAnnotations
+@rendermode ParticipantRenderMode.Instance
 @inject HttpClient Http
 @inject Roster.Web.Client.Services.ParticipantAuthState AuthState
 @inject NavigationManager Navigation
+@inject IStringLocalizer<ParticipantResource> Loc
 
-<PageTitle>Join Game</PageTitle>
+<PageTitle>@Loc["JoinPageTitle"]</PageTitle>
 
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
             <div class="card shadow-sm">
                 <div class="card-body p-4">
-                    <h2 class="card-title text-center mb-4">Join Game</h2>
+                    @if (_isLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">@Loc["Loading"]</span>
+                            </div>
+                        </div>
+                    }
+                    else if (_gameNotFound)
+                    {
+                        <h2 class="card-title text-center mb-3">@Loc["GameNotFoundTitle"]</h2>
+                        <p class="text-center text-muted mb-4">@Loc["GameNotFoundHelp"]</p>
+                        <a href="/j" class="btn btn-primary w-100">@Loc["EnterCodeTitle"]</a>
+                    }
+                    else if (_notJoinable is not null)
+                    {
+                        <h2 class="card-title text-center mb-3">@Loc[_notJoinable == "Draft" ? "GameNotOpenTitle" : "GameClosedTitle"]</h2>
+                        <p class="text-center text-muted mb-0">@Loc[_notJoinable == "Draft" ? "GameNotOpenHelp" : "GameClosedHelp"]</p>
+                    }
+                    else
+                    {
+                    <h2 class="card-title text-center mb-4">@Loc["JoinTitle"]</h2>
 
                     @if (!string.IsNullOrEmpty(_errorMessage))
                     {
@@ -20,27 +42,26 @@
                         </div>
                     }
 
-                    <EditForm Model="@_model" OnValidSubmit="HandleValidSubmit">
-                        <DataAnnotationsValidator />
+                    <EditForm Model="@_model" OnSubmit="HandleSubmit">
 
                         <div class="mb-3">
-                            <label for="nickname" class="form-label">Nickname</label>
-                            <InputText id="nickname" class="form-control" @bind-Value="_model.Nickname" placeholder="Choose a nickname..." />
-                            <ValidationMessage For="@(() => _model.Nickname)" class="text-danger mt-1" />
+                            <label for="nickname" class="form-label">@Loc["Nickname"]</label>
+                            <InputText id="nickname" class="form-control" @bind-Value="_model.Nickname" placeholder="@Loc["NicknamePlaceholder"]" />
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100" disabled="@_isSubmitting">
                             @if (_isSubmitting)
                             {
                                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                <span>Joining...</span>
+                                <span>@Loc["Joining"]</span>
                             }
                             else
                             {
-                                <span>Join Game</span>
+                                <span>@Loc["JoinButton"]</span>
                             }
                         </button>
                     </EditForm>
+                    }
                 </div>
             </div>
         </div>
@@ -53,11 +74,41 @@
 
     private JoinGameViewModel _model = new();
     private bool _isSubmitting;
+    private bool _isLoading = true;
+    private bool _gameNotFound;
+    private string? _notJoinable;
     private string? _errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        // If already joined, maybe redirect to the dashboard/game view?
+        try
+        {
+            var response = await Http.GetAsync($"/api/games/{GameId}");
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                _gameNotFound = true;
+                return;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                var game = await response.Content.ReadFromJsonAsync<GameInfoViewModel>();
+                if (game is not null && game.State is not ("Open" or "Live"))
+                {
+                    _notJoinable = game.State;
+                }
+            }
+        }
+        catch (HttpRequestException)
+        {
+            // Offline or server unreachable: show the form and let the submit report the network error.
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
+        // If already joined, go straight to the game view.
         var token = await AuthState.GetTokenAsync();
         if (!string.IsNullOrEmpty(token))
         {
@@ -65,14 +116,22 @@
         }
     }
 
-    private async Task HandleValidSubmit()
+    private async Task HandleSubmit()
     {
-        _isSubmitting = true;
         _errorMessage = null;
+
+        var nickname = _model.Nickname.Trim();
+        if (nickname.Length is < 2 or > 50)
+        {
+            _errorMessage = Loc["NicknameInvalid"];
+            return;
+        }
+
+        _isSubmitting = true;
 
         try
         {
-            var response = await Http.PostAsJsonAsync($"/api/games/{GameId}/participant/join", new { nickname = _model.Nickname });
+            var response = await Http.PostAsJsonAsync($"/api/games/{GameId}/participant/join", new { nickname });
 
             if (response.IsSuccessStatusCode)
             {
@@ -84,18 +143,18 @@
                 }
                 else
                 {
-                    _errorMessage = "Invalid response from server.";
+                    _errorMessage = Loc["JoinInvalidResponse"];
                 }
             }
             else
             {
                 var errorResult = await response.Content.ReadFromJsonAsync<ErrorResponse>();
-                _errorMessage = errorResult?.Error ?? "An error occurred while joining the game.";
+                _errorMessage = errorResult?.Error ?? Loc["JoinFailed"];
             }
         }
         catch (Exception)
         {
-            _errorMessage = "A network error occurred. Please try again.";
+            _errorMessage = Loc["NetworkErrorTryAgain"];
         }
         finally
         {
@@ -103,10 +162,13 @@
         }
     }
 
+    public class GameInfoViewModel
+    {
+        public string State { get; set; } = string.Empty;
+    }
+
     public class JoinGameViewModel
     {
-        [Required(ErrorMessage = "Nickname is required")]
-        [StringLength(50, MinimumLength = 2, ErrorMessage = "Nickname must be between 2 and 50 characters")]
         public string Nickname { get; set; } = string.Empty;
     }
 

@@ -52,6 +52,15 @@ public sealed class GameLifecycleService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>Permanently deletes the game and all its data, whatever its state.</summary>
+    public async Task DeleteGameAsync(Guid gameId, CancellationToken cancellationToken = default)
+    {
+        var game = await _gameRepository.GetByIdAsync(gameId, cancellationToken);
+        if (game == null) throw new ArgumentException($"Game {gameId} not found.");
+
+        await _gameRepository.DeleteAsync(gameId, cancellationToken);
+    }
+
     public async Task ArchiveGameAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         var game = await _gameRepository.GetByIdAsync(gameId, cancellationToken);

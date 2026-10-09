@@ -52,6 +52,18 @@ public sealed class Game
         RowVersion = Array.Empty<byte>();
     }
 
+    public void Rename(string name)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        Name = name.Trim();
+    }
+
+    public void ChangeLineupSize(int lineupSize)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(lineupSize, 1);
+        LineupSize = lineupSize;
+    }
+
     public void Open()
     {
         if (State != GameState.Draft) throw new InvalidOperationException("Game must be in Draft state to be opened.");

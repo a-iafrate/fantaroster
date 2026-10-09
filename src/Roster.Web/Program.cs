@@ -23,6 +23,7 @@ builder.Services.AddDbContext<RosterDbContext>(options =>
 builder.Services.AddScoped<IResyncService, ResyncService>();
 builder.Services.AddScoped<IGameCreationService, GameCreationService>();
 builder.Services.AddScoped<GameLifecycleService>();
+builder.Services.AddScoped<GameSettingsService>();
 builder.Services.AddScoped<ElementManagementService>();
 builder.Services.AddScoped<RuleManagementService>();
 builder.Services.AddScoped<ConsentManagementService>();
@@ -52,7 +53,7 @@ builder.Services.AddIdentityCore<OrganizerUser>(options =>
 .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<Microsoft.AspNetCore.Identity.SignInManager<OrganizerUser>>();
-builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IUserClaimsPrincipalFactory<OrganizerUser>, Microsoft.AspNetCore.Identity.UserClaimsPrincipalFactory<OrganizerUser>>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IUserClaimsPrincipalFactory<OrganizerUser>, Roster.Infrastructure.Security.OrganizerClaimsPrincipalFactory>();
 
 builder.Services.AddRateLimiter(options =>
 {

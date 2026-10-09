@@ -520,6 +520,33 @@
   <data name="NoReferees" xml:space="preserve">
     <value>No referees have been added yet.</value>
   </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Game settings</value>
+  </data>
+  <data name="SettingsDesc" xml:space="preserve">
+    <value>Change the name and the number of elements per lineup.</value>
+  </data>
+  <data name="SettingsLockedNotice" xml:space="preserve">
+    <value>The number of elements per lineup can no longer be changed because at least one participant has already joined. The name can still be changed.</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>Settings saved.</value>
+  </data>
+  <data name="SettingsInvalid" xml:space="preserve">
+    <value>Enter a name and a lineup size of at least 1.</value>
+  </data>
+  <data name="DeleteGameMenu" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteGameTitle" xml:space="preserve">
+    <value>Delete game</value>
+  </data>
+  <data name="DeleteGameWarning" xml:space="preserve">
+    <value>You are about to permanently delete &quot;{0}&quot;. Elements, rules, referees, participants, lineups and every score will be deleted. This cannot be undone.</value>
+  </data>
+  <data name="DeleteGameConfirm" xml:space="preserve">
+    <value>Yes, delete everything</value>
+  </data>
 </root>
 
 

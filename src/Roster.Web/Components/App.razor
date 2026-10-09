@@ -21,6 +21,9 @@
 <body>
     <Routes />
     <ReconnectModal />
+    <script>
+        window.rosterGetBrowserLanguage = () => navigator.language || 'en';
+    </script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script>
         if ('serviceWorker' in navigator) {

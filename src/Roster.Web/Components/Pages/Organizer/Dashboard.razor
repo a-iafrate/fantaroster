@@ -6,6 +6,7 @@
 @using Roster.Domain.Games
 @attribute [Authorize]
 @inject IGameRepository GameRepository
+@inject Roster.Application.Services.GameLifecycleService LifecycleService
 @inject IStringLocalizer<SharedResource> Loc
 
 <PageTitle>@Loc["DashboardTitle"]</PageTitle>
@@ -55,7 +56,7 @@
                         {
                             <div class="game-dropdown">
                                 <a href="/organizer/games/@game.Id" class="game-dropdown-item">@actionText</a>
-                                <!-- Add other actions here if needed -->
+                                <button type="button" class="game-dropdown-item game-dropdown-danger" @onclick="() => AskDelete(game)">@Loc["DeleteGameMenu"]</button>
                             </div>
                         }
                     </div>
@@ -79,7 +80,62 @@
     </div>
 </div>
 
+@if (gameToDelete is not null)
+{
+    <div class="delete-backdrop" @onclick="CancelDelete">
+        <div class="delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" @onclick:stopPropagation>
+            <h3 id="delete-title">@Loc["DeleteGameTitle"]</h3>
+            <p>@string.Format(Loc["DeleteGameWarning"], gameToDelete.Name)</p>
+            @if (!string.IsNullOrEmpty(deleteError))
+            {
+                <p class="delete-error">@deleteError</p>
+            }
+            <div class="delete-actions">
+                <button type="button" class="delete-cancel" @onclick="CancelDelete" disabled="@isDeleting">@Loc["BtnCancel"]</button>
+                <button type="button" class="delete-confirm" @onclick="ConfirmDeleteAsync" disabled="@isDeleting">@Loc["DeleteGameConfirm"]</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
+    private Game? gameToDelete;
+    private bool isDeleting;
+    private string? deleteError;
+
+    private void AskDelete(Game game)
+    {
+        activeMenuId = null;
+        deleteError = null;
+        gameToDelete = game;
+    }
+
+    private void CancelDelete()
+    {
+        if (!isDeleting) gameToDelete = null;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (gameToDelete is null || isDeleting) return;
+
+        isDeleting = true;
+        try
+        {
+            await LifecycleService.DeleteGameAsync(gameToDelete.Id);
+            Games = await GameRepository.GetAllAsync();
+            gameToDelete = null;
+        }
+        catch (Exception ex)
+        {
+            deleteError = ex.Message;
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+    }
+
     private List<Game>? Games;
     private Guid? activeMenuId;
     private string activeFilter = "All";

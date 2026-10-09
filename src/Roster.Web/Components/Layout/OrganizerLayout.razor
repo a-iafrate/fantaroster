@@ -1,6 +1,10 @@
 @inherits LayoutComponentBase
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.Extensions.Localization
+@using Roster.Infrastructure.Security
 @inject IStringLocalizer<SharedResource> Loc
+@inject AuthenticationStateProvider AuthStateProvider
 
 <div class="org-layout">
     <div class="org-sidebar">
@@ -31,10 +35,10 @@
         </div>
 
         <div class="org-account-btn">
-            <div class="org-avatar">CM</div>
+            <div class="org-avatar">@_initials</div>
             <div class="org-account-info">
-                <div class="org-account-name">Chiara Monti</div>
-                <div class="org-account-email">chiara@dotnetemilia.it</div>
+                <div class="org-account-name">@_displayName</div>
+                <div class="org-account-email">@_email</div>
             </div>
             <i class="icon-chevrons-up-down"></i>
         </div>
@@ -44,3 +48,30 @@
         @Body
     </main>
 </div>
+
+@code {
+    private string _displayName = string.Empty;
+    private string _email = string.Empty;
+    private string _initials = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
+
+        _email = user.FindFirstValue(ClaimTypes.Email) ?? user.Identity?.Name ?? string.Empty;
+        _displayName = user.FindFirstValue(OrganizerClaimsPrincipalFactory.DisplayNameClaimType)
+            ?? _email.Split('@')[0];
+        _initials = GetInitials(_displayName);
+    }
+
+    private static string GetInitials(string name)
+    {
+        var parts = name.Split([' ', '.', '_', '-'], StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length switch
+        {
+            0 => string.Empty,
+            1 => parts[0][..1].ToUpperInvariant(),
+            _ => string.Concat(parts[0][..1], parts[^1][..1]).ToUpperInvariant()
+        };
+    }
+}

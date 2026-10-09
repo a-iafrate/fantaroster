@@ -520,6 +520,33 @@
   <data name="NoReferees" xml:space="preserve">
     <value>Nessun arbitro è stato ancora aggiunto.</value>
   </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Impostazioni del gioco</value>
+  </data>
+  <data name="SettingsDesc" xml:space="preserve">
+    <value>Modifica il nome e il numero di elementi per rosa.</value>
+  </data>
+  <data name="SettingsLockedNotice" xml:space="preserve">
+    <value>Il numero di elementi per rosa non è più modificabile perché si è già iscritto almeno un partecipante. Il nome si può ancora cambiare.</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>Impostazioni salvate.</value>
+  </data>
+  <data name="SettingsInvalid" xml:space="preserve">
+    <value>Inserisci un nome e un numero di elementi pari ad almeno 1.</value>
+  </data>
+  <data name="DeleteGameMenu" xml:space="preserve">
+    <value>Elimina</value>
+  </data>
+  <data name="DeleteGameTitle" xml:space="preserve">
+    <value>Elimina gioco</value>
+  </data>
+  <data name="DeleteGameWarning" xml:space="preserve">
+    <value>Stai per eliminare definitivamente &quot;{0}&quot;. Verranno cancellati elementi, regole, arbitri, partecipanti, rose e tutti i punteggi. L&apos;operazione non può essere annullata.</value>
+  </data>
+  <data name="DeleteGameConfirm" xml:space="preserve">
+    <value>Sì, elimina tutto</value>
+  </data>
 </root>
 
 

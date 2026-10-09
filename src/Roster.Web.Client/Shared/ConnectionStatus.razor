@@ -1,10 +1,11 @@
 @inject IJSRuntime JSRuntime
+@inject IStringLocalizer<ParticipantResource> Loc
 @implements IAsyncDisposable
 
 @if (!IsOnline)
 {
     <div class="connection-status offline">
-        Offline - Trying to reconnect...
+        @Loc["Offline"]
     </div>
 }
 

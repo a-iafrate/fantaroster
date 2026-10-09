@@ -1,7 +1,10 @@
 @page "/j"
+@rendermode ParticipantRenderMode.Instance
 @inject NavigationManager Navigation
+@inject HttpClient Http
+@inject IStringLocalizer<ParticipantResource> Loc
 
-<PageTitle>Enter Join Code</PageTitle>
+<PageTitle>@Loc["EnterCodePageTitle"]</PageTitle>
 
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -10,17 +13,22 @@
                 <div class="mb-4">
                     <i class="icon-qr-code" style="font-size: 48px; color: var(--color-primary, #3b82f6);"></i>
                 </div>
-                <h2 class="h4 mb-3">Join a Game</h2>
-                <p class="text-muted mb-4">Enter the 5-character join code provided by the organizer.</p>
+                <h2 class="h4 mb-3">@Loc["EnterCodeTitle"]</h2>
+                <p class="text-muted mb-4">@Loc["EnterCodeHelp"]</p>
                 
+                @if (_errorMessage is not null)
+                {
+                    <div class="alert alert-danger" role="alert">@_errorMessage</div>
+                }
+
                 <form @onsubmit="Submit">
                     <div class="mb-3">
                         <input type="text" class="form-control form-control-lg text-center" style="letter-spacing: 0.25em; text-transform: uppercase;" 
                                placeholder="XXXXX" maxlength="5" @bind="_joinCode" @bind:event="oninput" />
                     </div>
                     
-                    <button type="submit" class="btn btn-primary btn-lg w-100" disabled="@(string.IsNullOrWhiteSpace(_joinCode) || _joinCode.Length != 5)">
-                        Go to Game
+                    <button type="submit" class="btn btn-primary btn-lg w-100" disabled="@(string.IsNullOrWhiteSpace(_joinCode) || _joinCode.Length != 5 || _isChecking)">
+                        @Loc["GoToGame"]
                     </button>
                 </form>
             </div>
@@ -31,11 +39,45 @@
 @code {
     private string _joinCode = string.Empty;
 
-    private void Submit()
+    private bool _isChecking;
+    private string? _errorMessage;
+
+    private async Task Submit()
     {
-        if (!string.IsNullOrWhiteSpace(_joinCode) && _joinCode.Length == 5)
+        if (string.IsNullOrWhiteSpace(_joinCode) || _joinCode.Length != 5 || _isChecking)
+            return;
+
+        _isChecking = true;
+        _errorMessage = null;
+        try
         {
-            Navigation.NavigateTo($"/join/{_joinCode.ToUpperInvariant()}");
+            var response = await Http.GetAsync($"/api/join-codes/{Uri.EscapeDataString(_joinCode.ToUpperInvariant())}");
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<JoinCodeResponse>();
+                if (result is not null)
+                {
+                    Navigation.NavigateTo($"/games/{result.GameId}/join");
+                    return;
+                }
+            }
+
+            _errorMessage = response.StatusCode == System.Net.HttpStatusCode.NotFound
+                ? Loc["JoinCodeNotFound"]
+                : Loc["NetworkErrorTryAgain"];
         }
+        catch (HttpRequestException)
+        {
+            _errorMessage = Loc["NetworkErrorTryAgain"];
+        }
+        finally
+        {
+            _isChecking = false;
+        }
+    }
+
+    public class JoinCodeResponse
+    {
+        public Guid GameId { get; set; }
     }
 }

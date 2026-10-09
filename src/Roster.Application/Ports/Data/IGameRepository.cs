@@ -15,6 +15,8 @@ public interface IGameRepository
     Task<Game?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
     Task<Game?> GetByJoinCodeAsync(string joinCode, CancellationToken cancellationToken = default);
     Task<List<Game>> GetAllAsync(CancellationToken cancellationToken = default);
+    /// <summary>Permanently deletes a game together with everything that belongs to it.</summary>
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     void Add(Game game);
     void Update(Game game);
 }

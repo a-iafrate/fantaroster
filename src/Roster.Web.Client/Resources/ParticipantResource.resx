@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+    <data name="JoinPageTitle" xml:space="preserve">
+    <value>Join Game</value>
+  </data>
+  <data name="JoinTitle" xml:space="preserve">
+    <value>Join Game</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>Nickname</value>
+  </data>
+  <data name="NicknamePlaceholder" xml:space="preserve">
+    <value>Choose a nickname...</value>
+  </data>
+  <data name="NicknameInvalid" xml:space="preserve">
+    <value>Nickname must be between 2 and 50 characters.</value>
+  </data>
+  <data name="Joining" xml:space="preserve">
+    <value>Joining...</value>
+  </data>
+  <data name="JoinButton" xml:space="preserve">
+    <value>Join Game</value>
+  </data>
+  <data name="JoinInvalidResponse" xml:space="preserve">
+    <value>Invalid response from server.</value>
+  </data>
+  <data name="JoinFailed" xml:space="preserve">
+    <value>An error occurred while joining the game.</value>
+  </data>
+  <data name="NetworkErrorTryAgain" xml:space="preserve">
+    <value>A network error occurred. Please try again.</value>
+  </data>
+  <data name="EnterCodePageTitle" xml:space="preserve">
+    <value>Enter Join Code</value>
+  </data>
+  <data name="EnterCodeTitle" xml:space="preserve">
+    <value>Join a Game</value>
+  </data>
+  <data name="EnterCodeHelp" xml:space="preserve">
+    <value>Enter the 5-character join code provided by the organizer.</value>
+  </data>
+  <data name="GoToGame" xml:space="preserve">
+    <value>Go to Game</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="DashboardPageTitle" xml:space="preserve">
+    <value>Game Dashboard</value>
+  </data>
+  <data name="DashboardHello" xml:space="preserve">
+    <value>Hello, {0}!</value>
+  </data>
+  <data name="Connected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="DashboardDeviceInfo" xml:space="preserve">
+    <value>This is your device. You are successfully joined to this game.</value>
+  </data>
+  <data name="Rank" xml:space="preserve">
+    <value>Rank</value>
+  </data>
+  <data name="Score" xml:space="preserve">
+    <value>Score</value>
+  </data>
+  <data name="BuildLineup" xml:space="preserve">
+    <value>Build Lineup</value>
+  </data>
+  <data name="Leaderboard" xml:space="preserve">
+    <value>Leaderboard</value>
+  </data>
+  <data name="ActivityFeed" xml:space="preserve">
+    <value>Activity Feed</value>
+  </data>
+  <data name="BackToDashboard" xml:space="preserve">
+    <value>Back to Dashboard</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="LineupPageTitle" xml:space="preserve">
+    <value>Build Lineup</value>
+  </data>
+  <data name="LineupTitle" xml:space="preserve">
+    <value>Build Your Lineup</value>
+  </data>
+  <data name="LineupLocked" xml:space="preserve">
+    <value>The game is live or ended. Your lineup is locked and cannot be modified.</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search elements...</value>
+  </data>
+  <data name="AllGroups" xml:space="preserve">
+    <value>All Groups</value>
+  </data>
+  <data name="YourLineup" xml:space="preserve">
+    <value>Your Lineup</value>
+  </data>
+  <data name="NoElementsSelected" xml:space="preserve">
+    <value>No elements selected yet.</value>
+  </data>
+  <data name="Captain" xml:space="preserve">
+    <value>Captain</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SavedSuccessfully" xml:space="preserve">
+    <value>Saved successfully!</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>Saving...</value>
+  </data>
+  <data name="SaveLineup" xml:space="preserve">
+    <value>Save Lineup</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>Failed to save lineup.</value>
+  </data>
+  <data name="SaveNetworkError" xml:space="preserve">
+    <value>Network error while saving.</value>
+  </data>
+  <data name="LeaderboardPageTitle" xml:space="preserve">
+    <value>Leaderboard</value>
+  </data>
+  <data name="LeaderboardLoadFailed" xml:space="preserve">
+    <value>Could not load the leaderboard.</value>
+  </data>
+  <data name="LeaderboardNetworkError" xml:space="preserve">
+    <value>Network error while loading leaderboard.</value>
+  </data>
+  <data name="MyPosition" xml:space="preserve">
+    <value>My Position</value>
+  </data>
+  <data name="RankValue" xml:space="preserve">
+    <value>Rank {0}</value>
+  </data>
+  <data name="PointsShort" xml:space="preserve">
+    <value>{0} pts</value>
+  </data>
+  <data name="NoLineupSaved" xml:space="preserve">
+    <value>No lineup saved yet.</value>
+  </data>
+  <data name="TopPositions" xml:space="preserve">
+    <value>Top Positions</value>
+  </data>
+  <data name="NoScoresYet" xml:space="preserve">
+    <value>No scores yet.</value>
+  </data>
+  <data name="ActivityPageTitle" xml:space="preserve">
+    <value>Activity Feed</value>
+  </data>
+  <data name="ActivityLoadFailed" xml:space="preserve">
+    <value>Could not load the activity feed.</value>
+  </data>
+  <data name="ActivityNetworkError" xml:space="preserve">
+    <value>Network error while loading activity feed.</value>
+  </data>
+  <data name="NoActivityYet" xml:space="preserve">
+    <value>No activity yet.</value>
+  </data>
+  <data name="Voided" xml:space="preserve">
+    <value>Voided</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>Offline - Trying to reconnect...</value>
+  </data>
+  <data name="GameNotFoundTitle" xml:space="preserve">
+    <value>Game not found</value>
+  </data>
+  <data name="GameNotFoundHelp" xml:space="preserve">
+    <value>This link does not point to an existing game. Check the link or enter the join code provided by the organizer.</value>
+  </data>
+  <data name="GameNotOpenTitle" xml:space="preserve">
+    <value>Not open yet</value>
+  </data>
+  <data name="GameNotOpenHelp" xml:space="preserve">
+    <value>The organizer has not opened this game to participants yet. Try again later.</value>
+  </data>
+  <data name="GameClosedTitle" xml:space="preserve">
+    <value>Game closed</value>
+  </data>
+  <data name="GameClosedHelp" xml:space="preserve">
+    <value>This game has ended and no longer accepts new participants.</value>
+  </data>
+  <data name="JoinCodeNotFound" xml:space="preserve">
+    <value>No game found with this code. Check it and try again.</value>
+  </data>
+</root>

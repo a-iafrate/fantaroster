@@ -40,6 +40,7 @@ else
             <div class="mg-nav-item @(ActiveTab == "Consent" ? "active" : "")" @onclick="@(() => SetTab("Consent"))">@Loc["ConsentFlowTitle"]</div>
             <div class="mg-nav-item @(ActiveTab == "Assets" ? "active" : "")" @onclick="@(() => SetTab("Assets"))">@Loc["AssetsTitle"]</div>
             <div class="mg-nav-item @(ActiveTab == "Referees" ? "active" : "")" @onclick="@(() => SetTab("Referees"))">@Loc["RefereesTitle"]</div>
+            <div class="mg-nav-item @(ActiveTab == "Settings" ? "active" : "")" @onclick="@(() => SetTab("Settings"))">@Loc["SettingsTitle"]</div>
         </div>
 
         <div class="mg-content">
@@ -123,6 +124,10 @@ else
             else if (ActiveTab == "Referees")
             {
                 <RefereesTab GameId="Id" OnError="HandleError" />
+            }
+            else if (ActiveTab == "Settings")
+            {
+                <SettingsTab Game="Game" OnSaved="LoadGame" OnError="HandleError" />
             }
         </div>
     </div>
