@@ -36,10 +36,6 @@ public sealed partial class IdentityEmailSender : IEmailSender<OrganizerUser>
 
     private async Task SendEmailAsync(string toEmail, string subject, string textBody)
     {
-#if DEBUG
-        LogDebugEmail(_logger, toEmail, subject, textBody);
-        await Task.CompletedTask;
-#else
         var acsConnectionString = _configuration["AzureCommunicationServices:ConnectionString"];
         if (!string.IsNullOrEmpty(acsConnectionString))
         {
@@ -60,8 +56,9 @@ public sealed partial class IdentityEmailSender : IEmailSender<OrganizerUser>
         else
         {
             LogNoEmailConfiguration(_logger, toEmail);
+            LogDebugEmail(_logger, toEmail, subject, textBody);
+            await Task.CompletedTask;
         }
-#endif
     }
 
     [LoggerMessage(LogLevel.Information, "=== EMAIL (DEBUG) ===\nTo: {ToEmail}\nSubject: {Subject}\nBody: {Body}\n=====================")]

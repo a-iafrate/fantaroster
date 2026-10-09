@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\Roster.ServiceDefaults\Roster.ServiceDefaults.csproj" />
@@ -24,6 +24,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <UserSecretsId>68d1aa15-5e08-4e48-a8b6-0a73906c13d2</UserSecretsId>
   </PropertyGroup>
 
 </Project>
