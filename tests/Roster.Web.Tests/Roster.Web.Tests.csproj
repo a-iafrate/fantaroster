@@ -1,25 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CS0619;CS0618</NoWarn>
   </PropertyGroup>
+
   <ItemGroup>
+    <PackageReference Include="bunit" />
+    <PackageReference Include="AngleSharp" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="NSubstitute" />
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="NSubstitute" />
-    <PackageReference Include="Shouldly" />
-    <PackageReference Include="Testcontainers.MsSql" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="Bunit" />
+    <Using Include="Shouldly" />
+    <Using Include="NSubstitute" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Roster.Web\Roster.Web.csproj" />
-    <ProjectReference Include="..\..\src\Roster.Infrastructure\Roster.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Roster.Web.Client\Roster.Web.Client.csproj" />
   </ItemGroup>
+
 </Project>

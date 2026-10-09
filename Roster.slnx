@@ -19,5 +19,6 @@
     <Project Path="tests/Roster.Plugins.Tests/Roster.Plugins.Tests.csproj" />
     <Project Path="tests/Roster.Ui.Tests/Roster.Ui.Tests.csproj" />
     <Project Path="tests/Roster.IntegrationTests/Roster.IntegrationTests.csproj" />
+    <Project Path="tests/Roster.Web.Tests/Roster.Web.Tests.csproj" />
   </Folder>
 </Solution>
