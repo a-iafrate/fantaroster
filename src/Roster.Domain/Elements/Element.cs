@@ -74,11 +74,12 @@ public sealed class Element
         IsHidden = isHidden;
     }
 
-    public void UpdateDetails(string name, string? subtitle, string? group)
+    public void UpdateDetails(string name, string? subtitle, string? group, string? imageUrl)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         Name = name;
         Subtitle = subtitle;
         Group = group;
+        ImageUrl = imageUrl;
     }
 }

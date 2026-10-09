@@ -74,18 +74,18 @@
     padding: var(--space-6);
 }
 
-::deep .mg-section {
+.mg-layout ::deep .mg-section {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
 }
 
-::deep .mg-section-title {
+.mg-layout ::deep .mg-section-title {
     font: var(--text-h3);
     letter-spacing: var(--tracking-h3);
 }
 
-::deep .mg-section-desc {
+.mg-layout ::deep .mg-section-desc {
     font: var(--text-body);
     color: var(--color-ink-2);
     margin-bottom: var(--space-4);
@@ -122,7 +122,7 @@
     color: var(--color-ink-2);
 }
 
-::deep .mg-btn-primary {
+.mg-layout ::deep .mg-btn-primary {
     height: 48px;
     padding: 0 var(--space-5);
     border-radius: var(--radius-m);
@@ -134,12 +134,12 @@
     cursor: pointer;
 }
 
-::deep .mg-btn-primary:disabled {
+.mg-layout ::deep .mg-btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-::deep .mg-btn-secondary {
+.mg-layout ::deep .mg-btn-secondary {
     height: 48px;
     padding: 0 var(--space-5);
     border-radius: var(--radius-m);
@@ -151,7 +151,7 @@
     cursor: pointer;
 }
 
-::deep .mg-btn-secondary:disabled {
+.mg-layout ::deep .mg-btn-secondary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -171,4 +171,143 @@
     border-radius: var(--radius-m);
     font: var(--text-small);
     border: 1px dashed var(--color-line-strong);
+}
+
+.mg-layout ::deep .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.mg-layout ::deep .modal {
+    background: var(--color-surface);
+    border-radius: var(--radius-l);
+    padding: var(--space-6);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.mg-layout ::deep .modal-title {
+    font: var(--text-h3);
+    font-weight: 800;
+}
+
+.mg-layout ::deep .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.mg-layout ::deep .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.mg-layout ::deep .form-group label {
+    font: var(--text-small);
+    font-weight: 700;
+}
+
+.mg-layout ::deep .form-control {
+    height: 44px;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-s);
+    border: 1.5px solid var(--color-line-strong);
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font: var(--text-body);
+}
+
+.mg-layout ::deep .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.mg-layout ::deep .mg-btn-text {
+    background: transparent;
+    border: none;
+    color: var(--color-ink-2);
+    font: var(--text-small);
+    font-weight: 700;
+    cursor: pointer;
+    padding: var(--space-1) var(--space-2);
+}
+.mg-layout ::deep .mg-btn-text:hover {
+    color: var(--color-ink);
+}
+.mg-layout ::deep .mg-btn-icon {
+    background: transparent;
+    border: none;
+    color: var(--color-ink-2);
+    font-size: 16px;
+    cursor: pointer;
+    padding: var(--space-1);
+}
+.mg-layout ::deep .text-danger {
+    color: var(--color-error) !important;
+}
+.mg-layout ::deep .element-badge {
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-pill);
+    font: var(--text-small);
+    font-weight: 800;
+    font-size: 11px;
+}
+.mg-layout ::deep .badge-success { background: var(--color-primary-bg); color: var(--color-primary); }
+.mg-layout ::deep .badge-neutral { background: var(--color-line); color: var(--color-ink-2); }
+.mg-layout ::deep .badge-warning { background: #fff3cd; color: #856404; }
+.mg-layout ::deep .badge-info { background: #d1ecf1; color: #0c5460; }
+
+.mg-layout ::deep .cg-list-container {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    background: var(--color-surface);
+}
+
+.mg-layout ::deep .cg-list-header {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-2);
+    font: var(--text-micro);
+    font-weight: 700;
+    color: var(--color-ink-2);
+}
+
+.mg-layout ::deep .cg-list-row {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-line);
+    align-items: center;
+    font: var(--text-body);
+}
+
+.mg-layout ::deep .cg-list-header > div,
+.mg-layout ::deep .cg-list-row > div {
+    flex: 1;
+}
+
+.mg-layout ::deep .cg-list-col-bold {
+    font-weight: 700;
+}
+
+.mg-layout ::deep .cg-list-col-muted {
+    color: var(--color-ink-2);
+}
+
+.mg-layout ::deep .element-actions {
+    display: flex;
+    gap: var(--space-2);
 }

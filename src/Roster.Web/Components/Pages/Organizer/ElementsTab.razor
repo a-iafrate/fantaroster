@@ -1,13 +1,36 @@
 @using Microsoft.Extensions.Localization
 @using Roster.Application.Services
+@using Roster.Application.Ports
+@using Roster.Application.Ports.Data
 @using Roster.Domain.Elements
 @using Roster.Domain.Games
+@using Roster.Domain.Sources
 @inject ElementManagementService ElementService
+@inject ISourceBindingRepository SourceBindingRepository
+@inject IResyncService ResyncService
 @inject IStringLocalizer<SharedResource> Loc
 
 <div class="mg-section">
-    <div class="mg-section-title">@Loc["ElementManagementTitle"]</div>
-    <div class="mg-section-desc">@Loc["ElementManagementDesc"]</div>
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+            <div class="mg-section-title">@Loc["ElementManagementTitle"]</div>
+            <div class="mg-section-desc">@Loc["ElementManagementDesc"]</div>
+        </div>
+        <div>
+            @if (SourceBindings != null && SourceBindings.Count > 0)
+            {
+                <button class="mg-btn-secondary" @onclick="ForceResync" disabled="@IsResyncing">
+                    <i class="icon-refresh-cw"></i> @(IsResyncing ? Loc["Loading"] : Loc["BtnResync"])
+                </button>
+            }
+            else if (SourceBindings != null && SourceBindings.Count == 0)
+            {
+                <button class="mg-btn-primary" @onclick="OpenAddElement">
+                    <i class="icon-plus"></i> @Loc["BtnAddElement"]
+                </button>
+            }
+        </div>
+    </div>
 
     @if (Elements == null)
     {
@@ -25,12 +48,18 @@
             @foreach (var el in Elements)
             {
                 <div class="cg-list-row @(el.IsHidden ? "element-hidden" : "")">
-                    <div class="cg-list-col-bold">
-                        @el.Name
-                        @if (!string.IsNullOrEmpty(el.Subtitle))
+                    <div class="cg-list-col-bold" style="display: flex; align-items: center; gap: 8px;">
+                        @if (!string.IsNullOrEmpty(el.ImageUrl))
                         {
-                            <div class="element-subtitle">@el.Subtitle</div>
+                            <img src="@el.ImageUrl" alt="" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-line);" />
                         }
+                        <div>
+                            @el.Name
+                            @if (!string.IsNullOrEmpty(el.Subtitle))
+                            {
+                                <div class="element-subtitle">@el.Subtitle</div>
+                            }
+                        </div>
                     </div>
                     <div>@el.Group</div>
                     <div class="element-status-col">
@@ -69,11 +98,11 @@
         </div>
     }
 
-    @if (EditingElement != null)
+    @if (EditingElement != null || IsAddingElement)
     {
         <div class="modal-backdrop">
             <div class="modal">
-                <div class="modal-title">@Loc["EditElementTitle"]</div>
+                <div class="modal-title">@(IsAddingElement ? Loc["AddElementTitle"] : Loc["EditElementTitle"])</div>
                 <div class="modal-body">
                     <div class="form-group">
                         <label>@Loc["ColName"]</label>
@@ -87,10 +116,14 @@
                         <label>@Loc["ColGroup"]</label>
                         <input type="text" @bind="EditGroup" class="form-control" />
                     </div>
+                    <div class="form-group">
+                        <label>@Loc["ColImageUrl"]</label>
+                        <input type="text" @bind="EditImageUrl" class="form-control" placeholder="https://..." />
+                    </div>
                 </div>
                 <div class="modal-actions">
                     <button class="mg-btn-secondary" @onclick="CancelEdit">@Loc["BtnCancel"]</button>
-                    <button class="mg-btn-primary" @onclick="SaveEdit">@Loc["BtnSave"]</button>
+                    <button class="mg-btn-primary" @onclick="SaveElement">@Loc["BtnSave"]</button>
                 </div>
             </div>
         </div>
@@ -103,14 +136,20 @@
     [Parameter] public EventCallback<string> OnError { get; set; }
 
     private IReadOnlyList<Element>? Elements;
+    private List<SourceBinding>? SourceBindings;
+    
     private Element? EditingElement;
+    private bool IsAddingElement;
+    private bool IsResyncing;
     
     private string EditName = "";
     private string? EditSubtitle;
     private string? EditGroup;
+    private string? EditImageUrl;
 
     protected override async Task OnInitializedAsync()
     {
+        SourceBindings = await SourceBindingRepository.GetByGameIdAsync(GameId);
         await LoadElements();
     }
 
@@ -128,25 +167,46 @@
 
     private void EditElement(Element element)
     {
+        IsAddingElement = false;
         EditingElement = element;
         EditName = element.Name;
         EditSubtitle = element.Subtitle;
         EditGroup = element.Group;
+        EditImageUrl = element.ImageUrl;
+    }
+
+    private void OpenAddElement()
+    {
+        EditingElement = null;
+        IsAddingElement = true;
+        EditName = "";
+        EditSubtitle = null;
+        EditGroup = null;
+        EditImageUrl = null;
     }
 
     private void CancelEdit()
     {
         EditingElement = null;
+        IsAddingElement = false;
     }
 
-    private async Task SaveEdit()
+    private async Task SaveElement()
     {
-        if (EditingElement == null || string.IsNullOrWhiteSpace(EditName)) return;
+        if (string.IsNullOrWhiteSpace(EditName)) return;
 
         try
         {
-            await ElementService.UpdateElementDetailsAsync(EditingElement.Id, EditName, EditSubtitle, EditGroup);
-            EditingElement = null;
+            if (IsAddingElement)
+            {
+                await ElementService.AddElementAsync(GameId, EditName, EditSubtitle, EditGroup, EditImageUrl);
+            }
+            else if (EditingElement != null)
+            {
+                await ElementService.UpdateElementDetailsAsync(EditingElement.Id, EditName, EditSubtitle, EditGroup, EditImageUrl);
+            }
+            
+            CancelEdit();
             await LoadElements();
         }
         catch (Exception ex)
@@ -178,6 +238,27 @@
         catch (Exception ex)
         {
             await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private async Task ForceResync()
+    {
+        if (SourceBindings == null || SourceBindings.Count == 0 || IsResyncing) return;
+        
+        IsResyncing = true;
+        try
+        {
+            var binding = SourceBindings.First();
+            await ResyncService.ResyncGameElementsAsync(GameId, binding.Id, default);
+            await LoadElements();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            IsResyncing = false;
         }
     }
 }

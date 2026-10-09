@@ -448,4 +448,25 @@
   <data name="ConsentInvalidElement">
     <value>Elemento non trovato.</value>
   </data>
+  <data name="BtnAddElement" xml:space="preserve">
+    <value>Aggiungi elemento</value>
+  </data>
+  <data name="AddElementTitle" xml:space="preserve">
+    <value>Aggiungi nuovo elemento</value>
+  </data>
+  <data name="BtnResync" xml:space="preserve">
+    <value>Forza sincronizzazione</value>
+  </data>
+  <data name="ColImageUrl" xml:space="preserve">
+    <value>URL Immagine</value>
+  </data>
+  <data name="BtnClose" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="ImportAndContinue" xml:space="preserve">
+    <value>Importa e Continua</value>
+  </data>
+  <data name="BtnAddRule" xml:space="preserve">
+    <value>Aggiungi Regola</value>
+  </data>
 </root>

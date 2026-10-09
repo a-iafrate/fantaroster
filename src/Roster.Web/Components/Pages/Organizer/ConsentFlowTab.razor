@@ -8,9 +8,9 @@
 @inject IElementRepository ElementRepository
 @inject NavigationManager Navigation
 
-<div class="cf-section">
-    <div class="cf-section-title">@Loc["ConsentFlowTitle"]</div>
-    <div class="cf-section-desc">@Loc["ConsentFlowDesc"]</div>
+<div class="mg-section">
+    <div class="mg-section-title">@Loc["ConsentFlowTitle"]</div>
+    <div class="mg-section-desc">@Loc["ConsentFlowDesc"]</div>
 
     @if (IsLoading)
     {
@@ -18,30 +18,45 @@
     }
     else if (!Elements.Any())
     {
-        <div class="cf-empty">@Loc["NoElementsRequiringConsent"]</div>
+        <div class="mg-alert-info">@Loc["NoElementsRequiringConsent"]</div>
     }
     else
     {
-        <div class="cf-list">
+        <div class="cg-list-container">
+            <div class="cg-list-header">
+                <div style="flex: 2;">@Loc["ColName"]</div>
+                <div>@Loc["ColStatus"]</div>
+                <div style="text-align: right;">@Loc["ColActions"]</div>
+            </div>
             @foreach (var element in Elements)
             {
-                <div class="cf-card">
-                    <div class="cf-info">
-                        <div class="cf-name">@element.Name</div>
-                        <div class="cf-subtitle">@element.Subtitle</div>
-                        <div class="cf-status">
-                            <span class="status-badge" style="background: @GetStatusColor(element.ConsentStatus)">@Loc["ConsentStatus_" + element.ConsentStatus]</span>
+                <div class="cg-list-row">
+                    <div class="cg-list-col-bold" style="flex: 2; display: flex; align-items: center; gap: 8px;">
+                        @if (!string.IsNullOrEmpty(element.ImageUrl))
+                        {
+                            <img src="@element.ImageUrl" alt="" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-line);" />
+                        }
+                        <div>
+                            <div>@element.Name</div>
+                            @if (!string.IsNullOrEmpty(element.Subtitle))
+                            {
+                                <div class="element-subtitle" style="font-weight: 400; font-size: 12px; color: var(--color-ink-2);">@element.Subtitle</div>
+                            }
                         </div>
                     </div>
                     
-                    <div class="cf-actions">
+                    <div>
+                        <span class="element-badge badge-info">@Loc["ConsentStatus_" + element.ConsentStatus]</span>
+                    </div>
+                    
+                    <div class="element-actions" style="justify-content: flex-end;">
                         @if (element.ConsentStatus == ConsentStatus.NotRequired || element.ConsentStatus == ConsentStatus.Declined || element.ConsentStatus == ConsentStatus.Accepted)
                         {
-                            <button class="cf-btn" @onclick="() => GenerateLink(element.Id)" disabled="@IsProcessing">@Loc["BtnGenerateConsentLink"]</button>
+                            <button class="mg-btn-text" @onclick="() => GenerateLink(element.Id)" disabled="@IsProcessing">@Loc["BtnGenerateConsentLink"]</button>
                         }
                         else if (element.ConsentStatus == ConsentStatus.Pending)
                         {
-                            <button class="cf-btn" @onclick="() => GenerateLink(element.Id)" disabled="@IsProcessing">@Loc["BtnRegenerateConsentLink"]</button>
+                            <button class="mg-btn-text" @onclick="() => GenerateLink(element.Id)" disabled="@IsProcessing">@Loc["BtnRegenerateConsentLink"]</button>
                         }
                     </div>
                 </div>
@@ -51,15 +66,15 @@
 
     @if (GeneratedToken != null)
     {
-        <div class="cf-modal-overlay">
-            <div class="cf-modal">
-                <div class="cf-modal-title">@Loc["ConsentLinkGenerated"]</div>
-                <div class="cf-modal-desc">@Loc["ConsentLinkGeneratedDesc"]</div>
-                
-                <input class="cf-input" type="text" readonly value="@GetFullLink(GeneratedToken)" />
-                
-                <div class="cf-modal-actions">
-                    <button class="cf-btn-primary" @onclick="CloseModal">@Loc["BtnClose"]</button>
+        <div class="modal-backdrop">
+            <div class="modal">
+                <div class="modal-title">@Loc["ConsentLinkGenerated"]</div>
+                <div class="modal-body">
+                    <div class="mg-section-desc">@Loc["ConsentLinkGeneratedDesc"]</div>
+                    <input class="form-control" type="text" readonly value="@GetFullLink(GeneratedToken)" />
+                </div>
+                <div class="modal-actions">
+                    <button class="mg-btn-primary" @onclick="CloseModal">@Loc["BtnClose"]</button>
                 </div>
             </div>
         </div>

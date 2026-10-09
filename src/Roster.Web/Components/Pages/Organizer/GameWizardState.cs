@@ -20,6 +20,9 @@ public class GameWizardState
     // Step 3
     public string SourceType { get; set; } = "sessionize"; // "sessionize", "csv", "manual"
 
-    // For Sessionize
+    // For Sessionize (legacy binding, can keep for compatibility or remove, better replace with dictionary)
     public string? SessionizeApiId { get; set; }
+
+    // For any plugin
+    public Dictionary<string, string> PluginConfig { get; set; } = new();
 }

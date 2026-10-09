@@ -161,20 +161,42 @@
                     </div>
                 </div>
 
-                @if (_state.SourceType == "sessionize")
+                                                @if (_state.SourceType != "manual")
                 {
-                    <div class="cg-form-group cg-mt-16">
-                        <div class="cg-label">@Loc["SessionizeApiId"]</div>
-                        <input type="text" @bind="_state.SessionizeApiId" class="cg-input cg-input-code" placeholder="@Loc["SessionizePlaceholder"]" />
-                        @if (!string.IsNullOrEmpty(SourceTestResult))
+                    var plugin = PluginRegistry.GetPlugin(_state.SourceType);
+                    if (plugin != null)
+                    {
+                        var schema = plugin.GetConfigSchema();
+                        foreach (var field in schema.Fields)
                         {
-                            <div class="cg-alert-success"><i class="icon-check"></i>@SourceTestResult</div>
+                            <div class="cg-form-group cg-mt-16">
+                                <div class="cg-label">@(Loc[field.Label] == null || Loc[field.Label].ResourceNotFound ? field.Label : Loc[field.Label]) @(field.IsRequired ? "*" : "(" + Loc["Optional"] + ")")</div>
+                                @if (field.Type == "textarea")
+                                {
+                                    <textarea value="@GetConfigValue(field.Key)" @onchange="@(e => SetConfigValue(field.Key, e.Value?.ToString()))" class="cg-input" rows="5" placeholder="@field.Description"></textarea>
+                                }
+                                else if (field.Type == "checkbox")
+                                {
+                                    <div class="cg-checkbox-group">
+                                        <input type="checkbox" checked="@(GetConfigValue(field.Key) == "true")" @onchange="@(e => SetConfigValue(field.Key, ((bool?)e.Value) == true ? "true" : "false"))" id="@field.Key" class="cg-checkbox" />
+                                        <label for="@field.Key" class="cg-checkbox-label">@field.Description</label>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="text" value="@GetConfigValue(field.Key)" @onchange="@(e => SetConfigValue(field.Key, e.Value?.ToString()))" class="cg-input cg-input-code" placeholder="@field.Description" />
+                                }
+                            </div>
                         }
-                        @if (!string.IsNullOrEmpty(SourceTestError))
-                        {
-                            <div class="cg-alert-error"><i class="icon-x"></i>@SourceTestError</div>
-                        }
-                    </div>
+                    }
+                }
+                @if (!string.IsNullOrEmpty(SourceTestResult))
+                {
+                    <div class="cg-alert-success cg-mt-16"><i class="icon-check"></i>@SourceTestResult</div>
+                }
+                @if (!string.IsNullOrEmpty(SourceTestError))
+                {
+                    <div class="cg-alert-error cg-mt-16" style="white-space: pre-wrap;"><i class="icon-x"></i>@SourceTestError</div>
                 }
 
                 <div class="cg-bottom-nav cg-mt-auto">
@@ -289,6 +311,19 @@
         _state.DomainPackId = id;
     }
 
+    private string GetConfigValue(string key)
+    {
+        return _state.PluginConfig.TryGetValue(key, out var val) ? val : "";
+    }
+
+    private void SetConfigValue(string key, string? value)
+    {
+        if (value == null)
+            _state.PluginConfig.Remove(key);
+        else
+            _state.PluginConfig[key] = value;
+    }
+
     private void NextStep()
     {
         if (CurrentStep == 1 && string.IsNullOrEmpty(_state.DomainPackId)) return;
@@ -315,29 +350,39 @@
         SourceTestError = null;
         SourceTestResult = null;
 
-        if (_state.SourceType == "sessionize" && !string.IsNullOrEmpty(_state.SessionizeApiId))
+        if (_state.SourceType == "manual")
+        {
+            PreviewElements.Clear();
+            NextStep();
+            return;
+        }
+
+        var plugin = PluginRegistry.GetPlugin(_state.SourceType);
+        if (plugin != null)
         {
             try
             {
-                var plugin = PluginRegistry.GetPlugin("sessionize");
-                if (plugin != null)
+                var config = new PluginConfig(_state.PluginConfig);
+                var validationResult = await plugin.ValidateConfigAsync(config, default);
+                if (!validationResult.IsValid)
                 {
-                    var config = new PluginConfig(new Dictionary<string, string> { { "EndpointId", _state.SessionizeApiId } });
-                    var result = await plugin.ImportAsync(config, default);
-                    PreviewElements = result.Elements.ToList();
-                    SourceTestResult = Loc["SessionizeFound", PreviewElements.Count];
-                    NextStep();
+                    SourceTestError = string.Join("\n", validationResult.Errors);
+                    return;
                 }
+                
+                var importResult = await plugin.ImportAsync(config, default);
+                PreviewElements = importResult.Elements.ToList();
+                SourceTestResult = Loc["SessionizeFound", PreviewElements.Count];
+                if (importResult.Warnings.Any())
+                {
+                     SourceTestError = string.Join("\n", importResult.Warnings);
+                }
+                NextStep();
             }
             catch (Exception ex)
             {
                 SourceTestError = Loc["SessionizeError", ex.Message];
             }
-        }
-        else if (_state.SourceType == "manual")
-        {
-            PreviewElements.Clear();
-            NextStep();
         }
         else 
         {
@@ -356,10 +401,10 @@
             string? pluginId = null;
             Dictionary<string, string>? pluginConfig = null;
 
-            if (_state.SourceType == "sessionize" && !string.IsNullOrEmpty(_state.SessionizeApiId))
+            if (_state.SourceType != "manual")
             {
-                pluginId = "sessionize";
-                pluginConfig = new Dictionary<string, string> { { "EndpointId", _state.SessionizeApiId } };
+                pluginId = _state.SourceType;
+                pluginConfig = new Dictionary<string, string>(_state.PluginConfig);
             }
 
             var cmd = new CreateGameCommand(
@@ -385,3 +430,6 @@
         }
     }
 }
+
+
+
