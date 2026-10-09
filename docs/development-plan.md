@@ -182,8 +182,8 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 - [x] Consent flow: generate consent invitations (link per element, optional email), public consent page (accept/decline), status visible in the console.
 - [x] Rule editor: add, edit, reorder, delete (only while `Draft`/`Open`); points must be non-zero.
 - [x] Lifecycle controls: open joins, go live (locks lineups), end game, archive.
-- [ ] Join assets: join code, join URL, printable QR (PNG/SVG) and a printable poster.
-- [ ] Referee invitations: create referee links (scoping arrives in P1).
+- [x] Join assets: join code, join URL, printable QR (PNG/SVG) and a printable poster.
+- [x] Referee invitations: create referee links (scoping arrives in P1).
 - [ ] bUnit tests for the wizard and rule editor; integration tests for the endpoints.
 
 **Deliverables:** organizer console (Interactive Server), magic-link sign-in, consent flow.

@@ -1,0 +1,174 @@
+@using Microsoft.Extensions.Localization
+@using Roster.Application.Services
+@using Roster.Domain.Referees
+@inject RefereeManagementService RefereeService
+@inject IStringLocalizer<SharedResource> Loc
+
+<div class="mg-section">
+    <div class="mg-section-title">@Loc["RefereesTitle"]</div>
+    <div class="mg-section-desc">@Loc["RefereesDesc"]</div>
+
+    @if (Referees == null)
+    {
+        <div>@Loc["Loading"]</div>
+    }
+    else
+    {
+        <div class="rules-actions-top">
+            <button class="mg-btn-primary" @onclick="OpenAddReferee">@Loc["BtnAddReferee"]</button>
+        </div>
+
+        <div class="cg-list-container">
+            <div class="cg-list-header">
+                <div>@Loc["ColDisplayName"]</div>
+                <div style="text-align: right;">@Loc["ColActions"]</div>
+            </div>
+            
+            @if (Referees.Count == 0)
+            {
+                <div class="cg-list-row">
+                    <div class="cg-list-col-muted">@Loc["NoReferees"]</div>
+                </div>
+            }
+            else
+            {
+                @foreach (var referee in Referees)
+                {
+                    <div class="cg-list-row">
+                        <div>@referee.DisplayName</div>
+                        <div class="cg-list-actions" style="text-align: right;">
+                            <button type="button" class="mg-btn-danger mg-btn-sm" @onclick="() => DeleteReferee(referee.Id)">
+                                @Loc["BtnDelete"]
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+
+    @if (ShowAddDialog)
+    {
+        <div class="mg-modal-backdrop" @onclick="CloseAddDialog">
+            <div class="mg-modal-content" @onclick:stopPropagation>
+                <h3>@Loc["AddRefereeTitle"]</h3>
+                
+                @if (NewRefereeToken != null)
+                {
+                    <div class="mg-alert-success">
+                        <p>@Loc["RefereeTokenSuccess"]</p>
+                        <div style="font-family: monospace; font-size: 1.2rem; margin: 1rem 0; padding: 1rem; background: var(--ds-surface-variant); border-radius: var(--ds-radius-sm);">
+                            @NewRefereeToken
+                        </div>
+                        <p style="font-weight: bold; color: var(--ds-danger);">@Loc["RefereeTokenWarning"]</p>
+                    </div>
+                    
+                    <div class="mg-form-actions">
+                        <button class="mg-btn-secondary" @onclick="CloseAddDialog">@Loc["BtnClose"]</button>
+                    </div>
+                }
+                else
+                {
+                    <EditForm Model="NewRefereeModel" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="mg-form-group">
+                            <label>@Loc["ColDisplayName"]</label>
+                            <InputText class="mg-input" @bind-Value="NewRefereeModel.DisplayName" />
+                            <ValidationMessage For="@(() => NewRefereeModel.DisplayName)" />
+                        </div>
+                        
+                        <div class="mg-form-actions">
+                            <button type="button" class="mg-btn-secondary" @onclick="CloseAddDialog" disabled="@IsProcessing">@Loc["BtnCancel"]</button>
+                            <button type="submit" class="mg-btn-primary" disabled="@IsProcessing">@Loc["BtnAddReferee"]</button>
+                        </div>
+                    </EditForm>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnError { get; set; }
+
+    private IReadOnlyList<Referee>? Referees;
+    private bool ShowAddDialog = false;
+    private bool IsProcessing = false;
+    private string? NewRefereeToken = null;
+
+    private AddRefereeModel NewRefereeModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRefereesAsync();
+    }
+
+    private async Task LoadRefereesAsync()
+    {
+        try
+        {
+            Referees = await RefereeService.GetRefereesAsync(GameId);
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private void OpenAddReferee()
+    {
+        NewRefereeModel = new AddRefereeModel();
+        NewRefereeToken = null;
+        ShowAddDialog = true;
+    }
+
+    private void CloseAddDialog()
+    {
+        ShowAddDialog = false;
+        NewRefereeToken = null;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsProcessing) return;
+        IsProcessing = true;
+        try
+        {
+            NewRefereeToken = await RefereeService.CreateRefereeAsync(GameId, NewRefereeModel.DisplayName);
+            await LoadRefereesAsync();
+            // DO NOT close the dialog! The user needs to copy the token!
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            IsProcessing = false;
+        }
+    }
+
+    private async Task DeleteReferee(Guid refereeId)
+    {
+        try
+        {
+            await RefereeService.DeleteRefereeAsync(refereeId);
+            await LoadRefereesAsync();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    public class AddRefereeModel
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        public string DisplayName { get; set; } = string.Empty;
+    }
+}

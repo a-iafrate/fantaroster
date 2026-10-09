@@ -1,0 +1,184 @@
+@page "/organizer/games/{Id:guid}/poster"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Options
+@using Roster.Application.Ports.Data
+@using Roster.Domain.Games
+@using Roster.Web.Options
+@attribute [Authorize]
+@inject IGameRepository GameRepository
+@inject IStringLocalizer<SharedResource> Loc
+@inject IOptions<BrandOptions> BrandOptions
+@inject NavigationManager Navigation
+@layout Roster.Web.Components.Layout.EmptyLayout
+
+<PageTitle>@Loc["PosterTitle"]</PageTitle>
+
+@if (Game == null)
+{
+    <div>@Loc["Loading"]</div>
+}
+else
+{
+    <div class="poster-container">
+        <div class="poster-header">
+            <h1 class="poster-title">@Game.Name</h1>
+            <h2 class="poster-subtitle">@Loc["JoinOurGame"]</h2>
+        </div>
+
+        <div class="poster-qr">
+            @((MarkupString)GenerateQrCodeSvg(GetJoinUrl()))
+        </div>
+
+        <div class="poster-code-section">
+            <div class="poster-code-label">@Loc["JoinCode"]</div>
+            <div class="poster-code-value">@Game.JoinCode</div>
+        </div>
+        
+        <div class="poster-url-section">
+            <div class="poster-url-label">@Loc["JoinUrl"]</div>
+            <div class="poster-url-value">@GetJoinUrl()</div>
+        </div>
+        
+        <div class="poster-footer">
+            <span class="brand-name">@BrandOptions.Value.Name</span>
+        </div>
+    </div>
+
+    <script>
+        // Auto-trigger print dialog when loaded
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
+    
+    .poster-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        font-family: var(--font-family, system-ui, sans-serif);
+        text-align: center;
+        color: #000;
+    }
+    
+    .poster-header {
+        margin-bottom: 3rem;
+    }
+    
+    .poster-title {
+        font-size: 4rem;
+        font-weight: 900;
+        margin: 0 0 1rem 0;
+        line-height: 1.1;
+    }
+    
+    .poster-subtitle {
+        font-size: 2rem;
+        font-weight: 500;
+        margin: 0;
+        color: #555;
+    }
+    
+    .poster-qr {
+        width: 400px;
+        height: 400px;
+        margin-bottom: 3rem;
+    }
+    
+    .poster-qr svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .poster-code-section {
+        margin-bottom: 2rem;
+    }
+    
+    .poster-code-label {
+        font-size: 1.5rem;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    
+    .poster-code-value {
+        font-size: 5rem;
+        font-weight: 900;
+        letter-spacing: 0.15em;
+        margin-top: 0.5rem;
+    }
+    
+    .poster-url-section {
+        margin-bottom: 4rem;
+    }
+    
+    .poster-url-label {
+        font-size: 1.2rem;
+        color: #777;
+    }
+    
+    .poster-url-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-top: 0.5rem;
+    }
+    
+    .poster-footer {
+        margin-top: auto;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #888;
+    }
+
+    @@media print {
+        @@page {
+            size: A4 portrait;
+            margin: 0;
+        }
+        body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .poster-container {
+            min-height: 100vh;
+            page-break-after: avoid;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private Game? Game { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Game = await GameRepository.GetByIdAsync(Id);
+    }
+
+    private string GetJoinUrl()
+    {
+        if (Game == null) return string.Empty;
+        return Navigation.ToAbsoluteUri($"/join/{Game.JoinCode}").ToString();
+    }
+
+    private string GenerateQrCodeSvg(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+        var qr = Net.Codecrete.QrCodeGenerator.QrCode.EncodeText(text, Net.Codecrete.QrCodeGenerator.QrCode.Ecc.High);
+        return qr.ToSvgString(4).Replace("stroke=\"none\" fill=\"#000000\"", "stroke=\"none\" fill=\"currentColor\"");
+    }
+}
+
