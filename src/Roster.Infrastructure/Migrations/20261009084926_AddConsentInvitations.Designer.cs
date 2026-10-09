@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Roster.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Roster.Infrastructure.Data;
 namespace Roster.Infrastructure.Migrations
 {
     [DbContext(typeof(RosterDbContext))]
-    partial class RosterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261009084926_AddConsentInvitations")]
+    partial class AddConsentInvitations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

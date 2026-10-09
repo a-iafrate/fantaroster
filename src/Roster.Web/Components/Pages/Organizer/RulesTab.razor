@@ -1,0 +1,263 @@
+@using Microsoft.Extensions.Localization
+@using Roster.Application.Services
+@using Roster.Domain.Games
+@inject RuleManagementService RuleService
+@inject IStringLocalizer<SharedResource> Loc
+
+<div class="mg-section">
+    <div class="mg-section-title">@Loc["RuleEditorTitle"]</div>
+    <div class="mg-section-desc">@Loc["RuleEditorDesc"]</div>
+
+    @if (Rules == null)
+    {
+        <div>@Loc["Loading"]</div>
+    }
+    else
+    {
+        @if (CanEdit)
+        {
+            <div class="rules-actions-top">
+                <button class="mg-btn-primary" @onclick="AddNewRule">@Loc["BtnAddRule"]</button>
+            </div>
+        }
+        else
+        {
+            <div class="mg-alert-info">
+                @Loc["RuleEditorDisabledInfo"]
+            </div>
+        }
+
+        <div class="cg-list-container">
+            <div class="cg-list-header">
+                <div>@Loc["ColLabel"]</div>
+                <div>@Loc["ColPoints"]</div>
+                <div>@Loc["ColCategory"]</div>
+                <div>@Loc["ColTarget"]</div>
+                @if (CanEdit)
+                {
+                    <div style="text-align: right;">@Loc["ColActions"]</div>
+                }
+            </div>
+            
+            @if (Rules.Count == 0)
+            {
+                <div class="cg-list-row">
+                    <div class="cg-list-col-muted">@Loc["NoRules"]</div>
+                </div>
+            }
+            else
+            {
+                @for (int i = 0; i < Rules.Count; i++)
+                {
+                    var rule = Rules[i];
+                    var isFirst = i == 0;
+                    var isLast = i == Rules.Count - 1;
+                    
+                    <div class="cg-list-row">
+                        <div class="cg-list-col-bold">@rule.Label</div>
+                        <div>
+                            <span class="element-badge @(rule.Points > 0 ? "badge-success" : "badge-warning")">
+                                @(rule.Points > 0 ? "+" : "")@rule.Points
+                            </span>
+                        </div>
+                        <div>@rule.Category</div>
+                        <div>@(rule.Target == RuleTarget.Element ? Loc["TargetElement"] : Loc["TargetParticipant"])</div>
+                        
+                        @if (CanEdit)
+                        {
+                            <div class="element-actions" style="justify-content: flex-end;">
+                                <button class="mg-btn-icon" @onclick="() => MoveRuleUp(rule)" disabled="@isFirst" title="@Loc["MoveUp"]"><i class="icon-arrow-up"></i></button>
+                                <button class="mg-btn-icon" @onclick="() => MoveRuleDown(rule)" disabled="@isLast" title="@Loc["MoveDown"]"><i class="icon-arrow-down"></i></button>
+                                <button class="mg-btn-text" @onclick="() => EditRule(rule)">@Loc["BtnEdit"]</button>
+                                <button class="mg-btn-text text-danger" @onclick="() => DeleteRule(rule)">@Loc["BtnDelete"]</button>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    }
+
+    @if (EditingRule != null || IsAdding)
+    {
+        <div class="modal-backdrop">
+            <div class="modal">
+                <div class="modal-title">@(IsAdding ? Loc["AddRuleTitle"] : Loc["EditRuleTitle"])</div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>@Loc["ColLabel"]</label>
+                        <input type="text" @bind="EditLabel" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>@Loc["ColPoints"]</label>
+                        <input type="number" @bind="EditPoints" class="form-control" />
+                        @if (EditPoints == 0)
+                        {
+                            <div class="form-hint text-danger">@Loc["PointsNonZeroError"]</div>
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label>@Loc["ColCategory"]</label>
+                        <input type="text" @bind="EditCategory" class="form-control" />
+                    </div>
+                    @if (IsAdding)
+                    {
+                        <div class="form-group">
+                            <label>@Loc["ColTarget"]</label>
+                            <select @bind="EditTarget" class="form-control">
+                                <option value="@RuleTarget.Element">@Loc["TargetElement"]</option>
+                                <option value="@RuleTarget.Participant">@Loc["TargetParticipant"]</option>
+                            </select>
+                        </div>
+                    }
+                </div>
+                <div class="modal-actions">
+                    <button class="mg-btn-secondary" @onclick="CancelEdit">@Loc["BtnCancel"]</button>
+                    <button class="mg-btn-primary" @onclick="SaveEdit" disabled="@(EditPoints == 0 || string.IsNullOrWhiteSpace(EditLabel))">@Loc["BtnSave"]</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid GameId { get; set; }
+    [Parameter] public GameState GameState { get; set; }
+    [Parameter] public EventCallback<string> OnError { get; set; }
+
+    private List<Rule>? Rules;
+    
+    private bool CanEdit => GameState == GameState.Draft || GameState == GameState.Open;
+
+    private bool IsAdding = false;
+    private Rule? EditingRule;
+    
+    private string EditLabel = "";
+    private int EditPoints = 1;
+    private string EditCategory = "";
+    private RuleTarget EditTarget = RuleTarget.Element;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRules();
+    }
+
+    private async Task LoadRules()
+    {
+        try
+        {
+            Rules = (await RuleService.GetRulesByGameAsync(GameId)).ToList();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private void AddNewRule()
+    {
+        IsAdding = true;
+        EditingRule = null;
+        EditLabel = "";
+        EditPoints = 1;
+        EditCategory = "";
+        EditTarget = RuleTarget.Element;
+    }
+
+    private void EditRule(Rule rule)
+    {
+        IsAdding = false;
+        EditingRule = rule;
+        EditLabel = rule.Label;
+        EditPoints = rule.Points;
+        EditCategory = rule.Category;
+        EditTarget = rule.Target;
+    }
+
+    private void CancelEdit()
+    {
+        IsAdding = false;
+        EditingRule = null;
+    }
+
+    private async Task SaveEdit()
+    {
+        if (EditPoints == 0 || string.IsNullOrWhiteSpace(EditLabel)) return;
+
+        try
+        {
+            if (IsAdding)
+            {
+                await RuleService.AddRuleAsync(GameId, EditLabel, EditPoints, EditCategory, EditTarget);
+            }
+            else if (EditingRule != null)
+            {
+                await RuleService.EditRuleAsync(GameId, EditingRule.Id, EditLabel, EditPoints, EditCategory);
+            }
+
+            IsAdding = false;
+            EditingRule = null;
+            await LoadRules();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private async Task DeleteRule(Rule rule)
+    {
+        try
+        {
+            await RuleService.DeleteRuleAsync(GameId, rule.Id);
+            await LoadRules();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private async Task MoveRuleUp(Rule rule)
+    {
+        if (Rules == null) return;
+        var index = Rules.IndexOf(rule);
+        if (index > 0)
+        {
+            var prev = Rules[index - 1];
+            Rules[index - 1] = rule;
+            Rules[index] = prev;
+            
+            await SaveOrder();
+        }
+    }
+
+    private async Task MoveRuleDown(Rule rule)
+    {
+        if (Rules == null) return;
+        var index = Rules.IndexOf(rule);
+        if (index < Rules.Count - 1)
+        {
+            var next = Rules[index + 1];
+            Rules[index + 1] = rule;
+            Rules[index] = next;
+            
+            await SaveOrder();
+        }
+    }
+
+    private async Task SaveOrder()
+    {
+        if (Rules == null) return;
+        try
+        {
+            var orderedIds = Rules.Select(r => r.Id).ToList();
+            await RuleService.ReorderRulesAsync(GameId, orderedIds);
+            await LoadRules();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+}

@@ -1,4 +1,5 @@
 @page "/organizer"
+@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using Roster.Application.Ports.Data
@@ -17,10 +18,10 @@
 </div>
 
 <div class="game-filters">
-    <div class="filter-chip active">@Loc["FilterAll"]</div>
-    <div class="filter-chip">@Loc["FilterDrafts"]</div>
-    <div class="filter-chip">@Loc["FilterLive"]</div>
-    <div class="filter-chip">@Loc["FilterArchived"]</div>
+    <div class="filter-chip @(activeFilter == "All" ? "active" : "")" @onclick="@(() => SetFilter("All"))">@Loc["FilterAll"]</div>
+    <div class="filter-chip @(activeFilter == "Draft" ? "active" : "")" @onclick="@(() => SetFilter("Draft"))">@Loc["FilterDrafts"]</div>
+    <div class="filter-chip @(activeFilter == "Live" ? "active" : "")" @onclick="@(() => SetFilter("Live"))">@Loc["FilterLive"]</div>
+    <div class="filter-chip @(activeFilter == "Archived" ? "active" : "")" @onclick="@(() => SetFilter("Archived"))">@Loc["FilterArchived"]</div>
 </div>
 
 <div class="games-grid">
@@ -30,7 +31,14 @@
     }
     else
     {
-        @foreach (var game in Games)
+        var filteredGames = Games.Where(g => 
+            activeFilter == "All" || 
+            (activeFilter == "Draft" && g.State == GameState.Draft) ||
+            (activeFilter == "Live" && g.State == GameState.Live) ||
+            (activeFilter == "Archived" && g.State == GameState.Archived)
+        );
+
+        @foreach (var game in filteredGames)
         {
             var isLive = game.State == GameState.Live;
             var dotColor = isLive ? "var(--color-success)" : "var(--color-ink-2)";
@@ -41,7 +49,16 @@
                 <div class="game-status">
                     <span class="status-dot" style="background: @dotColor"></span>
                     @statusText
-                    <i class="icon-ellipsis game-menu-icon"></i>
+                    <div class="game-menu-container">
+                        <i class="icon-ellipsis game-menu-icon" @onclick="() => ToggleMenu(game.Id)"></i>
+                        @if (activeMenuId == game.Id)
+                        {
+                            <div class="game-dropdown">
+                                <a href="/organizer/games/@game.Id" class="game-dropdown-item">@actionText</a>
+                                <!-- Add other actions here if needed -->
+                            </div>
+                        }
+                    </div>
                 </div>
                 <div class="game-name">@game.Name</div>
                 <div class="game-meta">
@@ -64,9 +81,24 @@
 
 @code {
     private List<Game>? Games;
+    private Guid? activeMenuId;
+    private string activeFilter = "All";
 
     protected override async Task OnInitializedAsync()
     {
         Games = await GameRepository.GetAllAsync();
+    }
+
+    private void ToggleMenu(Guid id)
+    {
+        if (activeMenuId == id)
+            activeMenuId = null;
+        else
+            activeMenuId = id;
+    }
+
+    private void SetFilter(string filter)
+    {
+        activeFilter = filter;
     }
 }

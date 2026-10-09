@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:schema id="root">
     <xs:element name="root" ns1:IsDataSet="true">
@@ -237,5 +237,215 @@
   </data>
   <data name="CreateGameError" xml:space="preserve">
     <value>Error: {0}</value>
+  </data>
+  <data name="ManageGameTitle" xml:space="preserve">
+    <value>Manage Game</value>
+  </data>
+  <data name="BackToDashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="LifecycleControlsTitle" xml:space="preserve">
+    <value>Lifecycle controls</value>
+  </data>
+  <data name="LifecycleControlsDesc" xml:space="preserve">
+    <value>Manage the phases of the game.</value>
+  </data>
+  <data name="ActionOpenJoins" xml:space="preserve">
+    <value>Open joins</value>
+  </data>
+  <data name="ActionOpenJoinsDesc" xml:space="preserve">
+    <value>Allow participants to join and build their lineup. Elements and rules can still be modified.</value>
+  </data>
+  <data name="BtnOpenGame" xml:space="preserve">
+    <value>Open joins</value>
+  </data>
+  <data name="ActionGoLive" xml:space="preserve">
+    <value>Go live</value>
+  </data>
+  <data name="ActionGoLiveDesc" xml:space="preserve">
+    <value>Lock lineups and start the game. Referees will be able to assign points.</value>
+  </data>
+  <data name="BtnGoLive" xml:space="preserve">
+    <value>Go live</value>
+  </data>
+  <data name="ActionEndGame" xml:space="preserve">
+    <value>End game</value>
+  </data>
+  <data name="ActionEndGameDesc" xml:space="preserve">
+    <value>Stop scoring and publish the final leaderboard.</value>
+  </data>
+  <data name="BtnEndGame" xml:space="preserve">
+    <value>End game</value>
+  </data>
+  <data name="ActionArchive" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="ActionArchiveDesc" xml:space="preserve">
+    <value>Move this game to the archive. It will be hidden from the main dashboard.</value>
+  </data>
+  <data name="BtnArchive" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="GameNotFound" xml:space="preserve">
+    <value>Game not found.</value>
+  </data>
+  <data name="ElementManagementTitle" xml:space="preserve">
+    <value>Element management</value>
+  </data>
+  <data name="ElementManagementDesc" xml:space="preserve">
+    <value>Manage the elements in play. Hide elements you don't want to show or mark them as not selectable.</value>
+  </data>
+  <data name="ColStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ColActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="StatusSelectable" xml:space="preserve">
+    <value>Selectable</value>
+  </data>
+  <data name="StatusNotSelectable" xml:space="preserve">
+    <value>Not selectable</value>
+  </data>
+  <data name="StatusMissing" xml:space="preserve">
+    <value>Missing from source</value>
+  </data>
+  <data name="BtnEdit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="BtnShow" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="BtnHide" xml:space="preserve">
+    <value>Hide</value>
+  </data>
+  <data name="BtnMakeSelectable" xml:space="preserve">
+    <value>Make selectable</value>
+  </data>
+  <data name="BtnMakeNotSelectable" xml:space="preserve">
+    <value>Make not selectable</value>
+  </data>
+  <data name="EditElementTitle" xml:space="preserve">
+    <value>Edit element</value>
+  </data>
+  <data name="BtnCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="BtnSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="RuleEditorTitle" xml:space="preserve">
+    <value>Rule editor</value>
+  </data>
+  <data name="RuleEditorDesc" xml:space="preserve">
+    <value>Manage bonuses and penalties. Points must be non-zero integers.</value>
+  </data>
+  <data name="RuleEditorDisabledInfo" xml:space="preserve">
+    <value>Rules cannot be modified because the game is already live or ended.</value>
+  </data>
+  <data name="BtnAddRule" xml:space="preserve">
+    <value>Add rule</value>
+  </data>
+  <data name="ColLabel" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="ColPoints" xml:space="preserve">
+    <value>Points</value>
+  </data>
+  <data name="ColCategory" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="ColTarget" xml:space="preserve">
+    <value>Target</value>
+  </data>
+  <data name="NoRules" xml:space="preserve">
+    <value>No rules defined yet.</value>
+  </data>
+  <data name="TargetElement" xml:space="preserve">
+    <value>Element</value>
+  </data>
+  <data name="TargetParticipant" xml:space="preserve">
+    <value>Participant</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="BtnDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="AddRuleTitle" xml:space="preserve">
+    <value>Add rule</value>
+  </data>
+  <data name="EditRuleTitle" xml:space="preserve">
+    <value>Edit rule</value>
+  </data>
+  <data name="PointsNonZeroError" xml:space="preserve">
+    <value>Points cannot be zero.</value>
+  </data>
+  <data name="ConsentFlowTitle">
+    <value>Consent flow</value>
+  </data>
+  <data name="ConsentFlowDesc">
+    <value>Manage consent requests for elements that require it.</value>
+  </data>
+  <data name="NoElementsRequiringConsent">
+    <value>No elements require consent in this game.</value>
+  </data>
+  <data name="ConsentStatus_NotRequired">
+    <value>Not Required</value>
+  </data>
+  <data name="ConsentStatus_Pending">
+    <value>Pending</value>
+  </data>
+  <data name="ConsentStatus_Accepted">
+    <value>Accepted</value>
+  </data>
+  <data name="ConsentStatus_Declined">
+    <value>Declined</value>
+  </data>
+  <data name="BtnGenerateConsentLink">
+    <value>Generate Link</value>
+  </data>
+  <data name="BtnRegenerateConsentLink">
+    <value>Regenerate Link</value>
+  </data>
+  <data name="ConsentLinkGenerated">
+    <value>Consent Link Generated</value>
+  </data>
+  <data name="ConsentLinkGeneratedDesc">
+    <value>Share this link with the element's contact.</value>
+  </data>
+  <data name="ConsentPageTitle">
+    <value>Give Consent</value>
+  </data>
+  <data name="ConsentErrorTitle">
+    <value>Error</value>
+  </data>
+  <data name="ConsentSuccessTitle">
+    <value>Thank You!</value>
+  </data>
+  <data name="ConsentSuccessDesc">
+    <value>Your response has been recorded.</value>
+  </data>
+  <data name="ConsentRequestTitle">
+    <value>Consent Request</value>
+  </data>
+  <data name="ConsentRequestDesc">
+    <value>Do you accept to participate in the game as {0}?</value>
+  </data>
+  <data name="BtnDeclineConsent">
+    <value>Decline</value>
+  </data>
+  <data name="BtnAcceptConsent">
+    <value>Accept</value>
+  </data>
+  <data name="ConsentInvalidToken">
+    <value>Invalid or expired consent token.</value>
+  </data>
+  <data name="ConsentInvalidElement">
+    <value>Element not found.</value>
   </data>
 </root>

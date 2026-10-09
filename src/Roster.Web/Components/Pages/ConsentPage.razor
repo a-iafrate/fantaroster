@@ -1,0 +1,113 @@
+@page "/consent/{Token}"
+@using Microsoft.Extensions.Localization
+@using Roster.Application.Services
+@using Roster.Application.Ports.Data
+@using Roster.Domain.Elements
+@inject IStringLocalizer<SharedResource> Loc
+@inject ConsentManagementService ConsentService
+@inject IElementRepository ElementRepository
+@inject NavigationManager Navigation
+
+<PageTitle>@Loc["ConsentPageTitle"]</PageTitle>
+
+<div class="consent-container">
+    @if (IsLoading)
+    {
+        <div class="consent-loading">@Loc["Loading"]</div>
+    }
+    else if (ErrorMessage != null)
+    {
+        <div class="consent-error">
+            <h2>@Loc["ConsentErrorTitle"]</h2>
+            <p>@ErrorMessage</p>
+        </div>
+    }
+    else if (IsAnswered)
+    {
+        <div class="consent-success">
+            <h2>@Loc["ConsentSuccessTitle"]</h2>
+            <p>@Loc["ConsentSuccessDesc"]</p>
+        </div>
+    }
+    else if (Element != null)
+    {
+        <div class="consent-card">
+            <h2>@Loc["ConsentRequestTitle"]</h2>
+            <p>@string.Format(Loc["ConsentRequestDesc"].Value, Element.Name)</p>
+            
+            <div class="consent-actions">
+                <button class="btn-decline" @onclick="() => Answer(false)" disabled="@IsProcessing">@Loc["BtnDeclineConsent"]</button>
+                <button class="btn-accept" @onclick="() => Answer(true)" disabled="@IsProcessing">@Loc["BtnAcceptConsent"]</button>
+            </div>
+            
+            @if (SubmitError != null)
+            {
+                <div class="consent-submit-error">@SubmitError</div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Token { get; set; } = string.Empty;
+
+    private bool IsLoading = true;
+    private bool IsProcessing = false;
+    private bool IsAnswered = false;
+    private string? ErrorMessage;
+    private string? SubmitError;
+    private Element? Element;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var invitation = await ConsentService.GetInvitationByTokenAsync(Token);
+            if (invitation == null)
+            {
+                ErrorMessage = Loc["ConsentInvalidToken"];
+            }
+            else if (invitation.AnsweredAt.HasValue)
+            {
+                IsAnswered = true;
+            }
+            else
+            {
+                Element = await ElementRepository.GetByIdAsync(invitation.ElementId);
+                if (Element == null)
+                {
+                    ErrorMessage = Loc["ConsentInvalidElement"];
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task Answer(bool accepted)
+    {
+        if (IsProcessing) return;
+        IsProcessing = true;
+        SubmitError = null;
+
+        try
+        {
+            await ConsentService.AnswerInvitationAsync(Token, accepted);
+            IsAnswered = true;
+        }
+        catch (Exception ex)
+        {
+            SubmitError = ex.Message;
+        }
+        finally
+        {
+            IsProcessing = false;
+        }
+    }
+}

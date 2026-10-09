@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Roster.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Roster.Infrastructure.Data;
 namespace Roster.Infrastructure.Migrations
 {
     [DbContext(typeof(RosterDbContext))]
-    partial class RosterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261009084526_AddRuleOrder")]
+    partial class AddRuleOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,37 +156,6 @@ namespace Roster.Infrastructure.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Roster.Domain.Elements.ConsentInvitation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("AnsweredAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Contact")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<Guid>("ElementId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("SentAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ElementId");
-
-                    b.ToTable("ConsentInvitations", (string)null);
                 });
 
             modelBuilder.Entity("Roster.Domain.Elements.Element", b =>
@@ -741,15 +713,6 @@ namespace Roster.Infrastructure.Migrations
                     b.HasOne("Roster.Infrastructure.Data.OrganizerUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Roster.Domain.Elements.ConsentInvitation", b =>
-                {
-                    b.HasOne("Roster.Domain.Elements.Element", null)
-                        .WithMany()
-                        .HasForeignKey("ElementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

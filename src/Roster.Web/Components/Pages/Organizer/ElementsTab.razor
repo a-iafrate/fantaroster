@@ -1,0 +1,183 @@
+@using Microsoft.Extensions.Localization
+@using Roster.Application.Services
+@using Roster.Domain.Elements
+@using Roster.Domain.Games
+@inject ElementManagementService ElementService
+@inject IStringLocalizer<SharedResource> Loc
+
+<div class="mg-section">
+    <div class="mg-section-title">@Loc["ElementManagementTitle"]</div>
+    <div class="mg-section-desc">@Loc["ElementManagementDesc"]</div>
+
+    @if (Elements == null)
+    {
+        <div>@Loc["Loading"]</div>
+    }
+    else
+    {
+        <div class="cg-list-container">
+            <div class="cg-list-header">
+                <div>@Loc["ColName"]</div>
+                <div>@Loc["ColGroup"]</div>
+                <div>@Loc["ColStatus"]</div>
+                <div>@Loc["ColActions"]</div>
+            </div>
+            @foreach (var el in Elements)
+            {
+                <div class="cg-list-row @(el.IsHidden ? "element-hidden" : "")">
+                    <div class="cg-list-col-bold">
+                        @el.Name
+                        @if (!string.IsNullOrEmpty(el.Subtitle))
+                        {
+                            <div class="element-subtitle">@el.Subtitle</div>
+                        }
+                    </div>
+                    <div>@el.Group</div>
+                    <div class="element-status-col">
+                        <span class="element-badge @(el.IsSelectable ? "badge-success" : "badge-neutral")">
+                            @(el.IsSelectable ? Loc["StatusSelectable"] : Loc["StatusNotSelectable"])
+                        </span>
+                        @if (el.SourceState == SourceState.MissingFromSource)
+                        {
+                            <span class="element-badge badge-warning">@Loc["StatusMissing"]</span>
+                        }
+                        <span class="element-badge badge-info">@el.ConsentStatus.ToString()</span>
+                    </div>
+                    <div class="element-actions">
+                        <button class="mg-btn-text" @onclick="() => EditElement(el)">@Loc["BtnEdit"]</button>
+                        
+                        @if (el.IsHidden)
+                        {
+                            <button class="mg-btn-text" @onclick="() => ToggleVisibility(el, false)">@Loc["BtnShow"]</button>
+                        }
+                        else
+                        {
+                            <button class="mg-btn-text" @onclick="() => ToggleVisibility(el, true)">@Loc["BtnHide"]</button>
+                        }
+
+                        @if (el.IsSelectable)
+                        {
+                            <button class="mg-btn-text" @onclick="() => ToggleSelectability(el, false)">@Loc["BtnMakeNotSelectable"]</button>
+                        }
+                        else
+                        {
+                            <button class="mg-btn-text" @onclick="() => ToggleSelectability(el, true)" disabled="@(el.ConsentStatus == ConsentStatus.Declined)">@Loc["BtnMakeSelectable"]</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (EditingElement != null)
+    {
+        <div class="modal-backdrop">
+            <div class="modal">
+                <div class="modal-title">@Loc["EditElementTitle"]</div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>@Loc["ColName"]</label>
+                        <input type="text" @bind="EditName" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>@Loc["ColSubtitle"]</label>
+                        <input type="text" @bind="EditSubtitle" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>@Loc["ColGroup"]</label>
+                        <input type="text" @bind="EditGroup" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="mg-btn-secondary" @onclick="CancelEdit">@Loc["BtnCancel"]</button>
+                    <button class="mg-btn-primary" @onclick="SaveEdit">@Loc["BtnSave"]</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid GameId { get; set; }
+    [Parameter] public GameState GameState { get; set; }
+    [Parameter] public EventCallback<string> OnError { get; set; }
+
+    private IReadOnlyList<Element>? Elements;
+    private Element? EditingElement;
+    
+    private string EditName = "";
+    private string? EditSubtitle;
+    private string? EditGroup;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadElements();
+    }
+
+    private async Task LoadElements()
+    {
+        try
+        {
+            Elements = await ElementService.GetElementsByGameAsync(GameId);
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private void EditElement(Element element)
+    {
+        EditingElement = element;
+        EditName = element.Name;
+        EditSubtitle = element.Subtitle;
+        EditGroup = element.Group;
+    }
+
+    private void CancelEdit()
+    {
+        EditingElement = null;
+    }
+
+    private async Task SaveEdit()
+    {
+        if (EditingElement == null || string.IsNullOrWhiteSpace(EditName)) return;
+
+        try
+        {
+            await ElementService.UpdateElementDetailsAsync(EditingElement.Id, EditName, EditSubtitle, EditGroup);
+            EditingElement = null;
+            await LoadElements();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private async Task ToggleVisibility(Element element, bool isHidden)
+    {
+        try
+        {
+            await ElementService.SetElementVisibilityAsync(element.Id, isHidden);
+            await LoadElements();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private async Task ToggleSelectability(Element element, bool isSelectable)
+    {
+        try
+        {
+            await ElementService.SetElementSelectabilityAsync(element.Id, isSelectable);
+            await LoadElements();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+}

@@ -25,6 +25,7 @@ public sealed class RosterDbContext : IdentityDbContext<OrganizerUser>
     public DbSet<Report> Reports => Set<Report>();
     public DbSet<SponsorBonus> SponsorBonuses => Set<SponsorBonus>();
     public DbSet<SourceBinding> SourceBindings => Set<SourceBinding>();
+    public DbSet<ConsentInvitation> ConsentInvitations => Set<ConsentInvitation>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

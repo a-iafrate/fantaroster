@@ -17,6 +17,7 @@ public sealed class Element
     public ConsentStatus ConsentStatus { get; private set; }
     public SourceState SourceState { get; private set; }
     public bool IsSelectable { get; private set; }
+    public bool IsHidden { get; private set; }
 
     private Element()
     {
@@ -66,5 +67,18 @@ public sealed class Element
     public void SetSelectability(bool isSelectable)
     {
         IsSelectable = isSelectable;
+    }
+
+    public void SetVisibility(bool isHidden)
+    {
+        IsHidden = isHidden;
+    }
+
+    public void UpdateDetails(string name, string? subtitle, string? group)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        Name = name;
+        Subtitle = subtitle;
+        Group = group;
     }
 }

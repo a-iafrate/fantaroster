@@ -178,10 +178,10 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Tasks**
 - [x] Organizer authentication: ASP.NET Core Identity with **magic link** sign-in (email via Azure Communication Services; output to console in development); anti-enumeration and rate limiting.
 - [x] Create-game wizard (labels come from the selected domain pack): choose domain pack → name and settings → connect a source (plugin form generated from `ConfigSchema`) → review imported elements → review and edit rules → publish.
-- [ ] Element management: edit, hide, mark as not selectable, show source state and consent status.
-- [ ] Consent flow: generate consent invitations (link per element, optional email), public consent page (accept/decline), status visible in the console.
-- [ ] Rule editor: add, edit, reorder, delete (only while `Draft`/`Open`); points must be non-zero.
-- [ ] Lifecycle controls: open joins, go live (locks lineups), end game, archive.
+- [x] Element management: edit, hide, mark as not selectable, show source state and consent status.
+- [x] Consent flow: generate consent invitations (link per element, optional email), public consent page (accept/decline), status visible in the console.
+- [x] Rule editor: add, edit, reorder, delete (only while `Draft`/`Open`); points must be non-zero.
+- [x] Lifecycle controls: open joins, go live (locks lineups), end game, archive.
 - [ ] Join assets: join code, join URL, printable QR (PNG/SVG) and a printable poster.
 - [ ] Referee invitations: create referee links (scoping arrives in P1).
 - [ ] bUnit tests for the wizard and rule editor; integration tests for the endpoints.

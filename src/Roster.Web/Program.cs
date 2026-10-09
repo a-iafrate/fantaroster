@@ -22,6 +22,10 @@ builder.Services.AddDbContext<RosterDbContext>(options =>
 // Application
 builder.Services.AddScoped<IResyncService, ResyncService>();
 builder.Services.AddScoped<IGameCreationService, GameCreationService>();
+builder.Services.AddScoped<GameLifecycleService>();
+builder.Services.AddScoped<ElementManagementService>();
+builder.Services.AddScoped<RuleManagementService>();
+builder.Services.AddScoped<ConsentManagementService>();
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Infrastructure

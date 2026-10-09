@@ -1,0 +1,138 @@
+@using Microsoft.Extensions.Localization
+@using Roster.Application.Services
+@using Roster.Application.Ports.Data
+@using Roster.Domain.Elements
+@using Roster.Domain.Games
+@inject IStringLocalizer<SharedResource> Loc
+@inject ConsentManagementService ConsentService
+@inject IElementRepository ElementRepository
+@inject NavigationManager Navigation
+
+<div class="cf-section">
+    <div class="cf-section-title">@Loc["ConsentFlowTitle"]</div>
+    <div class="cf-section-desc">@Loc["ConsentFlowDesc"]</div>
+
+    @if (IsLoading)
+    {
+        <div>@Loc["Loading"]</div>
+    }
+    else if (!Elements.Any())
+    {
+        <div class="cf-empty">@Loc["NoElementsRequiringConsent"]</div>
+    }
+    else
+    {
+        <div class="cf-list">
+            @foreach (var element in Elements)
+            {
+                <div class="cf-card">
+                    <div class="cf-info">
+                        <div class="cf-name">@element.Name</div>
+                        <div class="cf-subtitle">@element.Subtitle</div>
+                        <div class="cf-status">
+                            <span class="status-badge" style="background: @GetStatusColor(element.ConsentStatus)">@Loc["ConsentStatus_" + element.ConsentStatus]</span>
+                        </div>
+                    </div>
+                    
+                    <div class="cf-actions">
+                        @if (element.ConsentStatus == ConsentStatus.NotRequired || element.ConsentStatus == ConsentStatus.Declined || element.ConsentStatus == ConsentStatus.Accepted)
+                        {
+                            <button class="cf-btn" @onclick="() => GenerateLink(element.Id)" disabled="@IsProcessing">@Loc["BtnGenerateConsentLink"]</button>
+                        }
+                        else if (element.ConsentStatus == ConsentStatus.Pending)
+                        {
+                            <button class="cf-btn" @onclick="() => GenerateLink(element.Id)" disabled="@IsProcessing">@Loc["BtnRegenerateConsentLink"]</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (GeneratedToken != null)
+    {
+        <div class="cf-modal-overlay">
+            <div class="cf-modal">
+                <div class="cf-modal-title">@Loc["ConsentLinkGenerated"]</div>
+                <div class="cf-modal-desc">@Loc["ConsentLinkGeneratedDesc"]</div>
+                
+                <input class="cf-input" type="text" readonly value="@GetFullLink(GeneratedToken)" />
+                
+                <div class="cf-modal-actions">
+                    <button class="cf-btn-primary" @onclick="CloseModal">@Loc["BtnClose"]</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public Guid GameId { get; set; }
+    [Parameter, EditorRequired] public GameState GameState { get; set; }
+    [Parameter] public EventCallback<string> OnError { get; set; }
+
+    private bool IsLoading = true;
+    private bool IsProcessing = false;
+    private List<Element> Elements = new();
+    private string? GeneratedToken;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadElements();
+    }
+
+    private async Task LoadElements()
+    {
+        IsLoading = true;
+        try
+        {
+            var allElements = await ElementRepository.GetByGameIdAsync(GameId);
+            Elements = allElements.ToList(); // Optionally filter by elements needing consent
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private string GetStatusColor(ConsentStatus status) => status switch
+    {
+        ConsentStatus.Accepted => "var(--color-success)",
+        ConsentStatus.Pending => "var(--color-warning)",
+        ConsentStatus.Declined => "var(--color-danger)",
+        _ => "var(--color-ink-3)"
+    };
+
+    private async Task GenerateLink(Guid elementId)
+    {
+        if (IsProcessing) return;
+        IsProcessing = true;
+        try
+        {
+            GeneratedToken = await ConsentService.GenerateInvitationAsync(elementId, null);
+            await LoadElements();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            IsProcessing = false;
+        }
+    }
+
+    private void CloseModal()
+    {
+        GeneratedToken = null;
+    }
+
+    private string GetFullLink(string token)
+    {
+        return Navigation.ToAbsoluteUri($"/consent/{token}").ToString();
+    }
+}
