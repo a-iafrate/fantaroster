@@ -38,6 +38,8 @@ else
             <div class="mg-nav-item @(ActiveTab == "Elements" ? "active" : "")" @onclick="@(() => SetTab("Elements"))">@Loc["ElementManagementTitle"]</div>
             <div class="mg-nav-item @(ActiveTab == "Rules" ? "active" : "")" @onclick="@(() => SetTab("Rules"))">@Loc["RuleEditorTitle"]</div>
             <div class="mg-nav-item @(ActiveTab == "Consent" ? "active" : "")" @onclick="@(() => SetTab("Consent"))">@Loc["ConsentFlowTitle"]</div>
+            <div class="mg-nav-item @(ActiveTab == "Assets" ? "active" : "")" @onclick="@(() => SetTab("Assets"))">@Loc["AssetsTitle"]</div>
+            <div class="mg-nav-item @(ActiveTab == "Referees" ? "active" : "")" @onclick="@(() => SetTab("Referees"))">@Loc["RefereesTitle"]</div>
         </div>
 
         <div class="mg-content">
@@ -114,6 +116,14 @@ else
             {
                 <ConsentFlowTab GameId="Id" GameState="Game.State" OnError="HandleError" />
             }
+            else if (ActiveTab == "Assets")
+            {
+                <AssetsTab Game="Game" OnError="HandleError" />
+            }
+            else if (ActiveTab == "Referees")
+            {
+                <RefereesTab GameId="Id" OnError="HandleError" />
+            }
         </div>
     </div>
 }
@@ -184,3 +194,5 @@ else
     private Task EndGame() => ExecuteAction(() => LifecycleService.EndGameAsync(Id));
     private Task ArchiveGame() => ExecuteAction(() => LifecycleService.ArchiveGameAsync(Id));
 }
+
+

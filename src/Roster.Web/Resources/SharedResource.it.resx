@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:schema id="root">
     <xs:element name="root" ns1:IsDataSet="true">
@@ -205,9 +205,6 @@
   <data name="ColGroup" xml:space="preserve">
     <value>Gruppo</value>
   </data>
-  <data name="ImportAndContinue" xml:space="preserve">
-    <value>Importa e continua</value>
-  </data>
   <data name="NameRequired" xml:space="preserve">
     <value>Il nome della partita è obbligatorio</value>
   </data>
@@ -343,9 +340,6 @@
   <data name="RuleEditorDisabledInfo" xml:space="preserve">
     <value>Le regole non possono essere modificate perché la partita è già iniziata o terminata.</value>
   </data>
-  <data name="BtnAddRule" xml:space="preserve">
-    <value>Aggiungi regola</value>
-  </data>
   <data name="ColLabel" xml:space="preserve">
     <value>Etichetta</value>
   </data>
@@ -463,10 +457,69 @@
   <data name="BtnClose" xml:space="preserve">
     <value>Chiudi</value>
   </data>
+  <data name="AssetsTitle" xml:space="preserve">
+    <value>Condivisione</value>
+  </data>
+  <data name="AssetsDesc" xml:space="preserve">
+    <value>Invita i partecipanti e condividi il gioco.</value>
+  </data>
+  <data name="JoinCode" xml:space="preserve">
+    <value>Codice di gioco</value>
+  </data>
+  <data name="JoinCodeDesc" xml:space="preserve">
+    <value>I partecipanti possono usare questo codice per unirsi al gioco.</value>
+  </data>
+  <data name="JoinUrl" xml:space="preserve">
+    <value>Link diretto</value>
+  </data>
+  <data name="JoinUrlDesc" xml:space="preserve">
+    <value>Condividi questo link con i partecipanti.</value>
+  </data>
+  <data name="PrintableQr" xml:space="preserve">
+    <value>QR Code Stampabile</value>
+  </data>
+  <data name="PrintableQrDesc" xml:space="preserve">
+    <value>Fai tasto destro per salvare o copiare il QR code.</value>
+  </data>
+  <data name="QrCodePlaceholder" xml:space="preserve">
+    <value>QR CODE</value>
+  </data>
+  <data name="PosterTitle" xml:space="preserve">
+    <value>Locandina Stampabile</value>
+  </data>
+  <data name="JoinOurGame" xml:space="preserve">
+    <value>Unisciti al gioco!</value>
+  </data>
+  <data name="BtnPrintPoster" xml:space="preserve">
+    <value>Stampa Locandina</value>
+  </data>
   <data name="ImportAndContinue" xml:space="preserve">
     <value>Importa e Continua</value>
   </data>
   <data name="BtnAddRule" xml:space="preserve">
     <value>Aggiungi Regola</value>
   </data>
+  <data name="RefereesTitle" xml:space="preserve">
+    <value>Arbitri</value>
+  </data>
+  <data name="RefereesDesc" xml:space="preserve">
+    <value>Gestisci gli arbitri per questo gioco.</value>
+  </data>
+  <data name="BtnAddReferee" xml:space="preserve">
+    <value>Aggiungi Arbitro</value>
+  </data>
+  <data name="AddRefereeTitle" xml:space="preserve">
+    <value>Aggiungi Nuovo Arbitro</value>
+  </data>
+  <data name="RefereeTokenSuccess" xml:space="preserve">
+    <value>Arbitro creato con successo. Copia questo token e condividilo in modo sicuro con l'arbitro:</value>
+  </data>
+  <data name="RefereeTokenWarning" xml:space="preserve">
+    <value>ATTENZIONE: Questo token non verrà mostrato di nuovo. Se perso, dovrai eliminare e ricreare l'arbitro.</value>
+  </data>
+  <data name="NoReferees" xml:space="preserve">
+    <value>Nessun arbitro è stato ancora aggiunto.</value>
+  </data>
 </root>
+
+

@@ -26,6 +26,7 @@ builder.Services.AddScoped<GameLifecycleService>();
 builder.Services.AddScoped<ElementManagementService>();
 builder.Services.AddScoped<RuleManagementService>();
 builder.Services.AddScoped<ConsentManagementService>();
+builder.Services.AddScoped<RefereeManagementService>();
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Infrastructure
@@ -107,3 +108,4 @@ app.MapRazorComponents<App>()
 app.MapAuthEndpoints();
 
 app.Run();
+

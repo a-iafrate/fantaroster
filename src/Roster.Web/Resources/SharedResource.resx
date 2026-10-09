@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:schema id="root">
     <xs:element name="root" ns1:IsDataSet="true">
@@ -205,9 +205,6 @@
   <data name="ColGroup" xml:space="preserve">
     <value>Group</value>
   </data>
-  <data name="ImportAndContinue" xml:space="preserve">
-    <value>Import and continue</value>
-  </data>
   <data name="NameRequired" xml:space="preserve">
     <value>Name is required</value>
   </data>
@@ -343,9 +340,6 @@
   <data name="RuleEditorDisabledInfo" xml:space="preserve">
     <value>Rules cannot be modified because the game is already live or ended.</value>
   </data>
-  <data name="BtnAddRule" xml:space="preserve">
-    <value>Add rule</value>
-  </data>
   <data name="ColLabel" xml:space="preserve">
     <value>Label</value>
   </data>
@@ -463,10 +457,69 @@
   <data name="BtnClose" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="AssetsTitle" xml:space="preserve">
+    <value>Assets &amp; Sharing</value>
+  </data>
+  <data name="AssetsDesc" xml:space="preserve">
+    <value>Invite participants and share the game.</value>
+  </data>
+  <data name="JoinCode" xml:space="preserve">
+    <value>Join Code</value>
+  </data>
+  <data name="JoinCodeDesc" xml:space="preserve">
+    <value>Players can enter this code to join the game.</value>
+  </data>
+  <data name="JoinUrl" xml:space="preserve">
+    <value>Direct Link</value>
+  </data>
+  <data name="JoinUrlDesc" xml:space="preserve">
+    <value>Share this link with participants.</value>
+  </data>
+  <data name="PrintableQr" xml:space="preserve">
+    <value>Printable QR Code</value>
+  </data>
+  <data name="PrintableQrDesc" xml:space="preserve">
+    <value>Right click to save or copy the QR code.</value>
+  </data>
+  <data name="QrCodePlaceholder" xml:space="preserve">
+    <value>QR CODE</value>
+  </data>
+  <data name="PosterTitle" xml:space="preserve">
+    <value>Printable Poster</value>
+  </data>
+  <data name="JoinOurGame" xml:space="preserve">
+    <value>Join our game!</value>
+  </data>
+  <data name="BtnPrintPoster" xml:space="preserve">
+    <value>Print Poster</value>
+  </data>
   <data name="ImportAndContinue" xml:space="preserve">
     <value>Import and Continue</value>
   </data>
   <data name="BtnAddRule" xml:space="preserve">
     <value>Add Rule</value>
   </data>
+  <data name="RefereesTitle" xml:space="preserve">
+    <value>Referees</value>
+  </data>
+  <data name="RefereesDesc" xml:space="preserve">
+    <value>Manage referees for this game.</value>
+  </data>
+  <data name="BtnAddReferee" xml:space="preserve">
+    <value>Add Referee</value>
+  </data>
+  <data name="AddRefereeTitle" xml:space="preserve">
+    <value>Add New Referee</value>
+  </data>
+  <data name="RefereeTokenSuccess" xml:space="preserve">
+    <value>Referee created successfully. Copy this token and share it securely with the referee:</value>
+  </data>
+  <data name="RefereeTokenWarning" xml:space="preserve">
+    <value>WARNING: This token will not be shown again. If lost, you must delete and recreate the referee.</value>
+  </data>
+  <data name="NoReferees" xml:space="preserve">
+    <value>No referees have been added yet.</value>
+  </data>
 </root>
+
+

@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<ISourceBindingRepository, SourceBindingRepository>();
         services.AddScoped<IRuleRepository, RuleRepository>();
         services.AddScoped<IConsentInvitationRepository, ConsentInvitationRepository>();
+        services.AddScoped<IRefereeRepository, RefereeRepository>();
 
         services.AddSingleton<IPluginRegistry, PluginRegistry>();
 
