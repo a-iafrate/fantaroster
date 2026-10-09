@@ -29,6 +29,13 @@ internal sealed class GameRepository : IGameRepository
             .FirstOrDefaultAsync(g => g.Slug == slug, cancellationToken);
     }
 
+    public async Task<Game?> GetByJoinCodeAsync(string joinCode, CancellationToken cancellationToken = default)
+    {
+        return await _context.Games
+            .AsNoTracking()
+            .FirstOrDefaultAsync(g => g.JoinCode == joinCode, cancellationToken);
+    }
+
     public async Task<List<Game>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Games

@@ -26,6 +26,22 @@ public static class GameEndpoints
         .WithName("GetAvailableElements")
         .AllowAnonymous();
 
+        app.MapGet("/join/{joinCode}", async (
+            [FromRoute] string joinCode,
+            Roster.Application.Ports.Data.IGameRepository repository,
+            CancellationToken cancellationToken) =>
+        {
+            var game = await repository.GetByJoinCodeAsync(joinCode, cancellationToken);
+            if (game == null)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.Redirect($"/games/{game.Id}/join");
+        })
+        .WithName("JoinGameByCode")
+        .AllowAnonymous();
+
         return app;
     }
 }
