@@ -25,7 +25,7 @@ public class RuleEditorTests : TestContext
         _ruleRepository = Substitute.For<IRuleRepository>();
         _gameRepository = Substitute.For<IGameRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
-        
+
         var ruleService = new RuleManagementService(_ruleRepository, _gameRepository, _unitOfWork);
         Services.AddSingleton(ruleService);
 

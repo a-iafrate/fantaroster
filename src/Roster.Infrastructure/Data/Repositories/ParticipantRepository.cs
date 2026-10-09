@@ -52,6 +52,14 @@ internal sealed class ParticipantRepository : IParticipantRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<Participant>> GetParticipantsByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Participants
+            .AsNoTracking()
+            .Where(p => p.GameId == gameId)
+            .ToListAsync(cancellationToken);
+    }
+
     public void Add(Participant participant)
     {
         _context.Participants.Add(participant);

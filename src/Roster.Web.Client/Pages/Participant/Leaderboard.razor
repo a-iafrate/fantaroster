@@ -1,0 +1,160 @@
+@page "/games/{GameId:guid}/leaderboard"
+@inject HttpClient Http
+@inject Roster.Web.Client.Services.ParticipantAuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Leaderboard</PageTitle>
+
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (_error != null)
+{
+    <div class="container mt-5">
+        <div class="alert alert-danger">@_error</div>
+        <a href="/games/@GameId" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+}
+else if (_leaderboard != null)
+{
+    <div class="container mt-4 pb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Leaderboard</h2>
+            <a href="/games/@GameId" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+        </div>
+
+        @if (_leaderboard.MyPosition != null)
+        {
+            <div class="card shadow-sm mb-4 border-primary">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Position</h5>
+                    <span class="badge bg-light text-primary fs-6">Rank @_leaderboard.MyPosition.Rank</span>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">@_leaderboard.MyPosition.Nickname</h4>
+                        <h4 class="mb-0 fw-bold">@_leaderboard.MyPosition.TotalScore pts</h4>
+                    </div>
+                    
+                    @if (_leaderboard.MyPosition.ElementScores.Any())
+                    {
+                        <div class="list-group list-group-flush border-top pt-2 mt-2">
+                            @foreach (var es in _leaderboard.MyPosition.ElementScores.OrderByDescending(x => x.Score))
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        @es.Name
+                                        @if (es.IsCaptain)
+                                        {
+                                            <span class="badge bg-warning text-dark ms-1">Captain</span>
+                                        }
+                                    </div>
+                                    <span class="fw-bold">@es.Score</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No lineup saved yet.</p>
+                    }
+                </div>
+            </div>
+        }
+
+        <h4 class="mb-3">Top Positions</h4>
+        <div class="list-group shadow-sm">
+            @foreach (var pos in _leaderboard.TopPositions)
+            {
+                var isMe = _leaderboard.MyPosition != null && pos.ParticipantId == _leaderboard.MyPosition.ParticipantId;
+                <div class="list-group-item d-flex justify-content-between align-items-center @(isMe ? "bg-light border-primary" : "")">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 fw-bold fs-5 text-muted" style="width: 30px; text-align: center;">@pos.Rank</div>
+                        <div class="fw-bold">@pos.Nickname</div>
+                    </div>
+                    <div class="fw-bold fs-5">@pos.TotalScore</div>
+                </div>
+            }
+            @if (!_leaderboard.TopPositions.Any())
+            {
+                <div class="list-group-item text-center text-muted">No scores yet.</div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    private bool _isLoading = true;
+    private string? _error;
+    private LeaderboardResponseViewModel? _leaderboard;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await AuthState.GetTokenAsync();
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo($"/games/{GameId}/join");
+            return;
+        }
+
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/participant/leaderboard");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _leaderboard = await response.Content.ReadFromJsonAsync<LeaderboardResponseViewModel>();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                await AuthState.ClearTokenAsync();
+                Navigation.NavigateTo($"/games/{GameId}/join");
+            }
+            else
+            {
+                _error = "Could not load the leaderboard.";
+            }
+        }
+        catch (Exception)
+        {
+            _error = "Network error while loading leaderboard.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    public class LeaderboardResponseViewModel
+    {
+        public LeaderboardViewModel? MyPosition { get; set; }
+        public List<LeaderboardViewModel> TopPositions { get; set; } = new();
+    }
+
+    public class LeaderboardViewModel
+    {
+        public int Rank { get; set; }
+        public Guid ParticipantId { get; set; }
+        public string Nickname { get; set; } = string.Empty;
+        public int TotalScore { get; set; }
+        public List<ElementScoreViewModel> ElementScores { get; set; } = new();
+    }
+
+    public class ElementScoreViewModel
+    {
+        public Guid ElementId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public int Score { get; set; }
+        public bool IsCaptain { get; set; }
+    }
+}

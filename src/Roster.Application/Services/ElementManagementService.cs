@@ -23,6 +23,31 @@ public sealed class ElementManagementService
         return await _elementRepository.GetByGameIdAsync(gameId, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Roster.Application.Elements.Queries.AvailableElementDto>> GetAvailableElementsAsync(Roster.Application.Elements.Queries.GetAvailableElementsQuery query, CancellationToken cancellationToken = default)
+    {
+        var elements = await _elementRepository.GetByGameIdAsync(query.GameId, cancellationToken);
+        var availableElements = new List<Roster.Application.Elements.Queries.AvailableElementDto>();
+
+        foreach (var element in elements)
+        {
+            if (element.IsHidden)
+                continue;
+
+            if (!element.IsSelectable)
+                continue;
+
+            availableElements.Add(new Roster.Application.Elements.Queries.AvailableElementDto(
+                element.Id,
+                element.Name,
+                element.Subtitle,
+                element.Group,
+                element.ImageUrl
+            ));
+        }
+
+        return availableElements;
+    }
+
     public async Task<Guid> AddElementAsync(Guid gameId, string name, string? subtitle, string? group, string? imageUrl, CancellationToken cancellationToken = default)
     {
         var element = new Element(

@@ -42,7 +42,7 @@ public sealed partial class IdentityEmailSender : IEmailSender<OrganizerUser>
             LogSendingAcs(_logger, toEmail);
             var emailClient = new EmailClient(acsConnectionString);
             var senderAddress = _configuration["AzureCommunicationServices:SenderAddress"] ?? "donotreply@fantaroster.com";
-            
+
             var emailMessage = new EmailMessage(
                 senderAddress: senderAddress,
                 recipientAddress: toEmail,
@@ -50,7 +50,7 @@ public sealed partial class IdentityEmailSender : IEmailSender<OrganizerUser>
                 {
                     PlainText = textBody
                 });
-                
+
             await emailClient.SendAsync(Azure.WaitUntil.Completed, emailMessage);
         }
         else

@@ -27,7 +27,7 @@ public class CreateGameWizardTests : TestContext
         _packLoader = Substitute.For<IDomainPackLoader>();
         _gameCreationService = Substitute.For<IGameCreationService>();
         _pluginRegistry = Substitute.For<IPluginRegistry>();
-        
+
         Services.AddSingleton(_packLoader);
         Services.AddSingleton(_gameCreationService);
         Services.AddSingleton(_pluginRegistry);
@@ -43,7 +43,7 @@ public class CreateGameWizardTests : TestContext
     public void Wizard_StartsAtStep1_WithDomainPacks()
     {
         // Arrange
-        _packLoader.GetAllPacks().Returns(new[] 
+        _packLoader.GetAllPacks().Returns(new[]
         {
             new DomainPack("generic", new Dictionary<string,string>{{"en", "Generic"}}, new Dictionary<string,string>{{"en", "Generic description"}}, false, Array.Empty<string>(), new Dictionary<string, PackTerminology>(), Array.Empty<PackRule>())
         });
@@ -60,7 +60,7 @@ public class CreateGameWizardTests : TestContext
     public void NextStep_DoesNotProceed_IfNoPackSelected()
     {
         // Arrange
-        _packLoader.GetAllPacks().Returns(new[] 
+        _packLoader.GetAllPacks().Returns(new[]
         {
             new DomainPack("generic", new Dictionary<string,string>{{"en", "Generic"}}, new Dictionary<string,string>{{"en", "Generic description"}}, false, Array.Empty<string>(), new Dictionary<string, PackTerminology>(), Array.Empty<PackRule>())
         });

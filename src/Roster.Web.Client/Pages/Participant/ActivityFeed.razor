@@ -1,0 +1,140 @@
+@page "/games/{GameId:guid}/activity"
+@inject HttpClient Http
+@inject Roster.Web.Client.Services.ParticipantAuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Activity Feed</PageTitle>
+
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (_error != null)
+{
+    <div class="container mt-5">
+        <div class="alert alert-danger">@_error</div>
+        <a href="/games/@GameId" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+}
+else
+{
+    <div class="container mt-4 pb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Activity Feed</h2>
+            <a href="/games/@GameId" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+        </div>
+
+        @if (_feed.Count == 0)
+        {
+            <div class="text-center text-muted mt-5">
+                <p>No activity yet.</p>
+            </div>
+        }
+        else
+        {
+            <div class="list-group shadow-sm">
+                @foreach (var item in _feed)
+                {
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">@item.CreatedAt.ToLocalTime().ToString("g")</span>
+                            @if (item.Status == "Voided")
+                            {
+                                <span class="badge bg-danger">Voided</span>
+                            }
+                            else
+                            {
+                                <span class="badge @(item.Points > 0 ? "bg-success" : "bg-warning text-dark")">
+                                    @(item.Points > 0 ? "+" : "")@item.Points pts
+                                </span>
+                            }
+                        </div>
+                        <h5 class="mb-1">
+                            @if (!string.IsNullOrEmpty(item.ElementName))
+                            {
+                                @item.ElementName
+                            }
+                            else if (!string.IsNullOrEmpty(item.ParticipantNickname))
+                            {
+                                @item.ParticipantNickname
+                            }
+                            else
+                            {
+                                <span>Unknown</span>
+                            }
+                        </h5>
+                        <p class="mb-0 text-muted">@item.RuleLabel</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    private bool _isLoading = true;
+    private string? _error;
+    private List<ActivityFeedItemViewModel> _feed = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await AuthState.GetTokenAsync();
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo($"/games/{GameId}/join");
+            return;
+        }
+
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/participant/activity");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var feed = await response.Content.ReadFromJsonAsync<List<ActivityFeedItemViewModel>>();
+                if (feed != null)
+                {
+                    _feed = feed;
+                }
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                await AuthState.ClearTokenAsync();
+                Navigation.NavigateTo($"/games/{GameId}/join");
+            }
+            else
+            {
+                _error = "Could not load the activity feed.";
+            }
+        }
+        catch (Exception)
+        {
+            _error = "Network error while loading activity feed.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    public class ActivityFeedItemViewModel
+    {
+        public Guid Id { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public string? ElementName { get; set; }
+        public string? ParticipantNickname { get; set; }
+        public string RuleLabel { get; set; } = string.Empty;
+        public int Points { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public string CreatedBy { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,99 @@
+@page "/games/{GameId:guid}"
+@inject HttpClient Http
+@inject Roster.Web.Client.Services.ParticipantAuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Game Dashboard</PageTitle>
+
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (_profile != null)
+{
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="card-title mb-0">Hello, @_profile.Nickname!</h2>
+                    <span class="badge bg-success">Connected</span>
+                </div>
+                <p class="text-muted">This is your device. You are successfully joined to this game.</p>
+                <hr />
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4>Rank</h4>
+                        <p class="display-6">@(_profile.Rank?.ToString() ?? "-")</p>
+                    </div>
+                    <div class="col-6">
+                        <h4>Score</h4>
+                        <p class="display-6">@_profile.TotalScore</p>
+                    </div>
+                </div>
+                <div class="mt-4 d-grid gap-2">
+                    <a href="/games/@GameId/lineup" class="btn btn-outline-primary">Build Lineup</a>
+                    <a href="/games/@GameId/leaderboard" class="btn btn-outline-secondary">Leaderboard</a>
+                    <a href="/games/@GameId/activity" class="btn btn-outline-secondary mt-2">Activity Feed</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    private ParticipantProfileViewModel? _profile;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await AuthState.GetTokenAsync();
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo($"/games/{GameId}/join");
+            return;
+        }
+
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/participant/me");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _profile = await response.Content.ReadFromJsonAsync<ParticipantProfileViewModel>();
+            }
+            else
+            {
+                // Token invalid or expired, or wrong game
+                await AuthState.ClearTokenAsync();
+                Navigation.NavigateTo($"/games/{GameId}/join");
+            }
+        }
+        catch (Exception)
+        {
+            // Fallback for network issues could go here
+            Console.WriteLine("Could not fetch profile. Network error.");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    public class ParticipantProfileViewModel
+    {
+        public Guid Id { get; set; }
+        public Guid GameId { get; set; }
+        public string Nickname { get; set; } = string.Empty;
+        public int? Rank { get; set; }
+        public decimal TotalScore { get; set; }
+    }
+}

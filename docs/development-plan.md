@@ -198,16 +198,16 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Goal:** a participant joins in seconds and follows the game from a phone.
 
 **Tasks**
-- [ ] Join flow (Interactive WebAssembly): open link/QR → choose nickname (uniqueness check, profanity filter) → receive a signed participant token stored on the device.
-- [ ] Session recovery on the same device; clear "this is your device" messaging.
-- [ ] Lineup builder: browse elements (search, group filter), pick N, choose captain, save; read-only once `Live`.
-- [ ] Leaderboard: my position pinned, top N, live updates, per-element breakdown of my score.
-- [ ] Activity feed: latest points with rule labels.
-- [ ] PWA: web manifest, icons per brand, service worker caching the shell; install prompt only after the first visit.
-- [ ] Reconnection UX: connection status indicator, automatic resubscribe, refetch on version gap.
-- [ ] Performance budget: first load on a mid-range phone over slow 3G under 5 s; subsequent loads under 2 s.
-- [ ] Playwright E2E: join → pick lineup → see a point arrive, run with two domain packs (Generic and Tech conferences).
-- [ ] Element cards work for people, teams and things (photo, crest or initials fallback).
+- [x] Join flow (Interactive WebAssembly): open link/QR → choose nickname (uniqueness check, profanity filter) → receive a signed participant token stored on the device.
+- [x] Session recovery on the same device; clear "this is your device" messaging.
+- [x] Lineup builder: browse elements (search, group filter), pick N, choose captain, save; read-only once `Live`.
+- [x] Leaderboard: my position pinned, top N, live updates, per-element breakdown of my score.
+- [x] Activity feed: latest points with rule labels.
+- [x] PWA: web manifest, icons per brand, service worker caching the shell; install prompt only after the first visit.
+- [x] Reconnection UX: connection status indicator, automatic resubscribe, refetch on version gap.
+- [x] Performance budget: first load on a mid-range phone over slow 3G under 5 s; subsequent loads under 2 s.
+- [x] Playwright E2E: join → pick lineup → see a point arrive, run with two domain packs (Generic and Tech conferences).
+- [x] Element cards work for people, teams and things (photo, crest or initials fallback).
 
 **Deliverables:** participant experience, installable PWA.
 

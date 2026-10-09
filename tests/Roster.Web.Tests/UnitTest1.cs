@@ -1,4 +1,4 @@
-﻿namespace Roster.Web.Tests;
+namespace Roster.Web.Tests;
 
 public class UnitTest1
 {

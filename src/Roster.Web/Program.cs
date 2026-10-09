@@ -27,6 +27,9 @@ builder.Services.AddScoped<ElementManagementService>();
 builder.Services.AddScoped<RuleManagementService>();
 builder.Services.AddScoped<ConsentManagementService>();
 builder.Services.AddScoped<RefereeManagementService>();
+builder.Services.AddScoped<ParticipantManagementService>();
+builder.Services.AddScoped<LeaderboardService>();
+builder.Services.AddScoped<ActivityFeedService>();
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Infrastructure
@@ -76,6 +79,15 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddScoped<Roster.Web.Client.Services.ParticipantAuthState>();
+builder.Services.AddScoped(sp =>
+{
+    var accessor = sp.GetRequiredService<IHttpContextAccessor>();
+    var request = accessor.HttpContext?.Request;
+    var uri = request != null ? $"{request.Scheme}://{request.Host.Value}/" : "https://localhost/";
+    return new HttpClient { BaseAddress = new Uri(uri) };
+});
+
 var app = builder.Build();
 
 var supportedCultures = new[] { "en", "it" };
@@ -109,9 +121,14 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(Roster.Web.Client._Imports).Assembly);
 
 app.MapAuthEndpoints();
+app.MapParticipantEndpoints();
+app.MapGameEndpoints();
+app.MapPwaEndpoints();
 
 app.Run();
 
 
 public partial class Program { }
+
+
 

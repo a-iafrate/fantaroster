@@ -33,6 +33,16 @@ internal sealed class ScoreEntryRepository : IScoreEntryRepository
             .AnyAsync(s => s.GameId == gameId && s.IdempotencyKey == idempotencyKey, cancellationToken);
     }
 
+    public async Task<List<ScoreEntry>> GetRecentEntriesByGameIdAsync(Guid gameId, int count, CancellationToken cancellationToken = default)
+    {
+        return await _context.ScoreEntries
+            .AsNoTracking()
+            .Where(s => s.GameId == gameId)
+            .OrderByDescending(s => s.CreatedAt)
+            .Take(count)
+            .ToListAsync(cancellationToken);
+    }
+
     public void Add(ScoreEntry entry)
     {
         _context.ScoreEntries.Add(entry);

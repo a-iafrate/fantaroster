@@ -1,0 +1,122 @@
+@page "/games/{GameId:guid}/join"
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+@inject Roster.Web.Client.Services.ParticipantAuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Join Game</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">Join Game</h2>
+
+                    @if (!string.IsNullOrEmpty(_errorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @_errorMessage
+                        </div>
+                    }
+
+                    <EditForm Model="@_model" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label for="nickname" class="form-label">Nickname</label>
+                            <InputText id="nickname" class="form-control" @bind-Value="_model.Nickname" placeholder="Choose a nickname..." />
+                            <ValidationMessage For="@(() => _model.Nickname)" class="text-danger mt-1" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100" disabled="@_isSubmitting">
+                            @if (_isSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>Joining...</span>
+                            }
+                            else
+                            {
+                                <span>Join Game</span>
+                            }
+                        </button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    private JoinGameViewModel _model = new();
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // If already joined, maybe redirect to the dashboard/game view?
+        var token = await AuthState.GetTokenAsync();
+        if (!string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo($"/games/{GameId}");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync($"/api/games/{GameId}/participant/join", new { nickname = _model.Nickname });
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<JoinResponse>();
+                if (result?.Token != null)
+                {
+                    await AuthState.SetTokenAsync(result.Token);
+                    Navigation.NavigateTo($"/games/{GameId}");
+                }
+                else
+                {
+                    _errorMessage = "Invalid response from server.";
+                }
+            }
+            else
+            {
+                var errorResult = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                _errorMessage = errorResult?.Error ?? "An error occurred while joining the game.";
+            }
+        }
+        catch (Exception)
+        {
+            _errorMessage = "A network error occurred. Please try again.";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    public class JoinGameViewModel
+    {
+        [Required(ErrorMessage = "Nickname is required")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Nickname must be between 2 and 50 characters")]
+        public string Nickname { get; set; } = string.Empty;
+    }
+
+    public class JoinResponse
+    {
+        public string? Token { get; set; }
+    }
+
+    public class ErrorResponse
+    {
+        public string? Error { get; set; }
+    }
+}

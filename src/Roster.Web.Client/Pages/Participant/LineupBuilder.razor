@@ -1,0 +1,332 @@
+@page "/games/{GameId:guid}/lineup"
+@inject HttpClient Http
+@inject Roster.Web.Client.Services.ParticipantAuthState AuthState
+@inject NavigationManager Navigation
+
+<PageTitle>Build Lineup</PageTitle>
+
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-4 mb-5">
+        <h2 class="mb-4">Build Your Lineup</h2>
+
+        @if (_isLiveOrEnded)
+        {
+            <div class="alert alert-info">
+                The game is live or ended. Your lineup is locked and cannot be modified.
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Search & Filters -->
+                <div class="mb-3 d-flex gap-2">
+                    <input type="text" class="form-control" placeholder="Search elements..." @bind="_searchText" @bind:event="oninput" />
+                    <select class="form-select" style="max-width: 200px;" @bind="_selectedGroup">
+                        <option value="">All Groups</option>
+                        @foreach (var group in _availableGroups)
+                        {
+                            <option value="@group">@group</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Elements Grid -->
+                <div class="row g-3">
+                    @foreach (var element in FilteredElements)
+                    {
+                        var isSelected = _selectedElementIds.Contains(element.Id);
+                        <div class="col-sm-6 col-md-4">
+                            <Roster.Ui.Components.ElementCard
+                                Name="@element.Name"
+                                Subtitle="@element.Subtitle"
+                                PhotoUrl="@element.ImageUrl"
+                                IsSelected="@isSelected"
+                                IsSelectable="!_isLiveOrEnded"
+                                ShowCheckbox="true"
+                                OnClick="() => ToggleElement(element.Id)" />
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-4 mt-4 mt-md-0">
+                <!-- Cart / Selection -->
+                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Your Lineup</h5>
+                        <span class="badge bg-light text-primary">@_selectedElementIds.Count / @_lineupSize</span>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (_selectedElementIds.Count == 0)
+                        {
+                            <div class="p-4 text-center text-muted">
+                                No elements selected yet.
+                            </div>
+                        }
+                        else
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var id in _selectedElementIds)
+                                {
+                                    var el = _elements.FirstOrDefault(e => e.Id == id);
+                                    if (el != null)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">@el.Name</div>
+                                                @if (_captainEnabled)
+                                                {
+                                                    <div class="form-check form-check-inline mt-1">
+                                                        <input class="form-check-input" type="radio" name="captainRadio" id="cap_@el.Id" checked="@(_captainElementId == el.Id)" @onchange="() => SetCaptain(el.Id)" disabled="@_isLiveOrEnded">
+                                                        <label class="form-check-label small" for="cap_@el.Id">Captain</label>
+                                                    </div>
+                                                }
+                                            </div>
+                                            @if (!_isLiveOrEnded)
+                                            {
+                                                <button type="button" class="btn-close" aria-label="Remove" @onclick="() => ToggleElement(el.Id)"></button>
+                                            }
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        @if (_saveError != null)
+                        {
+                            <div class="alert alert-danger py-2 mb-2">@_saveError</div>
+                        }
+                        @if (_saveSuccess)
+                        {
+                            <div class="alert alert-success py-2 mb-2">Saved successfully!</div>
+                        }
+                        @if (!_isLiveOrEnded)
+                        {
+                            <button class="btn btn-primary w-100" @onclick="SaveLineup" disabled="@_isSaving">
+                                @if (_isSaving)
+                                {
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span> Saving...</span>
+                                }
+                                else
+                                {
+                                    <span>Save Lineup</span>
+                                }
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    private bool _isLoading = true;
+    private bool _isSaving = false;
+    private bool _isLiveOrEnded = false;
+    private string? _saveError;
+    private bool _saveSuccess = false;
+
+    private int _lineupSize = 5; // Should ideally come from Game details, hardcoded default for now until we fetch game info
+    private bool _captainEnabled = true; // Same
+
+    private List<AvailableElementViewModel> _elements = new();
+    private List<string> _availableGroups = new();
+    
+    private string _searchText = string.Empty;
+    private string _selectedGroup = string.Empty;
+
+    private List<Guid> _selectedElementIds = new();
+    private Guid? _captainElementId;
+
+    private IEnumerable<AvailableElementViewModel> FilteredElements =>
+        _elements.Where(e => 
+            (string.IsNullOrEmpty(_selectedGroup) || e.Group == _selectedGroup) &&
+            (string.IsNullOrEmpty(_searchText) || 
+             e.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) || 
+             (e.Subtitle != null && e.Subtitle.Contains(_searchText, StringComparison.OrdinalIgnoreCase)))
+        );
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await AuthState.GetTokenAsync();
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo($"/games/{GameId}/join");
+            return;
+        }
+
+        try
+        {
+            // We'll just fetch elements and lineup. We should also fetch Game configuration for LineupSize and CaptainEnabled.
+            // For now, we assume size 5 and captain enabled.
+            // Wait, we can get LineupSize from the backend if we had an endpoint, but the user didn't ask for a game details endpoint yet.
+            // I'll leave them as default and assume 5.
+
+            var requestElements = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/elements");
+            var resElements = await Http.SendAsync(requestElements);
+            if (resElements.IsSuccessStatusCode)
+            {
+                var elements = await resElements.Content.ReadFromJsonAsync<List<AvailableElementViewModel>>();
+                if (elements != null)
+                {
+                    _elements = elements;
+                    _availableGroups = _elements.Where(e => !string.IsNullOrEmpty(e.Group)).Select(e => e.Group!).Distinct().OrderBy(g => g).ToList();
+                }
+            }
+
+            var requestLineup = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/participant/lineup");
+            requestLineup.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var resLineup = await Http.SendAsync(requestLineup);
+            
+            if (resLineup.IsSuccessStatusCode)
+            {
+                var lineup = await resLineup.Content.ReadFromJsonAsync<ParticipantLineupViewModel>();
+                if (lineup != null)
+                {
+                    _selectedElementIds = lineup.PickedElementIds.ToList();
+                    _captainElementId = lineup.CaptainElementId;
+                    _isLiveOrEnded = lineup.IsLocked;
+                }
+            }
+            else if (resLineup.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // No lineup yet
+            }
+            else
+            {
+                // Invalid token?
+                await AuthState.ClearTokenAsync();
+                Navigation.NavigateTo($"/games/{GameId}/join");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ToggleElement(Guid id)
+    {
+        if (_isLiveOrEnded) return;
+
+        _saveSuccess = false;
+        _saveError = null;
+
+        if (_selectedElementIds.Contains(id))
+        {
+            _selectedElementIds.Remove(id);
+            if (_captainElementId == id) _captainElementId = null;
+        }
+        else
+        {
+            if (_selectedElementIds.Count < _lineupSize)
+            {
+                _selectedElementIds.Add(id);
+            }
+        }
+    }
+
+    private void SetCaptain(Guid id)
+    {
+        if (_isLiveOrEnded) return;
+
+        _saveSuccess = false;
+        _saveError = null;
+
+        if (_selectedElementIds.Contains(id))
+        {
+            _captainElementId = id;
+        }
+    }
+
+    private async Task SaveLineup()
+    {
+        if (_isLiveOrEnded) return;
+
+        _isSaving = true;
+        _saveError = null;
+        _saveSuccess = false;
+
+        var token = await AuthState.GetTokenAsync();
+
+        var requestBody = new SaveLineupRequestViewModel
+        {
+            PickedElementIds = _selectedElementIds.ToArray(),
+            CaptainElementId = _captainElementId
+        };
+
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/api/games/{GameId}/participant/lineup");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            request.Content = System.Net.Http.Json.JsonContent.Create(requestBody);
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _saveSuccess = true;
+            }
+            else
+            {
+                var err = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                _saveError = err?.Error ?? "Failed to save lineup.";
+            }
+        }
+        catch (Exception)
+        {
+            _saveError = "Network error while saving.";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    public class AvailableElementViewModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Subtitle { get; set; }
+        public string? Group { get; set; }
+        public string? ImageUrl { get; set; }
+    }
+
+    public class ParticipantLineupViewModel
+    {
+        public Guid ParticipantId { get; set; }
+        public Guid[] PickedElementIds { get; set; } = Array.Empty<Guid>();
+        public Guid? CaptainElementId { get; set; }
+        public bool IsLocked { get; set; }
+    }
+
+    public class SaveLineupRequestViewModel
+    {
+        public Guid[] PickedElementIds { get; set; } = Array.Empty<Guid>();
+        public Guid? CaptainElementId { get; set; }
+    }
+
+    public class ErrorResponse
+    {
+        public string? Error { get; set; }
+    }
+}

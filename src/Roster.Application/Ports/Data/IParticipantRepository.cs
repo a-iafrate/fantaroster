@@ -15,6 +15,7 @@ public interface IParticipantRepository
     Task<Participant?> GetByNicknameAsync(Guid gameId, string nickname, CancellationToken cancellationToken = default);
     Task<Lineup?> GetLineupByParticipantIdAsync(Guid participantId, CancellationToken cancellationToken = default);
     Task<List<Lineup>> GetLineupsByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default);
+    Task<List<Participant>> GetParticipantsByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default);
     void Add(Participant participant);
     void Update(Participant participant);
     void AddLineup(Lineup lineup);

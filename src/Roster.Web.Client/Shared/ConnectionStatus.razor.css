@@ -1,0 +1,19 @@
+.connection-status {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 500;
+    z-index: 9999;
+    color: white;
+    background-color: var(--color-danger, #ef4444);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}

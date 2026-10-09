@@ -1,0 +1,50 @@
+@namespace Roster.Ui.Components
+
+<div class="element-card @(IsSelected ? "selected" : "")" @onclick="OnClick" role="button" aria-pressed="@IsSelected">
+    <div class="element-avatar">
+        @if (!string.IsNullOrEmpty(PhotoUrl))
+        {
+            <img src="@PhotoUrl" alt="@Name" class="avatar-img" />
+        }
+        else if (!string.IsNullOrEmpty(FallbackCrestUrl))
+        {
+            <img src="@FallbackCrestUrl" alt="@Name crest" class="avatar-img avatar-crest" />
+        }
+        else
+        {
+            <div class="avatar-initials">@GetInitials(Name)</div>
+        }
+    </div>
+    <div class="element-info">
+        <div class="element-name">@Name</div>
+        @if (!string.IsNullOrEmpty(Subtitle))
+        {
+            <div class="element-subtitle">@Subtitle</div>
+        }
+    </div>
+    @if (IsSelectable && ShowCheckbox)
+    {
+        <div class="element-action">
+            <input type="checkbox" checked="@IsSelected" tabindex="-1" readonly aria-label="Select @Name" />
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Name { get; set; } = string.Empty;
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string? PhotoUrl { get; set; }
+    [Parameter] public string? FallbackCrestUrl { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public bool IsSelectable { get; set; } = true;
+    [Parameter] public bool ShowCheckbox { get; set; } = true;
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0][..1].ToUpperInvariant();
+        return (parts[0][..1] + parts[^1][..1]).ToUpperInvariant();
+    }
+}
