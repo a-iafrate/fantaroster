@@ -380,8 +380,6 @@ public sealed class RefereeSession : IDisposable
         }
     }
 
-    private string ElementOrEmpty(Guid? id) => ElementName(id);
-
     private string RuleLabel(Guid ruleId) => Rules.FirstOrDefault(r => r.Id == ruleId)?.Label ?? string.Empty;
 
     private int RulePoints(Guid ruleId) => Rules.FirstOrDefault(r => r.Id == ruleId)?.Points ?? 0;

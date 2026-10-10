@@ -511,12 +511,6 @@
   <data name="AddRefereeTitle" xml:space="preserve">
     <value>Add New Referee</value>
   </data>
-  <data name="RefereeTokenSuccess" xml:space="preserve">
-    <value>Referee created successfully. Copy this token and share it securely with the referee:</value>
-  </data>
-  <data name="RefereeTokenWarning" xml:space="preserve">
-    <value>WARNING: This token will not be shown again. If lost, you must delete and recreate the referee.</value>
-  </data>
   <data name="NoReferees" xml:space="preserve">
     <value>No referees have been added yet.</value>
   </data>
@@ -546,6 +540,21 @@
   </data>
   <data name="DeleteGameConfirm" xml:space="preserve">
     <value>Yes, delete everything</value>
+  </data>
+  <data name="RefereeLinkSuccess" xml:space="preserve">
+    <value>Referee created. Send this invite link: it opens the referee console on their phone.</value>
+  </data>
+  <data name="RefereeLinkLabel" xml:space="preserve">
+    <value>Referee invite link</value>
+  </data>
+  <data name="RefereeLinkWarning" xml:space="preserve">
+    <value>This link will not be shown again. If it is lost, delete the referee and create a new one.</value>
+  </data>
+  <data name="BtnCopyLink" xml:space="preserve">
+    <value>Copy link</value>
+  </data>
+  <data name="LinkCopied" xml:space="preserve">
+    <value>Link copied</value>
   </data>
 </root>
 

@@ -1,0 +1,446 @@
+/* Referee console (mockup 03, screens 08 and 09): one task, huge targets, one hand, dark by default. */
+.ref-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--target-referee);
+}
+
+.ref-titles {
+    flex: 1;
+    min-width: 0;
+}
+
+.ref-sub {
+    overflow: hidden;
+    color: var(--color-ink-2);
+    font: var(--text-small);
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.ref-title {
+    margin: 0;
+    font: var(--text-h2);
+    font-weight: 800;
+    letter-spacing: var(--tracking-h2);
+}
+
+.ref-title:focus {
+    outline: none;
+}
+
+.ref-back,
+.ref-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: var(--target-referee);
+    height: var(--target-referee);
+    border: 1.5px solid var(--color-line-strong);
+    border-radius: var(--radius-l);
+    background: transparent;
+    color: var(--color-ink);
+    font-size: 1.625rem;
+    cursor: pointer;
+}
+
+.ref-dot--idle {
+    background: var(--color-warning);
+}
+
+.ref-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: var(--space-3) 0;
+}
+
+.ref-step {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-line);
+}
+
+.ref-step--on {
+    background: var(--color-primary);
+}
+
+.ref-notice {
+    margin: 0 0 var(--space-3);
+}
+
+.ref-offline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-m);
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    font: var(--text-small);
+    font-weight: 700;
+}
+
+.ref-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    /* Room for the undo toast so it never hides the last row. */
+    padding-bottom: calc(var(--target-referee) + var(--space-8));
+}
+
+/* Step 1: two columns of big tiles. */
+.ref-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ref-tile {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: 132px;
+    padding: var(--space-4);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    text-align: start;
+    cursor: pointer;
+}
+
+.ref-tile:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.ref-tile__name {
+    font: var(--text-body);
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+/* Step 2: the element and its rules. */
+.ref-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-m);
+    background: var(--color-surface-2);
+}
+
+.ref-chip__name {
+    font: var(--text-body);
+    font-weight: 700;
+}
+
+.ref-rules {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ref-rule {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: var(--target-referee);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    text-align: start;
+    cursor: pointer;
+}
+
+.ref-rule--static {
+    cursor: default;
+}
+
+.ref-rule__label {
+    flex: 1;
+    font: var(--text-body);
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.ref-pts {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    min-width: 60px;
+    height: var(--target-min);
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-m);
+    background: var(--color-lime);
+    color: var(--color-on-lime);
+    font: var(--text-h3);
+    font-weight: 800;
+}
+
+.ref-pts--penalty {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.ref-pts--small {
+    min-width: 52px;
+    height: 36px;
+    font: var(--text-body-l);
+    font-weight: 800;
+}
+
+.ref-pts--voided {
+    border: 1px dashed var(--color-line-strong);
+    background: transparent;
+    color: var(--color-ink-2);
+    text-decoration: line-through;
+}
+
+.ref-pts--big {
+    min-width: 110px;
+    height: var(--target-referee);
+    padding: 0 var(--space-5);
+    border-radius: var(--radius-l);
+    font: var(--text-display);
+    font-size: 2.5rem;
+    letter-spacing: 0;
+}
+
+/* Step 3: confirm. */
+.ref-confirm__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    text-align: center;
+}
+
+.ref-confirm__who {
+    font: var(--text-h2);
+    font-weight: 800;
+}
+
+.ref-confirm__btn {
+    min-height: 72px;
+    border: 0;
+    border-radius: var(--radius-l);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font: var(--text-h3);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.ref-confirm__btn:disabled {
+    background: var(--color-line);
+    color: var(--color-ink-2);
+}
+
+/* Undo toast: ten seconds, with a countdown bar. */
+.ref-undo {
+    position: fixed;
+    inset-inline: var(--space-3);
+    /* Above the offline bar of the layout, which sits at the very bottom. */
+    bottom: calc(max(var(--space-6), env(safe-area-inset-bottom)) + var(--space-12));
+    z-index: calc(var(--z-toast) + 1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    max-width: 616px;
+    margin-inline: auto;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
+    overflow: hidden;
+    border-radius: var(--radius-l);
+    background: var(--color-ink);
+    color: var(--color-bg);
+    box-shadow: var(--shadow-overlay);
+}
+
+.ref-undo__bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 4px;
+    width: 100%;
+    background: var(--color-cyan);
+    transform-origin: left;
+    animation: ref-countdown 10s linear forwards;
+}
+
+.ref-undo__text {
+    flex: 1;
+    min-width: 0;
+    font: var(--text-body);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.ref-undo__btn {
+    flex: none;
+    min-height: var(--target-referee);
+    padding: 0 var(--space-4);
+    border: 2px solid var(--color-bg);
+    border-radius: var(--radius-m);
+    background: transparent;
+    color: inherit;
+    font: var(--text-body);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+@keyframes ref-countdown {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+/* Recent points (screen 09). */
+.ref-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--radius-m);
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    font-size: 1.5rem;
+}
+
+.ref-banner__title {
+    font: var(--text-body);
+    font-weight: 800;
+}
+
+.ref-banner__sub {
+    font: var(--text-small);
+    font-weight: 600;
+}
+
+.ref-recent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-3) 0 0;
+    padding: 0 0 var(--space-6);
+    list-style: none;
+}
+
+.ref-point {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 72px;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+}
+
+.ref-point--voided {
+    border-style: dashed;
+    border-color: var(--color-line-strong);
+    opacity: .7;
+}
+
+.ref-point__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.ref-point__who {
+    font: var(--text-body);
+    font-weight: 700;
+}
+
+.ref-point__status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-ink-2);
+    font: var(--text-small);
+}
+
+.ref-point__void {
+    flex: none;
+    min-height: var(--target-referee);
+    padding: 0 var(--space-4);
+    border: 1.5px solid var(--color-line-strong);
+    border-radius: var(--radius-m);
+    background: transparent;
+    color: var(--color-danger);
+    font: var(--text-small);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.ref-empty {
+    text-align: center;
+}
+
+/* Menu and dialogs: bigger rows than elsewhere. */
+.ref-menu-item {
+    min-height: var(--target-referee);
+}
+
+.ref-dialog-btn {
+    min-height: var(--target-referee);
+}
+
+.ref-help {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding-inline-start: var(--space-5);
+    font: var(--text-body);
+}
+
+.ref-message {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-16) var(--space-2) var(--space-6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ref-undo__bar {
+        animation: none;
+    }
+}
+
+.ref-menu-head {
+    padding: 0 var(--space-3) var(--space-3);
+}
+
+.ref-menu-game {
+    font: var(--text-body-l);
+    font-weight: 800;
+}
+
+.ref-menu-referee {
+    font: var(--text-small);
+}

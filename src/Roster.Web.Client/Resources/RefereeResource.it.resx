@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+    <data name="Assign" xml:space="preserve">
+    <value>Assegna {0}</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Indietro</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="ConfirmTitle" xml:space="preserve">
+    <value>Conferma</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Esci dalla console</value>
+  </data>
+  <data name="ExitBody" xml:space="preserve">
+    <value>Per rientrare servirà di nuovo il link di invito.</value>
+  </data>
+  <data name="ExitBodyPending" xml:space="preserve">
+    <value>Ci sono ancora punti da inviare ({0}) e andrebbero persi. Per rientrare servirà di nuovo il link di invito.</value>
+  </data>
+  <data name="ExitConfirm" xml:space="preserve">
+    <value>Sì, esci</value>
+  </data>
+  <data name="ExitTitle" xml:space="preserve">
+    <value>Uscire dalla console?</value>
+  </data>
+  <data name="GameNotFoundBody" xml:space="preserve">
+    <value>Questo link non corrisponde a nessuna partita. Chiedi un nuovo link all'organizzatore.</value>
+  </data>
+  <data name="GameNotFoundTitle" xml:space="preserve">
+    <value>Partita non trovata</value>
+  </data>
+  <data name="GameNotLive" xml:space="preserve">
+    <value>La partita non è ancora iniziata. I punti si assegnano appena parte.</value>
+  </data>
+  <data name="GameOver" xml:space="preserve">
+    <value>La partita è finita: non si possono più assegnare punti.</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Aiuto</value>
+  </data>
+  <data name="HelpStep1" xml:space="preserve">
+    <value>Tocca {0} a cui va il punto.</value>
+  </data>
+  <data name="HelpStep2" xml:space="preserve">
+    <value>Tocca cosa è successo.</value>
+  </data>
+  <data name="HelpStep3" xml:space="preserve">
+    <value>Conferma. Hai 10 secondi per annullare.</value>
+  </data>
+  <data name="HelpTitle" xml:space="preserve">
+    <value>Come assegnare un punto</value>
+  </data>
+  <data name="Live" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="LoadFailedBody" xml:space="preserve">
+    <value>Controlla la connessione e riprova.</value>
+  </data>
+  <data name="LoadFailedTitle" xml:space="preserve">
+    <value>Qualcosa non si è caricato</value>
+  </data>
+  <data name="Menu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="NeedsInviteBody" xml:space="preserve">
+    <value>Apri il link che ti ha mandato l'organizzatore. Se non funziona più, chiedine uno nuovo.</value>
+  </data>
+  <data name="NeedsInviteTitle" xml:space="preserve">
+    <value>Serve un link di invito</value>
+  </data>
+  <data name="NoElements" xml:space="preserve">
+    <value>Non c'è ancora niente in gioco.</value>
+  </data>
+  <data name="NoPointsYet" xml:space="preserve">
+    <value>Ancora nessun punto assegnato.</value>
+  </data>
+  <data name="NoRules" xml:space="preserve">
+    <value>Questa partita non ha ancora regole da applicare.</value>
+  </data>
+  <data name="NotStarted" xml:space="preserve">
+    <value>Non iniziata</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="OfflinePending" xml:space="preserve">
+    <value>Offline, punti in attesa: {0}</value>
+  </data>
+  <data name="OfflineSub" xml:space="preserve">
+    <value>Partono da soli appena torna la rete.</value>
+  </data>
+  <data name="Over" xml:space="preserve">
+    <value>Finita</value>
+  </data>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Console arbitro</value>
+  </data>
+  <data name="PendingCount" xml:space="preserve">
+    <value>{0} in coda</value>
+  </data>
+  <data name="PickElement" xml:space="preserve">
+    <value>Scegli {0}</value>
+  </data>
+  <data name="PickRule" xml:space="preserve">
+    <value>Cosa è successo?</value>
+  </data>
+  <data name="QueuedLabel" xml:space="preserve">
+    <value>{0} (in attesa di rete)</value>
+  </data>
+  <data name="RecentPoints" xml:space="preserve">
+    <value>Punti recenti</value>
+  </data>
+  <data name="Rejected" xml:space="preserve">
+    <value>Il punto non è stato accettato. Controlla che la partita sia in corso e riprova.</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Riprova</value>
+  </data>
+  <data name="Rules" xml:space="preserve">
+    <value>Regole</value>
+  </data>
+  <data name="SearchElements" xml:space="preserve">
+    <value>Cerca {0}</value>
+  </data>
+  <data name="StatusPending" xml:space="preserve">
+    <value>in attesa</value>
+  </data>
+  <data name="StatusVoided" xml:space="preserve">
+    <value>annullato</value>
+  </data>
+  <data name="StepOf" xml:space="preserve">
+    <value>Passo {0} di 3</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Annulla {0} s</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Sconosciuto</value>
+  </data>
+  <data name="Void" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="RefereeLabel" xml:space="preserve">
+    <value>Arbitro: {0}</value>
+  </data>
+</root>

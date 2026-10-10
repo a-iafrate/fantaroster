@@ -3,6 +3,8 @@
 @using Roster.Domain.Referees
 @inject RefereeManagementService RefereeService
 @inject IStringLocalizer<SharedResource> Loc
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <div class="mg-section">
     <div class="mg-section-title">@Loc["RefereesTitle"]</div>
@@ -56,11 +58,10 @@
                 @if (NewRefereeToken != null)
                 {
                     <div class="mg-alert-success">
-                        <p>@Loc["RefereeTokenSuccess"]</p>
-                        <div style="font-family: monospace; font-size: 1.2rem; margin: 1rem 0; padding: 1rem; background: var(--ds-surface-variant); border-radius: var(--ds-radius-sm);">
-                            @NewRefereeToken
-                        </div>
-                        <p style="font-weight: bold; color: var(--ds-danger);">@Loc["RefereeTokenWarning"]</p>
+                        <p>@Loc["RefereeLinkSuccess"]</p>
+                        <input class="mg-input" type="text" readonly aria-label="@Loc["RefereeLinkLabel"]" value="@InviteLink(NewRefereeToken)" />
+                        <button type="button" class="mg-btn-secondary" @onclick="() => CopyLinkAsync(NewRefereeToken)">@(LinkCopied ? Loc["LinkCopied"] : Loc["BtnCopyLink"])</button>
+                        <p class="mg-warning">@Loc["RefereeLinkWarning"]</p>
                     </div>
                     
                     <div class="mg-form-actions">
@@ -120,10 +121,23 @@
         }
     }
 
+    private bool LinkCopied;
+
+    // The token travels in the URL fragment: browsers never send it to the server or write it in access logs.
+    private string InviteLink(string token) =>
+        $"{Navigation.ToAbsoluteUri($"/games/{GameId}/referee").AbsoluteUri}#t={Uri.EscapeDataString(token)}";
+
+    private async Task CopyLinkAsync(string token)
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", InviteLink(token));
+        LinkCopied = true;
+    }
+
     private void OpenAddReferee()
     {
         NewRefereeModel = new AddRefereeModel();
         NewRefereeToken = null;
+        LinkCopied = false;
         ShowAddDialog = true;
     }
 

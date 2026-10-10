@@ -20,7 +20,7 @@
                     <button type="button" class="ref-back" aria-label="@Loc["Back"]" @onclick="GoBack"><i class="icon-arrow-left" aria-hidden="true"></i></button>
                 }
                 <div class="ref-titles">
-                    <div class="ref-sub">@string.Format(Loc["StepOf"], game.Name, _step)</div>
+                    <div class="ref-sub">@string.Format(Loc["StepOf"], _step)</div>
                     <h1 class="ref-title" tabindex="-1" @ref="_title">@StepTitle()</h1>
                 </div>
                 <span class="ds-badge ds-badge--surface"><span class="ds-live-dot @(game.IsLive ? "" : "ref-dot--idle")" aria-hidden="true"></span>@(game.IsLive ? Loc["Live"] : game.IsOver ? Loc["Over"] : Loc["NotStarted"])</span>
@@ -117,8 +117,8 @@
 
             @if (_last is { } last)
             {
-                <div class="ref-undo" role="status">
-                    <span class="ref-undo__bar" style="width: @(_undoSeconds * 10)%"></span>
+                <div class="ref-undo" role="status" @key="last">
+                    <span class="ref-undo__bar" aria-hidden="true"></span>
                     <i class="@(last.Result.Status == AssignStatus.Queued ? "icon-clock" : "icon-check")" aria-hidden="true"></i>
                     <span class="ref-undo__text">@last.Label</span>
                     <button type="button" class="ref-undo__btn" @onclick="UndoAsync">@string.Format(Loc["Undo"], _undoSeconds)</button>
@@ -189,6 +189,13 @@
             <button type="button" class="ds-scrim" tabindex="-1" aria-label="@Loc["Close"]" @onclick="CloseMenu"></button>
             <div class="ds-sheet" role="dialog" aria-modal="true" aria-label="@Loc["Menu"]" @onkeydown="OnMenuKeyDown">
                 <div class="ds-sheet__grabber" aria-hidden="true"></div>
+                <div class="ref-menu-head">
+                    <div class="ref-menu-game">@game.Name</div>
+                    @if (Session.RefereeName is { Length: > 0 } refereeName)
+                    {
+                        <div class="ds-muted ref-menu-referee">@string.Format(Loc["RefereeLabel"], refereeName)</div>
+                    }
+                </div>
                 <button type="button" class="ds-menu-item ref-menu-item" @ref="_firstMenuItem" @onclick="() => OpenView(ConsoleView.Recent)">
                     <i class="icon-history" aria-hidden="true"></i><span>@Loc["RecentPoints"]</span>
                     @if (Session.PendingCount > 0)
@@ -328,11 +335,13 @@
             token = Uri.UnescapeDataString(uri.Fragment["#t=".Length..]);
         }
 
-        await Session.EnsureLoadedAsync(GameId, token);
         if (token is not null)
         {
+            // Drop the token from the address bar and the history before anything else.
             Navigation.NavigateTo(uri.GetLeftPart(UriPartial.Path), replace: true);
         }
+
+        await Session.EnsureLoadedAsync(GameId, token);
     }
 
     private void OnSessionChanged() => InvokeAsync(StateHasChanged);

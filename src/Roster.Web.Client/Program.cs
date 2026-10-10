@@ -12,6 +12,7 @@ builder.Services.AddScoped<ParticipantAuthState>();
 builder.Services.AddScoped<OfflineScoreStore>();
 builder.Services.AddScoped<GameHubClient>();
 builder.Services.AddScoped<ParticipantSession>();
+builder.Services.AddScoped<RefereeSession>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

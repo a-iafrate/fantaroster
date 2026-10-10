@@ -511,12 +511,6 @@
   <data name="AddRefereeTitle" xml:space="preserve">
     <value>Aggiungi Nuovo Arbitro</value>
   </data>
-  <data name="RefereeTokenSuccess" xml:space="preserve">
-    <value>Arbitro creato con successo. Copia questo token e condividilo in modo sicuro con l'arbitro:</value>
-  </data>
-  <data name="RefereeTokenWarning" xml:space="preserve">
-    <value>ATTENZIONE: Questo token non verrà mostrato di nuovo. Se perso, dovrai eliminare e ricreare l'arbitro.</value>
-  </data>
   <data name="NoReferees" xml:space="preserve">
     <value>Nessun arbitro è stato ancora aggiunto.</value>
   </data>
@@ -546,6 +540,21 @@
   </data>
   <data name="DeleteGameConfirm" xml:space="preserve">
     <value>Sì, elimina tutto</value>
+  </data>
+  <data name="RefereeLinkSuccess" xml:space="preserve">
+    <value>Arbitro creato. Invia questo link di invito: apre la console arbitro sul suo telefono.</value>
+  </data>
+  <data name="RefereeLinkLabel" xml:space="preserve">
+    <value>Link di invito per l'arbitro</value>
+  </data>
+  <data name="RefereeLinkWarning" xml:space="preserve">
+    <value>Questo link non verrà mostrato di nuovo. Se lo perdi, elimina l'arbitro e creane uno nuovo.</value>
+  </data>
+  <data name="BtnCopyLink" xml:space="preserve">
+    <value>Copia il link</value>
+  </data>
+  <data name="LinkCopied" xml:space="preserve">
+    <value>Link copiato</value>
   </data>
 </root>
 
