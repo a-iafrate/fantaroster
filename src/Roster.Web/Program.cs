@@ -35,7 +35,21 @@ builder.Services.AddScoped<ScoreManagementService>();
 builder.Services.AddSingleton<Roster.Application.Games.Queries.LeaderboardStateStore>();
 builder.Services.AddSingleton(TimeProvider.System);
 
-builder.Services.AddSignalR();
+var azureSignalRConnectionString = builder.Configuration["Azure:SignalR:ConnectionString"];
+
+if (!string.IsNullOrWhiteSpace(azureSignalRConnectionString))
+{
+    builder.Services.AddSignalR()
+        .AddAzureSignalR(options =>
+        {
+            options.ConnectionString = azureSignalRConnectionString;
+        });
+}
+else
+{
+    builder.Services.AddSignalR();
+}
+
 builder.Services.AddScoped<Roster.Application.Ports.Notifications.IGameNotificationService, Roster.Web.Services.GameNotificationService>();
 
 // Infrastructure
@@ -127,7 +141,6 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(Roster.Web.Client._Imports).Assembly);
 
 app.MapAuthEndpoints();
-app.MapRefereeEndpoints();
 app.MapParticipantEndpoints();
 app.MapGameEndpoints();
 app.MapPwaEndpoints();
