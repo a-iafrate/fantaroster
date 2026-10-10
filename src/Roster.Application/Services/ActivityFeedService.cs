@@ -32,7 +32,7 @@ public sealed class ActivityFeedService
     {
         // 50 latest entries should be enough for an activity feed payload
         var entries = await _scoreEntryRepository.GetRecentEntriesByGameIdAsync(query.GameId, 50, cancellationToken);
-        
+
         if (entries.Count == 0)
         {
             return new List<ActivityFeedItemDto>();

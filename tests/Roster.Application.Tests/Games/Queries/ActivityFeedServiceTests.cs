@@ -48,7 +48,7 @@ public class ActivityFeedServiceTests
 
         _elementRepository.GetByGameIdAsync(gameId, Arg.Any<CancellationToken>()).Returns(new List<Element>());
         _participantRepository.GetParticipantsByGameIdAsync(gameId, Arg.Any<CancellationToken>()).Returns(new List<Participant>());
-        
+
         var rule = new Rule(ruleId, gameId, "Cool Rule", 10, "TestCategory", RuleTarget.Element);
         _ruleRepository.GetByGameIdAsync(gameId, Arg.Any<CancellationToken>()).Returns(new List<Rule> { rule });
 

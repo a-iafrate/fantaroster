@@ -39,6 +39,18 @@ public static class GameEndpoints
         .WithName("GetAvailableElements")
         .AllowAnonymous();
 
+        group.MapGet("/rules", async (
+            [FromRoute] Guid gameId,
+            RuleManagementService service,
+            CancellationToken cancellationToken) =>
+        {
+            var rules = await service.GetRulesByGameAsync(gameId, cancellationToken);
+            var dtos = rules.Select(r => new { r.Id, r.Label, r.Points, r.Category, Target = r.Target.ToString() });
+            return Results.Ok(dtos);
+        })
+        .WithName("GetGameRules")
+        .AllowAnonymous(); // TODO: In production this could be open or referee only, but elements are open too.
+
         app.MapGet("/api/join-codes/{joinCode}", async (
             [FromRoute] string joinCode,
             Roster.Application.Ports.Data.IGameRepository repository,

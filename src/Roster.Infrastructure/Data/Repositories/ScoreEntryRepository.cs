@@ -43,6 +43,11 @@ internal sealed class ScoreEntryRepository : IScoreEntryRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<ScoreEntry?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.ScoreEntries.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+    }
+
     public void Add(ScoreEntry entry)
     {
         _context.ScoreEntries.Add(entry);

@@ -14,6 +14,7 @@ public interface IScoreEntryRepository
     Task<List<ScoreEntry>> GetValidEntriesByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default);
     Task<List<ScoreEntry>> GetRecentEntriesByGameIdAsync(Guid gameId, int count, CancellationToken cancellationToken = default);
     Task<bool> ExistsByIdempotencyKeyAsync(Guid gameId, string idempotencyKey, CancellationToken cancellationToken = default);
+    Task<ScoreEntry?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     void Add(ScoreEntry entry);
     void Update(ScoreEntry entry);
 }

@@ -31,7 +31,12 @@ builder.Services.AddScoped<RefereeManagementService>();
 builder.Services.AddScoped<ParticipantManagementService>();
 builder.Services.AddScoped<LeaderboardService>();
 builder.Services.AddScoped<ActivityFeedService>();
+builder.Services.AddScoped<ScoreManagementService>();
+builder.Services.AddSingleton<Roster.Application.Games.Queries.LeaderboardStateStore>();
 builder.Services.AddSingleton(TimeProvider.System);
+
+builder.Services.AddSignalR();
+builder.Services.AddScoped<Roster.Application.Ports.Notifications.IGameNotificationService, Roster.Web.Services.GameNotificationService>();
 
 // Infrastructure
 builder.Services.AddInfrastructure();
@@ -125,6 +130,8 @@ app.MapAuthEndpoints();
 app.MapParticipantEndpoints();
 app.MapGameEndpoints();
 app.MapPwaEndpoints();
+app.MapScoreEndpoints();
+app.MapHub<Roster.Web.Hubs.GameHub>("/hubs/game");
 
 app.Run();
 

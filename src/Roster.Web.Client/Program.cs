@@ -9,6 +9,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 // Register client-side services here
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddScoped<ParticipantAuthState>();
+builder.Services.AddScoped<OfflineScoreStore>();
+builder.Services.AddScoped<GameHubClient>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 var host = builder.Build();

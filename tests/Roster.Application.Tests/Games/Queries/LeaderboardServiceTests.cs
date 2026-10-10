@@ -21,15 +21,19 @@ public class LeaderboardServiceTests
     private readonly IScoreEntryRepository _scoreEntryRepository = Substitute.For<IScoreEntryRepository>();
     private readonly IParticipantRepository _participantRepository = Substitute.For<IParticipantRepository>();
     private readonly IElementRepository _elementRepository = Substitute.For<IElementRepository>();
+    private readonly Roster.Application.Ports.Notifications.IGameNotificationService _notificationService = Substitute.For<Roster.Application.Ports.Notifications.IGameNotificationService>();
     private readonly LeaderboardService _sut;
 
     public LeaderboardServiceTests()
     {
+        var stateStore = new LeaderboardStateStore();
         _sut = new LeaderboardService(
             _gameRepository,
             _scoreEntryRepository,
             _participantRepository,
-            _elementRepository);
+            _elementRepository,
+            stateStore,
+            _notificationService);
     }
 
     [Fact]

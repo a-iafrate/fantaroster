@@ -1,0 +1,306 @@
+@page "/games/{GameId:guid}/referee"
+@inject HttpClient Http
+@inject Roster.Web.Client.Services.OfflineScoreStore OfflineStore
+@inject Roster.Web.Client.Services.GameHubClient HubClient
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+
+<PageTitle>Referee Console</PageTitle>
+
+<div class="referee-console">
+    @if (_loading)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="status-bar">
+            <span>Network: @(_isConnected ? "Online" : "Offline")</span>
+            @if (_OfflineStore.Count > 0)
+            {
+                <span class="warning">Pending: @_OfflineStore.Count</span>
+            }
+        </div>
+
+        @if (_step == 1)
+        {
+            <h2>Select Element</h2>
+            <div class="grid">
+                @foreach (var el in _elements)
+                {
+                    <button class="card" @onclick="() => SelectElement(el.Id)">
+                        @el.Name
+                    </button>
+                }
+            </div>
+        }
+        else if (_step == 2)
+        {
+            <h2>Select Rule for @_selectedElementName</h2>
+            <button class="back-btn" @onclick="GoBack">Back</button>
+            <div class="list">
+                @foreach (var rule in _rules)
+                {
+                    <button class="row-btn @(rule.Points > 0 ? "bonus" : "penalty")" @onclick="() => SelectRule(rule.Id)">
+                        <span class="label">@rule.Label</span>
+                        <span class="points">@(rule.Points > 0 ? $"+{rule.Points}" : rule.Points.ToString())</span>
+                    </button>
+                }
+            </div>
+        }
+        else if (_step == 3)
+        {
+            <h2>Confirm Assignment</h2>
+            <p>Assign <strong>@_selectedRuleLabel</strong> to <strong>@_selectedElementName</strong>?</p>
+            <div class="actions">
+                <button class="btn cancel" @onclick="Cancel">Cancel</button>
+                <button class="btn confirm" @onclick="ConfirmAssignment">Confirm</button>
+            </div>
+        }
+
+        @if (_recentScores.Count > 0 && _step == 1)
+        {
+            <div class="recent-history">
+                <h3>Recent Activity</h3>
+                @foreach (var score in _recentScores)
+                {
+                    <div class="history-item @(score.Status == "Voided" ? "voided" : "")">
+                        <span>@GetElementName(score.ElementId) - @GetRuleLabel(score.RuleId)</span>
+                        @if (score.Status == "Valid")
+                        {
+                            <button class="void-btn" @onclick="() => VoidScore(score.Id)">Undo</button>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+<style>
+    /* One-handed layout styling */
+    .referee-console { padding: 1rem; max-width: 600px; margin: auto; }
+    .status-bar { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 1rem; color: #666; }
+    .warning { color: orange; font-weight: bold; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .card { padding: 2rem 1rem; font-size: 1.2rem; text-align: center; border: 1px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer; touch-action: manipulation; }
+    .list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .row-btn { padding: 1.5rem 1rem; font-size: 1.1rem; display: flex; justify-content: space-between; border: 1px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer; touch-action: manipulation; }
+    .bonus .points { color: green; font-weight: bold; }
+    .penalty .points { color: red; font-weight: bold; }
+    .actions { display: flex; gap: 1rem; margin-top: 2rem; }
+    .btn { flex: 1; padding: 1.5rem; font-size: 1.2rem; border: none; border-radius: 8px; color: white; cursor: pointer; touch-action: manipulation; }
+    .cancel { background: #666; }
+    .confirm { background: #007bff; }
+    .back-btn { margin-bottom: 1rem; padding: 0.8rem; background: #eee; border: none; border-radius: 4px; cursor: pointer; }
+    .recent-history { margin-top: 3rem; border-top: 1px solid #eee; padding-top: 1rem; }
+    .history-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+    .voided { text-decoration: line-through; opacity: 0.6; }
+    .void-btn { padding: 0.5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; }
+
+    /* Dark theme considerations (simulated) */
+    @@media (prefers-color-scheme: dark) {
+        .card, .row-btn { background: #222; color: #eee; border-color: #444; }
+        .back-btn { background: #333; color: #eee; }
+        .referee-console { color: #eee; }
+    }
+</style>
+
+@code {
+    [Parameter] public Guid GameId { get; set; }
+
+    private bool _loading = true;
+    private bool _isConnected = true;
+    private int _step = 1;
+
+    private List<ElementDto> _elements = new();
+    private List<RuleDto> _rules = new();
+    private List<ScoreEntryDto> _recentScores = new();
+    private List<Roster.Web.Client.Services.PendingScoreAssignment> _OfflineStore = new();
+
+    private Guid? _selectedElementId;
+    private string? _selectedElementName;
+    private Guid _selectedRuleId;
+    private string? _selectedRuleLabel;
+    
+    private string _refereeToken = "dummy-token"; // In a real flow, this comes from a login or query param.
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Try to get token from local storage or URL here
+        try 
+        {
+            var storedToken = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "refereeToken");
+            if (!string.IsNullOrEmpty(storedToken)) _refereeToken = storedToken;
+        } catch {}
+
+        await LoadDataAsync();
+        
+        HubClient.OnScoreEntryAdded += OnScoreAdded;
+        HubClient.OnScoreEntryVoided += OnScoreVoided;
+        await HubClient.StartAsync(GameId);
+
+        _OfflineStore = await OfflineStore.GetQueueAsync();
+        if (_OfflineStore.Count > 0)
+        {
+            // Try sync if we think we have connection
+            _ = SyncOfflineStoreAsync();
+        }
+
+        // Setup JS interop for online/offline events if desired, but we can rely on sync retry on action
+        _loading = false;
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            var elementsTask = Http.GetFromJsonAsync<List<ElementDto>>($"/api/games/{GameId}/elements");
+            var rulesTask = Http.GetFromJsonAsync<List<RuleDto>>($"/api/games/{GameId}/rules");
+            var scoresTask = Http.GetFromJsonAsync<List<ScoreEntryDto>>($"/api/games/{GameId}/score-entries?count=10");
+
+            await Task.WhenAll(elementsTask!, rulesTask!, scoresTask!);
+
+            _elements = elementsTask.Result ?? new();
+            _rules = rulesTask.Result ?? new();
+            _recentScores = scoresTask.Result ?? new();
+            _isConnected = true;
+        }
+        catch
+        {
+            _isConnected = false;
+        }
+    }
+
+    private void SelectElement(Guid id)
+    {
+        _selectedElementId = id;
+        _selectedElementName = _elements.FirstOrDefault(e => e.Id == id)?.Name;
+        _step = 2;
+    }
+
+    private void SelectRule(Guid id)
+    {
+        _selectedRuleId = id;
+        _selectedRuleLabel = _rules.FirstOrDefault(r => r.Id == id)?.Label;
+        _step = 3;
+    }
+
+    private void GoBack() => _step--;
+    private void Cancel() => _step = 1;
+
+    private async Task ConfirmAssignment()
+    {
+        var idempotencyKey = Guid.NewGuid().ToString();
+        var request = new Roster.Web.Client.Services.PendingScoreAssignment(
+            GameId, _selectedElementId, null, _selectedRuleId, idempotencyKey
+        );
+
+        try
+        {
+            var requestMsg = new HttpRequestMessage(HttpMethod.Post, $"/api/games/{GameId}/score-entries");
+            requestMsg.Headers.Add("Idempotency-Key", idempotencyKey);
+            requestMsg.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _refereeToken);
+            requestMsg.Content = System.Net.Http.Json.JsonContent.Create(new
+            {
+                ElementId = _selectedElementId,
+                RuleId = _selectedRuleId
+            });
+
+            var response = await Http.SendAsync(requestMsg);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                await OfflineStore.EnqueueAsync(request);
+                _isConnected = false;
+            }
+            else
+            {
+                _isConnected = true;
+                await SyncOfflineStoreAsync(); // Try sync any pending
+            }
+        }
+        catch
+        {
+            await OfflineStore.EnqueueAsync(request);
+            _isConnected = false;
+        }
+
+        _OfflineStore = await OfflineStore.GetQueueAsync();
+        _step = 1;
+        
+        // Optimistically reload scores or wait for hub
+        await LoadRecentScoresSilentlyAsync();
+    }
+
+    private async Task VoidScore(Guid entryId)
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, $"/api/games/{GameId}/score-entries/{entryId}/void");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _refereeToken);
+            request.Content = System.Net.Http.Json.JsonContent.Create(new { Note = "Undo from console" });
+            
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                _isConnected = true;
+            }
+            else
+            {
+                _isConnected = false;
+            }
+        }
+        catch
+        {
+            _isConnected = false;
+        }
+        await LoadRecentScoresSilentlyAsync();
+    }
+
+    private async Task SyncOfflineStoreAsync()
+    {
+        await OfflineStore.SyncAsync(_refereeToken);
+        _OfflineStore = await OfflineStore.GetQueueAsync();
+        StateHasChanged();
+    }
+
+    private async Task LoadRecentScoresSilentlyAsync()
+    {
+        try
+        {
+            var scores = await Http.GetFromJsonAsync<List<ScoreEntryDto>>($"/api/games/{GameId}/score-entries?count=10");
+            if (scores != null)
+            {
+                _recentScores = scores;
+                StateHasChanged();
+            }
+        }
+        catch { }
+    }
+
+    private void OnScoreAdded(Guid entryId)
+    {
+        _ = InvokeAsync(LoadRecentScoresSilentlyAsync);
+    }
+
+    private void OnScoreVoided(Guid entryId)
+    {
+        _ = InvokeAsync(LoadRecentScoresSilentlyAsync);
+    }
+
+    private string GetElementName(Guid? id) => _elements.FirstOrDefault(e => e.Id == id)?.Name ?? "Unknown";
+    private string GetRuleLabel(Guid id) => _rules.FirstOrDefault(r => r.Id == id)?.Label ?? "Unknown";
+
+    public async ValueTask DisposeAsync()
+    {
+        HubClient.OnScoreEntryAdded -= OnScoreAdded;
+        HubClient.OnScoreEntryVoided -= OnScoreVoided;
+        await HubClient.DisposeAsync();
+    }
+
+    public class ElementDto { public Guid Id { get; set; } public string Name { get; set; } = ""; }
+    public class RuleDto { public Guid Id { get; set; } public string Label { get; set; } = ""; public int Points { get; set; } }
+    public class ScoreEntryDto { public Guid Id { get; set; } public Guid? ElementId { get; set; } public Guid RuleId { get; set; } public string Status { get; set; } = ""; }
+}

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Roster.Application.Games.Queries;
 using Roster.Application.Ports.Data;
+using Roster.Application.Ports.Notifications;
 using Roster.Domain.Scoring;
 
 namespace Roster.Application.Services;
@@ -15,29 +16,62 @@ public sealed class LeaderboardService
     private readonly IScoreEntryRepository _scoreEntryRepository;
     private readonly IParticipantRepository _participantRepository;
     private readonly IElementRepository _elementRepository;
+    private readonly LeaderboardStateStore _stateStore;
+    private readonly IGameNotificationService _notificationService;
 
     public LeaderboardService(
         IGameRepository gameRepository,
         IScoreEntryRepository scoreEntryRepository,
         IParticipantRepository participantRepository,
-        IElementRepository elementRepository)
+        IElementRepository elementRepository,
+        LeaderboardStateStore stateStore,
+        IGameNotificationService notificationService)
     {
         _gameRepository = gameRepository;
         _scoreEntryRepository = scoreEntryRepository;
         _participantRepository = participantRepository;
         _elementRepository = elementRepository;
+        _stateStore = stateStore;
+        _notificationService = notificationService;
     }
 
     public async Task<LeaderboardResponseDto> HandleAsync(GetLeaderboardQuery query, CancellationToken cancellationToken)
     {
-        var game = await _gameRepository.GetByIdAsync(query.GameId, cancellationToken);
-        if (game == null)
-            throw new ArgumentException($"Game {query.GameId} not found");
+        var state = _stateStore.GetOrAddState(query.GameId);
+        var cached = state.GetLeaderboard();
 
-        var entries = await _scoreEntryRepository.GetValidEntriesByGameIdAsync(query.GameId, cancellationToken);
-        var lineups = await _participantRepository.GetLineupsByGameIdAsync(query.GameId, cancellationToken);
-        var participants = await _participantRepository.GetParticipantsByGameIdAsync(query.GameId, cancellationToken);
-        var elements = await _elementRepository.GetByGameIdAsync(query.GameId, cancellationToken);
+        if (cached == null)
+        {
+            cached = await RecomputeCoreAsync(query.GameId, cancellationToken);
+            state.Update(cached);
+        }
+
+        var topPositions = cached.OrderBy(d => d.Rank).Take(10).ToList();
+        var myPosition = cached.FirstOrDefault(d => d.ParticipantId == query.CallerParticipantId);
+
+        return new LeaderboardResponseDto(myPosition, topPositions);
+    }
+
+    public async Task RecomputeAndBroadcastAsync(Guid gameId, CancellationToken cancellationToken = default)
+    {
+        var newLeaderboard = await RecomputeCoreAsync(gameId, cancellationToken);
+
+        var state = _stateStore.GetOrAddState(gameId);
+        state.Update(newLeaderboard);
+
+        await _notificationService.NotifyLeaderboardUpdatedAsync(gameId, state.Version, cancellationToken);
+    }
+
+    private async Task<List<LeaderboardDto>> RecomputeCoreAsync(Guid gameId, CancellationToken cancellationToken)
+    {
+        var game = await _gameRepository.GetByIdAsync(gameId, cancellationToken);
+        if (game == null)
+            throw new ArgumentException($"Game {gameId} not found");
+
+        var entries = await _scoreEntryRepository.GetValidEntriesByGameIdAsync(gameId, cancellationToken);
+        var lineups = await _participantRepository.GetLineupsByGameIdAsync(gameId, cancellationToken);
+        var participants = await _participantRepository.GetParticipantsByGameIdAsync(gameId, cancellationToken);
+        var elements = await _elementRepository.GetByGameIdAsync(gameId, cancellationToken);
 
         var elementDict = elements.ToDictionary(e => e.Id);
         var participantDict = participants.ToDictionary(p => p.Id);
@@ -84,9 +118,6 @@ public sealed class LeaderboardService
             ));
         }
 
-        var topPositions = dtos.OrderBy(d => d.Rank).Take(10).ToList();
-        var myPosition = dtos.FirstOrDefault(d => d.ParticipantId == query.CallerParticipantId);
-
-        return new LeaderboardResponseDto(myPosition, topPositions);
+        return dtos;
     }
 }
