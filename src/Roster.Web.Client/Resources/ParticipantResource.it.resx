@@ -229,4 +229,13 @@
   <data name="JoinCodeNotFound" xml:space="preserve">
     <value>Nessun gioco trovato con questo codice. Controllalo e riprova.</value>
   </data>
+  <data name="ErrorUnhandled" xml:space="preserve">
+    <value>Qualcosa è andato storto.</value>
+  </data>
+  <data name="ErrorReload" xml:space="preserve">
+    <value>Ricarica</value>
+  </data>
+  <data name="ErrorDismiss" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
 </root>

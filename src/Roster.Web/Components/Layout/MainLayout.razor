@@ -22,7 +22,7 @@
                 </div>
                 <div class="pub-mobile-settings">
                     <button class="pub-chip"><i class="icon-globe"></i>Italiano</button>
-                    <button class="pub-chip"><i class="icon-moon"></i>Tema</button>
+                    <ThemeToggle CssClass="pub-chip" />
                 </div>
                 <div class="pub-mobile-actions">
                     <a href="/j" class="pub-btn-outline"><i class="icon-qr-code"></i>Ho un codice partita</a>
@@ -53,7 +53,6 @@
 
     <main class="pub-main">
         @Body
-        <Roster.Web.Client.Shared.ConnectionStatus @rendermode="InteractiveWebAssembly" />
     </main>
 
     <!-- Footer -->
@@ -97,14 +96,10 @@
             <span>© 2026 FantaRoster</span>
             <div class="pub-footer-settings">
                 <button class="pub-chip-dark"><i class="icon-globe"></i>Italiano</button>
-                <button class="pub-chip-dark"><i class="icon-moon"></i>Scuro</button>
+                <ThemeToggle CssClass="pub-chip-dark" />
             </div>
         </div>
     </footer>
 </div>
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+<Roster.Web.Client.Layout.ErrorBanner />

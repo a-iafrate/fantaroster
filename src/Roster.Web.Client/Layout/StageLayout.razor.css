@@ -1,0 +1,6 @@
+.stage-surface {
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--stage-bg);
+    color: var(--stage-on-bg);
+}

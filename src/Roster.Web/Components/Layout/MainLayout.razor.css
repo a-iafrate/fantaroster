@@ -27,7 +27,7 @@ a { text-decoration: none; color: inherit; }
 .pub-mobile-link i { color: var(--color-ink-2); }
 
 .pub-mobile-settings { display: flex; gap: 8px; margin-top: 16px; }
-.pub-chip { height: 40px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--color-line-strong); font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; background: transparent; color: inherit; cursor: pointer; }
+.pub-chip, .pub-mobile-settings ::deep .pub-chip { height: 40px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--color-line-strong); font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; background: transparent; color: inherit; cursor: pointer; }
 
 .pub-mobile-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 24px; }
 .pub-btn-outline { height: 56px; border-radius: 14px; border: 1.5px solid var(--color-line-strong); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -72,4 +72,4 @@ a { text-decoration: none; color: inherit; }
 @media (min-width: 1024px) { .pub-footer-bottom { flex-direction: row; justify-content: space-between; align-items: center; } }
 
 .pub-footer-settings { display: flex; gap: 10px; }
-.pub-chip-dark { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #5A4285; display: flex; align-items: center; gap: 6px; font-weight: 700; background: transparent; color: inherit; cursor: pointer; }
+.pub-chip-dark, .pub-footer-settings ::deep .pub-chip-dark { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #5A4285; display: flex; align-items: center; gap: 6px; font-weight: 700; background: transparent; color: inherit; cursor: pointer; }

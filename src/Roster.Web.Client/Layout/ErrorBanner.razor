@@ -1,0 +1,8 @@
+@inject IStringLocalizer<ParticipantResource> Loc
+
+@* Shown by blazor.web.js when an unhandled error occurs in an interactive component. *@
+<div id="blazor-error-ui" role="alert" data-nosnippet>
+    @Loc["ErrorUnhandled"]
+    <a href="." class="reload">@Loc["ErrorReload"]</a>
+    <button type="button" class="dismiss" aria-label="@Loc["ErrorDismiss"]"><i class="icon-x" aria-hidden="true"></i></button>
+</div>

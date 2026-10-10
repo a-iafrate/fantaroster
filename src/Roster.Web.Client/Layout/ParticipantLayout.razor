@@ -1,0 +1,11 @@
+@inherits LayoutComponentBase
+
+@* Participant surface: phone-first shell, no public site chrome. Theme follows the device preference. *@
+<div class="surface participant-surface" data-theme-surface="participant">
+    <main class="participant-main">
+        @Body
+    </main>
+    <ConnectionStatus @rendermode="ClientRenderMode.Instance" />
+</div>
+
+<ErrorBanner />

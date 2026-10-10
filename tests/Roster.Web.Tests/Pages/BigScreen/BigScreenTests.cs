@@ -23,7 +23,7 @@ public class BigScreenTests : TestContext
         var client = new HttpClient(mockHttp) { BaseAddress = new Uri("http://localhost/") };
         Services.AddSingleton(client);
 
-        Services.AddSingleton(sp => 
+        Services.AddSingleton(sp =>
         {
             var nav = sp.GetRequiredService<NavigationManager>();
             return new GameHubClient(nav, logger);

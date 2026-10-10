@@ -1,0 +1,11 @@
+@inherits LayoutComponentBase
+
+@* Referee surface: no navigation, one task. Dark by default (dark halls); the referee can switch theme. *@
+<div class="surface referee-surface" data-theme-surface="referee" data-theme-default="dark">
+    <main class="referee-main">
+        @Body
+    </main>
+    <ConnectionStatus @rendermode="ClientRenderMode.Instance" />
+</div>
+
+<ErrorBanner />
