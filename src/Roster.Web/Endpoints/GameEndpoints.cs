@@ -22,6 +22,7 @@ public static class GameEndpoints
             [FromRoute] Guid gameId,
             Roster.Application.Ports.Data.IGameRepository repository,
             IDomainPackLoader domainPacks,
+            Microsoft.Extensions.Options.IOptions<Roster.Web.Options.BrandOptions> brand,
             CancellationToken cancellationToken) =>
         {
             var game = await repository.GetByIdAsync(gameId, cancellationToken);
@@ -40,6 +41,8 @@ public static class GameEndpoints
                 game.CaptainEnabled,
                 game.CaptainMultiplier,
                 game.State.ToString(),
+                game.JoinCode,
+                brand.Value.Name,
                 new GameTermsResponse(
                     terms?.ElementSingular ?? string.Empty,
                     terms?.ElementPlural ?? string.Empty,
@@ -71,6 +74,24 @@ public static class GameEndpoints
         })
         .WithName("GetGameRules")
         .AllowAnonymous(); // TODO: In production this could be open or referee only, but elements are open too.
+
+        // The big screen has no participant token: this is the same ranking every participant sees, without "my position".
+        group.MapGet("/leaderboard", async (
+            [FromRoute] Guid gameId,
+            Roster.Application.Services.LeaderboardService service,
+            Roster.Application.Ports.Data.IGameRepository repository,
+            CancellationToken cancellationToken) =>
+        {
+            if (await repository.GetByIdAsync(gameId, cancellationToken) is null)
+            {
+                return Results.NotFound();
+            }
+
+            var leaderboard = await service.HandleAsync(new Roster.Application.Games.Queries.GetLeaderboardQuery(gameId, Guid.Empty), cancellationToken);
+            return Results.Ok(leaderboard);
+        })
+        .WithName("GetPublicLeaderboard")
+        .AllowAnonymous();
 
         app.MapGet("/api/join-codes/{joinCode}", async (
             [FromRoute] string joinCode,
@@ -111,6 +132,8 @@ public sealed record GameInfoResponse(
     bool CaptainEnabled,
     decimal CaptainMultiplier,
     string State,
+    string JoinCode,
+    string BrandName,
     GameTermsResponse Terms);
 
 /// <summary>Words defined by the game's domain pack for the request culture: what elements and their groups are called.</summary>

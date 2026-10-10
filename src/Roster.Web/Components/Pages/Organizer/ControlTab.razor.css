@@ -1,0 +1,115 @@
+.ctl-phases {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+    list-style: none;
+}
+
+.ctl-phase {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-line);
+}
+
+.ctl-phase:first-child {
+    border-top: 0;
+}
+
+.ctl-phase--current {
+    background: var(--color-primary-tint);
+}
+
+.ctl-phase__dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid var(--color-line-strong);
+    border-radius: var(--radius-s);
+    color: var(--color-ink-2);
+}
+
+.ctl-phase--done .ctl-phase__dot {
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+.ctl-phase--current .ctl-phase__dot {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+.ctl-phase__text {
+    display: flex;
+    flex-direction: column;
+}
+
+.ctl-phase__label {
+    font: var(--text-body);
+    font-weight: 600;
+}
+
+.ctl-phase--current .ctl-phase__label {
+    font-weight: 800;
+}
+
+.ctl-phase__note {
+    color: var(--color-ink-2);
+    font: var(--text-micro);
+}
+
+.ctl-action {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.ctl-action .ds-btn {
+    min-height: var(--target-referee);
+    font: var(--text-h3);
+    font-weight: 800;
+}
+
+.ctl-action__note {
+    margin: 0;
+    font: var(--text-small);
+    text-align: center;
+}
+
+.ctl-code {
+    letter-spacing: .2em;
+    text-transform: uppercase;
+}
+
+@media (min-width: 1024px) {
+    .ctl-phases {
+        flex-direction: row;
+    }
+
+    .ctl-phase {
+        flex: 1;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-4);
+        border-top: 0;
+        border-left: 1px solid var(--color-line);
+    }
+
+    .ctl-phase:first-child {
+        border-left: 0;
+    }
+
+    .ctl-action {
+        max-width: 480px;
+    }
+}

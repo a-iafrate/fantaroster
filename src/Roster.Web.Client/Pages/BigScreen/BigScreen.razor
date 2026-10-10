@@ -1,346 +1,407 @@
 @page "/games/{GameId:guid}/big-screen"
 @rendermode ClientRenderMode.Instance
-@using Roster.Web.Client.Services
+@using System.Net.Http.Json
 @using Roster.Web.Client.Pages.BigScreen.Components
-@using Microsoft.AspNetCore.SignalR.Client
-@using System.Text.Json.Serialization
+@implements IAsyncDisposable
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject GameHubClient HubClient
-@implements IAsyncDisposable
+@inject TimeProvider Time
+@inject IJSRuntime JS
+@inject IStringLocalizer<StageResource> Loc
 
-<div class="big-screen @(_kiosk ? "kiosk-mode" : "")">
-    @if (_loading)
+<PageTitle>@Loc["PageTitle"]</PageTitle>
+
+@* Big screen (mockup 04, screens 15 and 16): 1920x1080 in the "stage" theme, scaled to any 16:9 display.
+   No fixed menu: the controls appear with the mouse or a key and hide after three seconds. *@
+<div class="stage @(_controlsVisible ? "" : "stage--idle")" tabindex="0" @ref="_root" @onkeydown="OnKeyDown" @onmousemove="ShowControls">
+    @if (_game is null)
     {
-        <div class="loading">Loading Big Screen...</div>
+        <p class="stage__message loading" role="status">@(_notFound ? Loc["NotFound"] : Loc["Loading"])</p>
+    }
+    else if (ShowJoin)
+    {
+        <section class="join" aria-label="@Loc["JoinTitle"]">
+            <div class="join__text">
+                <div class="stage__brand"><img src="assets/logo-r.svg" alt="" /><Wordmark Name="@_game.BrandName" /></div>
+                <h1 class="join__headline">@Loc["StillTime"]</h1>
+                <p class="join__body">@JoinBody()</p>
+                <div class="join__pills">
+                    <span class="pill pill--white"><i class="icon-users" aria-hidden="true"></i>@string.Format(Loc["PlayersCount"], _total)</span>
+                    @if (_game.IsBeforeStart)
+                    {
+                        <span class="pill pill--lime"><i class="icon-clock" aria-hidden="true"></i>@Loc["RostersOpen"]</span>
+                    }
+                </div>
+            </div>
+            <div class="join__qr">
+                <span class="join__card join__card--cyan" aria-hidden="true"></span>
+                <span class="join__card join__card--blue" aria-hidden="true"></span>
+                <div class="join__card join__card--main">
+                    <QrView Text="@_joinUrl" />
+                    <div class="join__host">@Host</div>
+                    <div class="join__code" aria-label="@Loc["JoinTitle"]">@_game.JoinCode</div>
+                </div>
+            </div>
+        </section>
     }
     else
     {
-        <div class="layout-grid">
-            <div class="header">
-                <div class="brand">@_gameName</div>
-                <div class="qr-box">
-                    <QrView Text="@_joinUrl" />
-                    <span>Scan to join!</span>
-                </div>
+        <header class="stage__bar">
+            <div class="stage__brand"><img src="assets/logo-r.svg" alt="" /><Wordmark Name="@_game.BrandName" /></div>
+            <span class="stage__game">@_game.Name</span>
+            <span class="pill pill--white stage__live"><span class="stage__dot stage__dot--@(_game.IsLive ? "live" : "idle")" aria-hidden="true"></span>@StateLabel()</span>
+        </header>
+
+        <section class="board" aria-label="@Loc["ModeLeaderboard"]">
+            @if (_moment is not null)
+            {
+                <div class="board__moment" role="status"><i class="icon-arrow-up" aria-hidden="true"></i>@_moment</div>
+            }
+            @if (_rows.Count == 0)
+            {
+                <p class="board__empty">@Loc["Waiting"]</p>
+            }
+            <ol class="board__rows">
+                @foreach (var row in _rows)
+                {
+                    <li class="row row--@row.Index @(row.Entry.ParticipantId == _liftedId ? "row--lift" : "")" @key="row.Entry.ParticipantId">
+                        <span class="row__rank"><span class="visually-hidden">@Loc["Rank"] </span>@row.Entry.Rank</span>
+                        <span class="row__change @(row.Change > 0 ? "row__change--up" : row.Change < 0 ? "row__change--down" : "")">
+                            @if (row.Change != 0)
+                            {
+                                <i class="@(row.Change > 0 ? "icon-arrow-up" : "icon-arrow-down")" aria-hidden="true"></i>@Math.Abs(row.Change)
+                                <span class="visually-hidden">@(row.Change > 0 ? string.Format(Loc["MovedUp"], row.Change) : string.Format(Loc["MovedDown"], -row.Change))</span>
+                            }
+                        </span>
+                        <span class="row__avatar avatar-@AvatarIndex(row.Entry.ParticipantId)" aria-hidden="true">@Initials(row.Entry.Nickname)</span>
+                        <span class="row__name">@row.Entry.Nickname</span>
+                        <span class="row__score">@row.Entry.TotalScore</span>
+                    </li>
+                }
+            </ol>
+        </section>
+
+        <aside class="side">
+            <div class="side__join">
+                <div class="side__title">@Loc["JoinTitle"]</div>
+                <QrView Text="@_joinUrl" />
+                <div class="side__host">@Host</div>
+                <div class="side__code">@_game.JoinCode</div>
             </div>
-
-            <div class="content">
-                <div class="leaderboard-section">
-                    <h2>Leaderboard</h2>
-                    <div class="leaderboard">
-                        @foreach (var pos in _leaderboard)
-                        {
-                            <div class="rank-row" style="--rank-index: @(pos.Rank);" @key="pos.ParticipantId">
-                                <span class="rank">#@pos.Rank</span>
-                                <span class="name">@pos.Nickname</span>
-                                <span class="score">@pos.TotalScore</span>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                <div class="ticker-section">
-                    <h2>Latest Points</h2>
-                    <div class="ticker">
-                        @foreach (var score in _recentScores.Where(s => s.Status != "Voided"))
-                        {
-                            var elName = _elements.FirstOrDefault(e => e.Id == score.ElementId)?.Name ?? "Unknown";
-                            var ruleLabel = _rules.FirstOrDefault(r => r.Id == score.RuleId)?.Label ?? "Unknown";
-
-                            <div class="score-card" @key="score.Id">
-                                <div class="score-details">
-                                    <strong>@elName</strong>
-                                    <div class="rule-label">@ruleLabel</div>
-                                </div>
-                                <div><span class="badge @(score.PointsSnapshot > 0 ? "bonus" : "penalty")">@(score.PointsSnapshot > 0 ? "+" : "")@score.PointsSnapshot</span></div>
-                            </div>
-                        }
-                    </div>
-                </div>
+            <div class="side__count">
+                <div class="side__count-label">@Loc["Players"]</div>
+                <div class="side__count-value">@_total</div>
             </div>
-        </div>
+        </aside>
+
+        <footer class="ticker" aria-label="@Loc["LatestPoints"]">
+            <span class="ticker__tag">@Loc["LatestPoints"]</span>
+            @foreach (var item in TickerItems())
+            {
+                <span class="ticker__item @(item.Points < 0 ? "ticker__item--penalty" : "")">
+                    <span class="ticker__points">@ParticipantFormat.Points(item.Points)</span>
+                    <span class="ticker__who">@item.Who</span>
+                    <span class="ticker__rule">@item.Rule</span>
+                </span>
+            }
+        </footer>
     }
+
+    <div class="controls @(_controlsVisible ? "controls--visible" : "")" role="toolbar" aria-label="@Loc["Controls"]">
+        @foreach (var mode in Modes)
+        {
+            <button type="button" class="controls__btn @(_mode == mode ? "controls__btn--on" : "")" aria-pressed="@(_mode == mode ? "true" : "false")" @onclick="() => SetMode(mode)">
+                @ModeLabel(mode)
+            </button>
+        }
+        <button type="button" class="controls__btn" aria-pressed="@(_paused ? "true" : "false")" @onclick="TogglePause">@(_paused ? Loc["Resume"] : Loc["Pause"])</button>
+        <button type="button" class="controls__btn" @onclick="FullscreenAsync">@Loc["Fullscreen"]</button>
+        <span class="controls__hint">@Loc["Shortcuts"]</span>
+    </div>
 </div>
 
-<style>
-    .big-screen {
-        width: 100vw;
-        height: 100vh;
-        background: var(--color-ink, #111);
-        color: var(--color-surface, #fff);
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .kiosk-mode {
-        cursor: none;
-    }
-
-    .layout-grid {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        padding: 40px; /* Safe area */
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 120px;
-        margin-bottom: 30px;
-    }
-
-    .brand {
-        font-size: 3rem;
-        font-weight: 800;
-        letter-spacing: -1px;
-    }
-
-    .qr-box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: var(--color-surface, #fff);
-        color: var(--color-ink, #000);
-        padding: 10px;
-        border-radius: 12px;
-        font-weight: bold;
-    }
-    
-    .qr-box .qr-container {
-        width: 80px;
-        height: 80px;
-    }
-
-    .content {
-        flex: 1;
-        display: flex;
-        gap: 60px;
-        overflow: hidden;
-    }
-
-    .leaderboard-section {
-        flex: 2;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .ticker-section {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        border-left: 2px solid var(--color-ink-2, #333);
-        padding-left: 40px;
-    }
-
-    h2 {
-        font-size: 2rem;
-        margin-bottom: 20px;
-        color: var(--color-line-strong, #888);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-
-    .leaderboard {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .rank-row {
-        display: flex;
-        align-items: center;
-        background: var(--color-ink-2, #222);
-        padding: 20px 30px;
-        border-radius: 12px;
-        font-size: 1.8rem;
-        transition: transform 0.5s ease-in-out;
-        animation: fadein 0.5s;
-    }
-    
-    @@keyframes fadein {
-        from { opacity: 0; transform: translateY(10px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @@media (prefers-reduced-motion: no-preference) {
-        .rank-row {
-            /* Example animation placeholder */
-        }
-    }
-
-    .rank {
-        width: 80px;
-        font-weight: 900;
-        color: #ffcc00;
-    }
-
-    .name {
-        flex: 1;
-        font-weight: 600;
-    }
-
-    .score {
-        font-weight: 800;
-        font-size: 2rem;
-    }
-
-    .ticker {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .score-card {
-        background: var(--color-ink-2, #222);
-        padding: 20px;
-        border-radius: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 1.5rem;
-    }
-
-    .score-details {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .rule-label {
-        font-size: 1rem;
-        color: #aaa;
-        margin-top: 5px;
-    }
-
-    .badge {
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-weight: bold;
-    }
-
-    .bonus { background: #28a745; color: #fff; }
-    .penalty { background: #dc3545; color: #fff; }
-
-</style>
-
 @code {
-    [Parameter] public Guid GameId { get; set; }
-    
-    private bool _loading = true;
-    private bool _kiosk = true;
-    
-    private string _gameName = "FantaRoster";
-    private string _joinUrl = "";
-    
-    private List<LeaderboardDto> _leaderboard = new();
-    private List<ScoreEntryDto> _recentScores = new();
+    private enum StageMode { Leaderboard, Join, Auto }
 
-    private List<ElementDto> _elements = new();
-    private List<RuleDto> _rules = new();
+    private sealed record Row(int Index, LeaderboardEntry Entry, int Change);
+
+    private sealed record TickerItem(string Who, string Rule, int Points);
+
+    private const int RowCount = 8;
+    private const int TickerCount = 3;
+    private static readonly StageMode[] Modes = [StageMode.Leaderboard, StageMode.Join, StageMode.Auto];
+    private static readonly TimeSpan ControlsHideAfter = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan MomentDuration = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan LiftDuration = TimeSpan.FromMilliseconds(1200);
+    private static readonly TimeSpan BoardDuration = TimeSpan.FromSeconds(20);
+    private static readonly TimeSpan JoinDuration = TimeSpan.FromSeconds(10);
+
+    [Parameter] public Guid GameId { get; set; }
+
+    private GameInfo? _game;
+    private bool _notFound;
+    private string _joinUrl = string.Empty;
+    private int _total;
+    private List<Row> _rows = [];
+    private Dictionary<Guid, int> _previousRanks = [];
+    private List<RefereeEntry> _recent = [];
+    private IReadOnlyList<AvailableElement> _elements = [];
+    private IReadOnlyList<GameRule> _rules = [];
+    private long _version = -1;
+
+    private StageMode _mode = StageMode.Auto;
+    private bool _paused;
+    private bool _autoShowsJoin;
+    private TimeSpan _autoElapsed;
+    // Hidden until the mouse moves or a key is pressed: a projector must not show UI by itself.
+    private bool _controlsVisible;
+    private string? _moment;
+    private Guid? _liftedId;
+    private ElementReference _root;
+    private ITimer? _clock;
+    private ITimer? _hideControls;
+    private ITimer? _hideMoment;
+    private ITimer? _hideLift;
+    private bool _focusRoot;
+
+    private string Host => new Uri(Nav.Uri).Authority;
+
+    /// <summary>Before the start there is nothing to rank: the join screen is the whole point of the display.</summary>
+    private bool ShowJoin => _mode == StageMode.Join
+        || (_mode == StageMode.Auto && (_game?.IsBeforeStart == true || _autoShowsJoin));
 
     protected override async Task OnInitializedAsync()
     {
         var uri = new Uri(Nav.Uri);
         _joinUrl = $"{uri.Scheme}://{uri.Authority}/games/{GameId}/join";
+        _mode = uri.Query.Contains("mode=join", StringComparison.OrdinalIgnoreCase) ? StageMode.Join : StageMode.Auto;
 
-        await LoadDataAsync();
+        HubClient.OnLeaderboardUpdated += OnHubEvent;
+        HubClient.OnScoreEntryAdded += OnHubEvent;
+        HubClient.OnScoreEntryVoided += OnHubEvent;
+        HubClient.OnGameStateChanged += OnGameState;
+        HubClient.OnReconnected += OnReconnected;
 
-        HubClient.OnLeaderboardUpdated += OnLeaderboardUpdated;
-        HubClient.OnScoreEntryAdded += OnScoreEntryAdded;
-        HubClient.OnScoreEntryVoided += OnScoreEntryVoided;
-        
+        await LoadAsync();
         await HubClient.StartAsync(GameId);
 
-        _loading = false;
+        _clock = Time.CreateTimer(_ => InvokeAsync(Tick), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+        _hideControls = Time.CreateTimer(_ => InvokeAsync(HideControls), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        _focusRoot = true;
     }
 
-    private async Task LoadDataAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusRoot)
+        {
+            _focusRoot = false;
+            await _root.FocusAsync();
+        }
+    }
+
+    private async Task LoadAsync()
     {
         try
         {
-            var lbTask = Http.GetFromJsonAsync<LeaderboardResponseDto>($"/api/games/{GameId}/participant/leaderboard");
-            var scoresTask = Http.GetFromJsonAsync<List<ScoreEntryDto>>($"/api/games/{GameId}/score-entries?count=5");
-            var elementsTask = Http.GetFromJsonAsync<List<ElementDto>>($"/api/games/{GameId}/elements");
-            var rulesTask = Http.GetFromJsonAsync<List<RuleDto>>($"/api/games/{GameId}/rules");
-            var gameInfoTask = Http.GetFromJsonAsync<GameInfoDto>($"/api/games/{GameId}"); 
-
-            await Task.WhenAll(lbTask!, scoresTask!, elementsTask!, rulesTask!);
-            
-            var lb = lbTask.Result;
-            if (lb != null && lb.TopPositions != null)
+            using var gameResponse = await Http.GetAsync(new Uri($"/api/games/{GameId}", UriKind.Relative));
+            if (gameResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                _leaderboard = lb.TopPositions.ToList();
+                _notFound = true;
+                return;
             }
+            gameResponse.EnsureSuccessStatusCode();
+            _game = await gameResponse.Content.ReadFromJsonAsync<GameInfo>();
 
-            _recentScores = scoresTask.Result ?? new();
-            _elements = elementsTask.Result ?? new();
-            _rules = rulesTask.Result ?? new();
-
-            try {
-                var gameInfo = await gameInfoTask!;
-                if (gameInfo != null) _gameName = gameInfo.Name;
-            } catch { }
-            StateHasChanged();
+            _elements = await Http.GetFromJsonAsync<List<AvailableElement>>($"/api/games/{GameId}/elements") ?? [];
+            _rules = await Http.GetFromJsonAsync<List<GameRule>>($"/api/games/{GameId}/rules") ?? [];
+            await RefreshBoardAsync();
         }
-        catch { }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException)
+        {
+            // Kiosk: keep what is on screen and retry on the next event or reconnection.
+        }
     }
 
-    private void OnLeaderboardUpdated(long version)
+    private async Task RefreshBoardAsync()
     {
-        _ = InvokeAsync(LoadDataAsync);
+        // The big screen has no participant: the anonymous projection of the leaderboard is enough.
+        var board = await Http.GetFromJsonAsync<LeaderboardResponse>($"/api/games/{GameId}/leaderboard");
+        _recent = await Http.GetFromJsonAsync<List<RefereeEntry>>($"/api/games/{GameId}/score-entries?count=10") ?? [];
+        if (board is null || board.Version < _version)
+        {
+            return;
+        }
+
+        _version = board.Version;
+        _total = board.TotalParticipants;
+
+        var top = board.TopPositions.OrderBy(p => p.Rank).Take(RowCount).ToList();
+        var rows = new List<Row>();
+        Row? biggestClimb = null;
+        for (var i = 0; i < top.Count; i++)
+        {
+            var change = _previousRanks.TryGetValue(top[i].ParticipantId, out var before) ? before - top[i].Rank : 0;
+            var row = new Row(i, top[i], change);
+            rows.Add(row);
+            if (change > 0 && (biggestClimb is null || change > biggestClimb.Change))
+            {
+                biggestClimb = row;
+            }
+        }
+
+        _previousRanks = board.TopPositions.ToDictionary(p => p.ParticipantId, p => p.Rank);
+        _rows = rows;
+
+        if (biggestClimb is not null)
+        {
+            AnnounceClimb(biggestClimb);
+        }
+        StateHasChanged();
     }
 
-    private void OnScoreEntryAdded(Guid entryId)
+    private void AnnounceClimb(Row row)
     {
-        _ = InvokeAsync(LoadDataAsync);
+        _moment = string.Format(Loc["Climbs"], row.Entry.Nickname, row.Change);
+        _liftedId = row.Entry.ParticipantId;
+        _hideMoment?.Dispose();
+        _hideMoment = Time.CreateTimer(_ => InvokeAsync(() => { _moment = null; StateHasChanged(); }), null, MomentDuration, Timeout.InfiniteTimeSpan);
+        _hideLift?.Dispose();
+        _hideLift = Time.CreateTimer(_ => InvokeAsync(() => { _liftedId = null; StateHasChanged(); }), null, LiftDuration, Timeout.InfiniteTimeSpan);
     }
 
-    private void OnScoreEntryVoided(Guid entryId)
+    private async void OnHubEvent(long _) => await RefreshSafelyAsync();
+
+    private async void OnHubEvent(Guid _) => await RefreshSafelyAsync();
+
+    private async void OnGameState(string state)
     {
-        _ = InvokeAsync(LoadDataAsync);
+        if (_game is not null)
+        {
+            _game = _game with { State = state };
+            await InvokeAsync(StateHasChanged);
+        }
     }
+
+    private async void OnReconnected() => await RefreshSafelyAsync();
+
+    private async Task RefreshSafelyAsync()
+    {
+        try
+        {
+            await InvokeAsync(RefreshBoardAsync);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException)
+        {
+            // Offline: the next event catches up.
+        }
+    }
+
+    private void Tick()
+    {
+        if (_mode != StageMode.Auto || _paused || _game is null || _game.IsBeforeStart)
+        {
+            return;
+        }
+
+        _autoElapsed += TimeSpan.FromSeconds(1);
+        var limit = _autoShowsJoin ? JoinDuration : BoardDuration;
+        if (_autoElapsed >= limit)
+        {
+            _autoShowsJoin = !_autoShowsJoin;
+            _autoElapsed = TimeSpan.Zero;
+        }
+        StateHasChanged();
+    }
+
+    private IEnumerable<TickerItem> TickerItems() => _recent
+        .Where(e => e.Status != "Voided")
+        .Take(TickerCount)
+        .Select(e => new TickerItem(
+            _elements.FirstOrDefault(el => el.Id == e.ElementId)?.Name ?? string.Empty,
+            _rules.FirstOrDefault(r => r.Id == e.RuleId)?.Label ?? string.Empty,
+            e.PointsSnapshot));
+
+    private string StateLabel() => _game!.IsLive ? Loc["Live"] : _game.IsOver ? Loc["Ended"] : Loc["NotStarted"];
+
+    private string JoinBody()
+    {
+        var plural = _game!.Terms.ElementPlural.ToLower(System.Globalization.CultureInfo.CurrentCulture);
+        return string.Format(Loc[_game.CaptainEnabled ? "StillTimeBodyCaptain" : "StillTimeBody"], _game.LineupSize, plural);
+    }
+
+    private string ModeLabel(StageMode mode) => mode switch
+    {
+        StageMode.Leaderboard => Loc["ModeLeaderboard"],
+        StageMode.Join => Loc["ModeJoin"],
+        _ => Loc["ModeAuto"],
+    };
+
+    private void SetMode(StageMode mode)
+    {
+        _mode = mode;
+        _autoShowsJoin = false;
+        _autoElapsed = TimeSpan.Zero;
+    }
+
+    private void TogglePause() => _paused = !_paused;
+
+    private async Task FullscreenAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("document.documentElement.requestFullscreen");
+        }
+        catch (JSException)
+        {
+            // The browser refused (no user gesture): nothing to do.
+        }
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        ShowControls();
+        switch (e.Key)
+        {
+            case "f" or "F":
+                await FullscreenAsync();
+                break;
+            case " ":
+                TogglePause();
+                break;
+        }
+    }
+
+    private void ShowControls()
+    {
+        if (!_controlsVisible)
+        {
+            _controlsVisible = true;
+        }
+        _hideControls?.Change(ControlsHideAfter, Timeout.InfiniteTimeSpan);
+    }
+
+    private void HideControls()
+    {
+        _controlsVisible = false;
+        StateHasChanged();
+    }
+
+    private static int AvatarIndex(Guid id) => Roster.Ui.Components.AvatarText.ColorIndex(id.ToString());
+
+    private static string Initials(string name) => Roster.Ui.Components.AvatarText.Initials(name);
 
     public async ValueTask DisposeAsync()
     {
-        HubClient.OnLeaderboardUpdated -= OnLeaderboardUpdated;
-        HubClient.OnScoreEntryAdded -= OnScoreEntryAdded;
-        HubClient.OnScoreEntryVoided -= OnScoreEntryVoided;
+        HubClient.OnLeaderboardUpdated -= OnHubEvent;
+        HubClient.OnScoreEntryAdded -= OnHubEvent;
+        HubClient.OnScoreEntryVoided -= OnHubEvent;
+        HubClient.OnGameStateChanged -= OnGameState;
+        HubClient.OnReconnected -= OnReconnected;
+        _clock?.Dispose();
+        _hideControls?.Dispose();
+        _hideMoment?.Dispose();
+        _hideLift?.Dispose();
         await HubClient.DisposeAsync();
-    }
-
-    // Local DTOs
-    public class LeaderboardResponseDto
-    {
-        public LeaderboardDto? MyPosition { get; set; }
-        public List<LeaderboardDto> TopPositions { get; set; } = new();
-    }
-
-    public class LeaderboardDto
-    {
-        public int Rank { get; set; }
-        public Guid ParticipantId { get; set; }
-        public string Nickname { get; set; } = "";
-        public int TotalScore { get; set; }
-    }
-
-    public class ScoreEntryDto
-    {
-        public Guid Id { get; set; }
-        public Guid? ElementId { get; set; }
-        public Guid RuleId { get; set; }
-        public int PointsSnapshot { get; set; }
-        public string Status { get; set; } = "";
-    }
-
-    public class ElementDto { public Guid Id { get; set; } public string Name { get; set; } = ""; }
-    public class RuleDto { public Guid Id { get; set; } public string Label { get; set; } = ""; }
-    
-    public class GameInfoDto
-    {
-        public string Name { get; set; } = "";
     }
 }

@@ -1,4 +1,7 @@
+/* Letterbox: the stage keeps 16:9 and the rest of the screen stays the stage color. */
 .stage-surface {
+    display: grid;
+    place-items: center;
     height: 100dvh;
     overflow: hidden;
     background: var(--stage-bg);

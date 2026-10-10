@@ -1,0 +1,253 @@
+@using System.Security.Claims
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.Authorization
+@using Roster.Domain.Games
+@using Roster.Infrastructure.Security
+@using Roster.Ui.Components
+@implements IDisposable
+@inject IStringLocalizer<SharedResource> Loc
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject OrganizerContext Context
+
+@* Organizer shell (mockup 06): account level (my games) and game level (overview, elements, rules, ...).
+   Sidebar from 1024 px; on phones a top bar and a drawer. Interactive island: the layout itself is static. *@
+<header class="org-topbar">
+    <button type="button" class="org-icon-btn" aria-label="@Loc["MenuOpen"]" aria-expanded="@(_drawer ? "true" : "false")" aria-controls="org-sidebar" @ref="_menuButton" @onclick="OpenDrawer">
+        <i class="icon-menu" aria-hidden="true"></i>
+    </button>
+    @if (_gameId is not null)
+    {
+        <div class="org-topbar__game">
+            <span class="org-topbar__state">@if (_game is { } topGame){<span class="org-dot org-dot--@StateClass(topGame.State)" aria-hidden="true"></span>@Loc["State" + topGame.State]}</span>
+            <span class="org-topbar__name">@_game?.Name</span>
+        </div>
+        <a class="org-icon-btn" href="/games/@_gameId/big-screen" target="_blank" rel="noopener" aria-label="@Loc["OpenBigScreen"]">
+            <i class="icon-monitor" aria-hidden="true"></i>
+        </a>
+    }
+    else
+    {
+        <a href="/organizer" class="org-brand org-brand--bar"><img src="assets/logo-r.svg" alt="" /><BrandWordmark /></a>
+        <span class="org-avatar" aria-hidden="true">@_initials</span>
+    }
+</header>
+
+@if (_drawer)
+{
+    <button type="button" class="ds-scrim org-scrim" tabindex="-1" aria-label="@Loc["MenuClose"]" @onclick="CloseDrawer"></button>
+}
+
+<aside id="org-sidebar" class="org-sidebar @(_drawer ? "org-sidebar--open" : "")" tabindex="-1" @ref="_sidebar" @onkeydown="OnKeyDown">
+    <div class="org-sidebar__head">
+        <a href="/organizer" class="org-brand"><img src="assets/logo-r.svg" alt="" /><BrandWordmark /></a>
+        <button type="button" class="org-icon-btn org-close" aria-label="@Loc["MenuClose"]" @onclick="CloseDrawer">
+            <i class="icon-x" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    @if (_gameId is { } gameId)
+    {
+        <a href="/organizer" class="org-game" aria-label="@Loc["BackToGames"]">
+            <span class="org-dot org-dot--@(_game is { } current ? StateClass(current.State) : "draft")" aria-hidden="true"></span>
+            <span class="org-game__name">@_game?.Name</span>
+            <i class="icon-arrow-left" aria-hidden="true"></i>
+        </a>
+        <nav class="org-nav" aria-label="@Loc["MainNavLabel"]">
+            @foreach (var item in GameNav())
+            {
+                <a href="@item.Href" class="org-nav-item" aria-current="@(item.Active ? "page" : null)" @onclick="CloseDrawer">
+                    <i class="@item.Icon" aria-hidden="true"></i>
+                    <span>@item.Label</span>
+                    @if (item.Badge > 0)
+                    {
+                        <span class="org-badge"><span class="visually-hidden">@Loc["ToDo"] </span>@item.Badge</span>
+                    }
+                </a>
+            }
+        </nav>
+        <div class="org-links">
+            <a href="/games/@gameId/big-screen" target="_blank" rel="noopener" class="org-nav-item">
+                <i class="icon-monitor" aria-hidden="true"></i><span>@Loc["OpenBigScreen"]</span><i class="icon-external-link org-external" aria-hidden="true"></i><span class="visually-hidden">@Loc["OpensNewTab"]</span>
+            </a>
+            <a href="/j" target="_blank" rel="noopener" class="org-nav-item">
+                <i class="icon-eye" aria-hidden="true"></i><span>@Loc["ViewAsPlayer"]</span><i class="icon-external-link org-external" aria-hidden="true"></i><span class="visually-hidden">@Loc["OpensNewTab"]</span>
+            </a>
+        </div>
+    }
+    else
+    {
+        <nav class="org-nav" aria-label="@Loc["MainNavLabel"]">
+            <a href="/organizer" class="org-nav-item" aria-current="@(IsAccountHome ? "page" : null)" @onclick="CloseDrawer">
+                <i class="icon-layout-grid" aria-hidden="true"></i><span>@Loc["DashboardTitle"]</span>
+            </a>
+        </nav>
+        <div class="org-plan">
+            <div class="org-plan-title">@Loc["PlanFree"]</div>
+            <div class="org-plan-desc">@Loc["PlanFreeDesc"]</div>
+        </div>
+    }
+
+    <div class="org-account">
+        <button type="button" class="org-account-btn" aria-haspopup="menu" aria-expanded="@(_account ? "true" : "false")" @onclick="ToggleAccount">
+            <span class="org-avatar" aria-hidden="true">@_initials</span>
+            <span class="org-account-info">
+                <span class="org-account-name">@_displayName</span>
+                <span class="org-account-email">@_email</span>
+            </span>
+            <i class="icon-chevrons-up-down" aria-hidden="true"></i>
+            <span class="visually-hidden">@Loc["AccountMenu"]</span>
+        </button>
+        @if (_account)
+        {
+            <div class="org-menu" role="menu">
+                <ThemeToggle CssClass="org-menu-item" ShowCaption="true" />
+                <hr class="ds-menu-separator" />
+                <form method="post" action="/auth/logout">
+                    <button type="submit" class="org-menu-item org-menu-item--danger" role="menuitem">
+                        <i class="icon-log-out" aria-hidden="true"></i><span>@Loc["SignOut"]</span>
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</aside>
+
+@code {
+    private static readonly Regex GameRoute = new(@"^organizer/games/(?<id>[0-9a-fA-F-]{36})(/(?<section>[a-z-]+))?/?$", RegexOptions.Compiled);
+
+    private sealed record NavItem(string Href, string Icon, string Label, bool Active, int Badge = 0);
+
+    private string _displayName = string.Empty;
+    private string _email = string.Empty;
+    private string _initials = string.Empty;
+    private bool _drawer;
+    private bool _account;
+    private Guid? _gameId;
+    private string _section = string.Empty;
+
+    // The page publishes the game once it is loaded; until then the shell shows the navigation only.
+    private OrganizerGameInfo? _game => Context.Game is { } g && g.Id == _gameId ? g : null;
+
+    private int _pendingConsents => Context.PendingConsents;
+
+    private bool IsAccountHome => _game is null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
+        _email = user.FindFirstValue(ClaimTypes.Email) ?? user.Identity?.Name ?? string.Empty;
+        _displayName = user.FindFirstValue(OrganizerClaimsPrincipalFactory.DisplayNameClaimType) ?? _email.Split('@')[0];
+        _initials = Initials(_displayName);
+
+        Navigation.LocationChanged += OnLocationChanged;
+        Context.Changed += OnContextChanged;
+        ReadRoute();
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+        Context.Changed -= OnContextChanged;
+    }
+
+    private void OnContextChanged() => InvokeAsync(StateHasChanged);
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e) =>
+        InvokeAsync(() =>
+        {
+            _drawer = false;
+            _account = false;
+            ReadRoute();
+            StateHasChanged();
+        });
+
+    private void ReadRoute()
+    {
+        var match = GameRoute.Match(Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0]);
+        if (match.Success && Guid.TryParse(match.Groups["id"].Value, out var id))
+        {
+            _gameId = id;
+            _section = match.Groups["section"].Value;
+        }
+        else
+        {
+            _gameId = null;
+            _section = string.Empty;
+        }
+    }
+
+    private IEnumerable<NavItem> GameNav()
+    {
+        var root = $"/organizer/games/{_gameId}";
+        yield return new NavItem(root, "icon-layout-dashboard", Loc["NavOverview"], _section.Length == 0);
+        yield return new NavItem($"{root}/elements", "icon-users", Loc["NavElements"], _section == "elements", _pendingConsents);
+        yield return new NavItem($"{root}/rules", "icon-scale", Loc["NavRules"], _section == "rules");
+        yield return new NavItem($"{root}/referees", "icon-flag", Loc["NavReferees"], _section == "referees");
+        yield return new NavItem($"{root}/control", "icon-radio", Loc["NavControl"], _section == "control");
+        yield return new NavItem($"{root}/materials", "icon-qr-code", Loc["NavMaterials"], _section == "materials");
+        yield return new NavItem($"{root}/settings", "icon-settings", Loc["NavSettings"], _section == "settings");
+    }
+
+    private static string StateClass(GameState state) => state switch
+    {
+        GameState.Live => "live",
+        GameState.Open => "open",
+        GameState.Draft => "draft",
+        _ => "done",
+    };
+
+    private ElementReference _menuButton;
+    private ElementReference _sidebar;
+    private bool _focusSidebar;
+    private bool _restoreFocus;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Keyboard users: focus moves into the drawer when it opens and back to the button when it closes.
+        if (_focusSidebar)
+        {
+            _focusSidebar = false;
+            await _sidebar.FocusAsync();
+        }
+        else if (_restoreFocus)
+        {
+            _restoreFocus = false;
+            await _menuButton.FocusAsync();
+        }
+    }
+
+    private void OpenDrawer()
+    {
+        _drawer = true;
+        _focusSidebar = true;
+    }
+
+    private void CloseDrawer()
+    {
+        _restoreFocus = _drawer;
+        _drawer = false;
+        _account = false;
+    }
+
+    private void ToggleAccount() => _account = !_account;
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            CloseDrawer();
+        }
+    }
+
+    private static string Initials(string name)
+    {
+        var parts = name.Split([' ', '.', '_', '-'], StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length switch
+        {
+            0 => string.Empty,
+            1 => parts[0][..1].ToUpperInvariant(),
+            _ => string.Concat(parts[0][..1], parts[^1][..1]).ToUpperInvariant(),
+        };
+    }
+}

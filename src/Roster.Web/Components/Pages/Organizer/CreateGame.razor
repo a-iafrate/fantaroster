@@ -1,10 +1,11 @@
 @page "/organizer/create-game"
+@using System.Globalization
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
 @using Roster.Application.Ports
 @using Roster.DomainPacks
 @using Roster.Plugins.Abstractions
+@using Roster.Web.Client.Components.Participant
 @using Roster.Web.Components.Pages.Organizer
 @using Roster.Web.Options
 @attribute [Authorize]
@@ -19,270 +20,242 @@
 
 <PageTitle>@Loc["CreateGameTitle"]</PageTitle>
 
-<div class="create-game-container">
-    <!-- Header / Stepper -->
-    <div class="cg-header">
-        <a href="/organizer" class="cg-close"><i class="icon-x"></i></a>
-        <div class="cg-title">@Loc["CreateGameTitle"]</div>
-        <div class="cg-stepper">
+@* New game wizard (mockup 03, screen 10): "Step N of 6" with a progress bar on phones, labeled steps from 1024 px. *@
+<div class="wiz">
+    <header class="wiz__bar">
+        <a href="/organizer" class="ds-icon-btn wiz__close" aria-label="@Loc["WizardClose"]"><i class="icon-x" aria-hidden="true"></i></a>
+        <div class="wiz__bar-title">
+            <span class="wiz__phone-step">@string.Format(Loc["StepOfTotal"], CurrentStep, Steps.Length)</span>
+            <span class="wiz__desktop-title">@Loc["CreateGameTitle"]</span>
+        </div>
+        <ol class="wiz__stepper" aria-label="@Loc["CreateGameTitle"]">
             @foreach (var step in Steps)
             {
-                var isDone = step.Number < CurrentStep;
-                var isCurrent = step.Number == CurrentStep;
-                
-                <div class="cg-step @(isDone ? "done" : "") @(isCurrent ? "current" : "")">
-                    <span class="cg-step-num">
-                        @(isDone ? "✓" : step.Number.ToString())
-                    </span>
-                    @step.Label
-                    @if (step.Number < Steps.Length)
-                    {
-                        <span class="cg-step-line"></span>
-                    }
-                </div>
+                <li class="wiz__step @(step.Number < CurrentStep ? "wiz__step--done" : "") @(step.Number == CurrentStep ? "wiz__step--current" : "")" aria-current="@(step.Number == CurrentStep ? "step" : null)">
+                    <span class="wiz__step-num" aria-hidden="true">@(step.Number < CurrentStep ? "✓" : step.Number.ToString())</span>
+                    <span>@step.Label</span>
+                </li>
             }
-        </div>
+        </ol>
+    </header>
+    <div class="wiz__progress" aria-hidden="true">
+        @foreach (var step in Steps)
+        {
+            <span class="wiz__segment @(step.Number <= CurrentStep ? "wiz__segment--on" : "")"></span>
+        }
     </div>
 
-    <!-- Main Content Area -->
-    <div class="cg-main">
-        <div class="cg-content">
-            
+    <main class="wiz__main">
+        <div class="wiz__content">
             @if (CurrentStep == 1)
             {
-                <!-- STEP 1: Domain Pack -->
-                <div class="cg-step-title">@Loc["CreateGameStep1Title"]</div>
-                <div class="cg-grid-2">
+                <h1 class="wiz__title" tabindex="-1" @ref="_title">@Loc["CreateGameStep1Title"]</h1>
+                <div class="wiz__choices" role="radiogroup" aria-label="@Loc["CreateGameStep1Title"]">
                     @foreach (var pack in DomainPacks)
                     {
                         var isSelected = _state.DomainPackId == pack.Id;
-                        var icon = pack.Id == "tech-conference" ? "icon-mic" : pack.Id == "generic" ? "icon-sparkles" : "icon-trophy";
-
-                        <div @onclick="() => SelectDomainPack(pack.Id)" class="cg-pack-card @(isSelected ? "selected" : "")">
-                            <div class="cg-pack-icon">
-                                <i class="@icon"></i>
-                            </div>
-                            <div style="flex:1">
-                                <div class="cg-pack-name">@(pack.Name.TryGetValue(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, out var n) || pack.Name.TryGetValue("en", out n) ? n : pack.Id)</div>
-                                <div class="cg-pack-desc">@(pack.Description.TryGetValue(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, out var d) || pack.Description.TryGetValue("en", out d) ? d : "")</div>
-                            </div>
-                        </div>
+                        <button type="button" role="radio" aria-checked="@(isSelected ? "true" : "false")" class="wiz__choice @(isSelected ? "wiz__choice--selected" : "")" @onclick="() => SelectDomainPack(pack.Id)">
+                            <span class="wiz__choice-icon" aria-hidden="true"><i class="@(string.IsNullOrEmpty(pack.Icon) ? "icon-sparkles" : pack.Icon)"></i></span>
+                            <span class="wiz__choice-text">
+                                <span class="wiz__choice-name">@Localized(pack.Name, pack.Id)</span>
+                                <span class="wiz__choice-desc">@Localized(pack.Description, string.Empty)</span>
+                            </span>
+                        </button>
                     }
-                </div>
-                <div class="cg-bottom-nav right cg-mt-auto">
-                    <button @onclick="NextStep" disabled="@string.IsNullOrEmpty(_state.DomainPackId)" class="cg-btn-primary">
-                        @Loc["BtnContinue"]
-                    </button>
                 </div>
             }
             else if (CurrentStep == 2)
             {
-                <!-- STEP 2: Settings (Name, etc.) -->
-                <div class="cg-step-title">@Loc["CreateGameStep2Title"]</div>
-                
-                <EditForm Model="_state" OnValidSubmit="NextStep">
+                <h1 class="wiz__title" tabindex="-1" @ref="_title">@Loc["CreateGameStep2Title"]</h1>
+                <EditForm id="settings-form" Model="_state" OnValidSubmit="NextStep" class="ds-form wiz__form">
                     <DataAnnotationsValidator />
-                    <div class="cg-flex-col-16">
-                        <div class="cg-form-group">
-                            <label class="cg-label">@Loc["CreateGameNameLabel"]</label>
-                            <InputText @bind-Value="_state.Name" class="cg-input" />
-                            @if (context.GetValidationMessages(() => _state.Name).Any())
-                            {
-                                <div class="cg-validation-msg">@Loc[context.GetValidationMessages(() => _state.Name).First()]</div>
-                            }
-                        </div>
-                        
-                        <div class="cg-grid-2">
-                            <div class="cg-form-group">
-                                <label class="cg-label">@Loc["CreateGameLanguageLabel"]</label>
-                                <InputSelect @bind-Value="_state.Culture" class="cg-input">
-                                    <option value="en">@Loc["LangEnglish"]</option>
-                                    <option value="it">@Loc["LangItalian"]</option>
-                                </InputSelect>
-                            </div>
-                            <div class="cg-form-group">
-                                <label class="cg-label">@Loc["CreateGameLineupSizeLabel"]</label>
-                                <InputNumber @bind-Value="_state.LineupSize" class="cg-input" />
-                            </div>
-                        </div>
-
-                        <div class="cg-checkbox-group">
-                            <InputCheckbox @bind-Value="_state.CaptainEnabled" id="capt" class="cg-checkbox" />
-                            <label for="capt" class="cg-checkbox-label">@Loc["CreateGameCaptainLabel"]</label>
-                        </div>
-                        
-                        @if (_state.CaptainEnabled)
+                    <div class="ds-field">
+                        <label class="ds-label" for="game-name">@Loc["CreateGameNameLabel"]</label>
+                        <InputText id="game-name" @bind-Value="_state.Name" class="ds-input" maxlength="100" />
+                        @if (context.GetValidationMessages(() => _state.Name).Any())
                         {
-                            <div class="cg-form-group cg-mt-16">
-                                <label class="cg-label">@Loc["CreateGameCaptainMultiplierLabel"]</label>
-                                <InputNumber @bind-Value="_state.CaptainMultiplier" class="cg-input" step="0.5" />
-                            </div>
+                            <p class="ds-alert" role="alert">@Loc[context.GetValidationMessages(() => _state.Name).First()]</p>
                         }
                     </div>
-
-                    <div class="cg-bottom-nav cg-mt-40">
-                        <button type="button" @onclick="PrevStep" class="cg-btn-secondary">@Loc["BtnBack"]</button>
-                        <button type="submit" class="cg-btn-primary">@Loc["BtnContinue"]</button>
+                    <div class="wiz__pair">
+                        <div class="ds-field">
+                            <label class="ds-label" for="game-culture">@Loc["CreateGameLanguageLabel"]</label>
+                            <InputSelect id="game-culture" @bind-Value="_state.Culture" class="ds-select">
+                                <option value="en">@Loc["LangEnglish"]</option>
+                                <option value="it">@Loc["LangItalian"]</option>
+                            </InputSelect>
+                        </div>
+                        <div class="ds-field">
+                            <label class="ds-label" for="game-size">@Loc["CreateGameLineupSizeLabel"]</label>
+                            <InputNumber id="game-size" @bind-Value="_state.LineupSize" class="ds-input" inputmode="numeric" min="1" />
+                        </div>
                     </div>
+                    <label class="ds-switch" for="game-captain">
+                        <span>@Loc["CreateGameCaptainLabel"]</span>
+                        <InputCheckbox id="game-captain" @bind-Value="_state.CaptainEnabled" />
+                    </label>
+                    @if (_state.CaptainEnabled)
+                    {
+                        <div class="ds-field">
+                            <label class="ds-label" for="game-multiplier">@Loc["CreateGameCaptainMultiplierLabel"]</label>
+                            <InputNumber id="game-multiplier" @bind-Value="_state.CaptainMultiplier" class="ds-input" step="0.5" inputmode="decimal" />
+                        </div>
+                    }
                 </EditForm>
             }
             else if (CurrentStep == 3)
             {
-                <!-- STEP 3: Source -->
-                <div class="cg-step-title">@Loc["CreateGameStep3Title"]</div>
-                <div class="cg-step-desc">@Loc["CreateGameSourceDesc"]</div>
-                
-                <div class="cg-grid-3">
-                    <div @onclick="@(() => _state.SourceType = "sessionize")" class="cg-source-card @(_state.SourceType == "sessionize" ? "selected" : "")">
-                        <div class="cg-source-header">
-                            <i class="icon-calendar-range cg-source-icon"></i>
-                            @if(_state.SourceType == "sessionize") { <span class="cg-source-check"><i class="icon-check"></i></span> }
-                        </div>
-                        <div class="cg-source-name">@Loc["SourceSessionize"]</div>
-                        <div class="cg-source-desc">@Loc["SourceSessionizeDesc"]</div>
-                    </div>
-                    
-                    <div @onclick="@(() => _state.SourceType = "csv")" class="cg-source-card @(_state.SourceType == "csv" ? "selected" : "")">
-                        <div class="cg-source-header">
-                            <i class="icon-file-spreadsheet cg-source-icon"></i>
-                            @if(_state.SourceType == "csv") { <span class="cg-source-check"><i class="icon-check"></i></span> }
-                        </div>
-                        <div class="cg-source-name">@Loc["SourceCSV"]</div>
-                        <div class="cg-source-desc">@Loc["SourceCSVDesc"]</div>
-                    </div>
+                <h1 class="wiz__title" tabindex="-1" @ref="_title">@Loc["CreateGameStep3Title"]</h1>
+                <p class="ds-muted wiz__desc">@Loc["CreateGameSourceDesc"]</p>
 
-                    <div @onclick="@(() => _state.SourceType = "manual")" class="cg-source-card @(_state.SourceType == "manual" ? "selected" : "")">
-                        <div class="cg-source-header">
-                            <i class="icon-pencil-line cg-source-icon"></i>
-                            @if(_state.SourceType == "manual") { <span class="cg-source-check"><i class="icon-check"></i></span> }
-                        </div>
-                        <div class="cg-source-name">@Loc["SourceNone"]</div>
-                        <div class="cg-source-desc">@Loc["SourceNoneDesc"]</div>
-                    </div>
+                <div class="wiz__choices wiz__choices--sources" role="radiogroup" aria-label="@Loc["CreateGameStep3Title"]">
+                    @foreach (var plugin in SourcePlugins())
+                    {
+                        var selected = _state.SourceType == plugin.Id;
+                        <button type="button" role="radio" aria-checked="@(selected ? "true" : "false")" class="wiz__choice wiz__choice--stack @(selected ? "wiz__choice--selected" : "")" @onclick="() => _state.SourceType = plugin.Id">
+                            <span class="wiz__choice-head">
+                                <i class="icon-database wiz__source-icon" aria-hidden="true"></i>
+                                @if (selected)
+                                {
+                                    <span class="wiz__check" aria-hidden="true"><i class="icon-check"></i></span>
+                                }
+                            </span>
+                            <span class="wiz__choice-name">@plugin.DisplayName</span>
+                            <span class="wiz__choice-desc">@SourceDescription(plugin.Id)</span>
+                        </button>
+                    }
+                    <button type="button" role="radio" aria-checked="@(_state.SourceType == ManualSource ? "true" : "false")" class="wiz__choice wiz__choice--stack @(_state.SourceType == ManualSource ? "wiz__choice--selected" : "")" @onclick="() => _state.SourceType = ManualSource">
+                        <span class="wiz__choice-head">
+                            <i class="icon-pencil-line wiz__source-icon" aria-hidden="true"></i>
+                            @if (_state.SourceType == ManualSource)
+                            {
+                                <span class="wiz__check" aria-hidden="true"><i class="icon-check"></i></span>
+                            }
+                        </span>
+                        <span class="wiz__choice-name">@Loc["SourceNone"]</span>
+                        <span class="wiz__choice-desc">@Loc["SourceNoneDesc"]</span>
+                    </button>
                 </div>
 
-                                                @if (_state.SourceType != "manual")
+                @if (_state.SourceType != ManualSource && PluginRegistry.GetPlugin(_state.SourceType) is { } selectedPlugin)
                 {
-                    var plugin = PluginRegistry.GetPlugin(_state.SourceType);
-                    if (plugin != null)
-                    {
-                        var schema = plugin.GetConfigSchema();
-                        foreach (var field in schema.Fields)
+                    <div class="ds-form">
+                        @foreach (var field in selectedPlugin.GetConfigSchema().Fields)
                         {
-                            <div class="cg-form-group cg-mt-16">
-                                <div class="cg-label">@(Loc[field.Label] == null || Loc[field.Label].ResourceNotFound ? field.Label : Loc[field.Label]) @(field.IsRequired ? "*" : "(" + Loc["Optional"] + ")")</div>
+                            <div class="ds-field">
+                                <label class="ds-label" for="cfg-@field.Key">@FieldLabel(field.Label) @(field.IsRequired ? "*" : $"({Loc["Optional"]})")</label>
                                 @if (field.Type == "textarea")
                                 {
-                                    <textarea value="@GetConfigValue(field.Key)" @onchange="@(e => SetConfigValue(field.Key, e.Value?.ToString()))" class="cg-input" rows="5" placeholder="@field.Description"></textarea>
+                                    <textarea id="cfg-@field.Key" value="@GetConfigValue(field.Key)" @onchange="@(e => SetConfigValue(field.Key, e.Value?.ToString()))" class="ds-input wiz__textarea" rows="5" placeholder="@field.Description"></textarea>
                                 }
                                 else if (field.Type == "checkbox")
                                 {
-                                    <div class="cg-checkbox-group">
-                                        <input type="checkbox" checked="@(GetConfigValue(field.Key) == "true")" @onchange="@(e => SetConfigValue(field.Key, ((bool?)e.Value) == true ? "true" : "false"))" id="@field.Key" class="cg-checkbox" />
-                                        <label for="@field.Key" class="cg-checkbox-label">@field.Description</label>
-                                    </div>
+                                    <label class="ds-switch" for="cfg-@field.Key">
+                                        <span>@field.Description</span>
+                                        <input type="checkbox" id="cfg-@field.Key" checked="@(GetConfigValue(field.Key) == "true")" @onchange="@(e => SetConfigValue(field.Key, ((bool?)e.Value) == true ? "true" : "false"))" />
+                                    </label>
                                 }
                                 else
                                 {
-                                    <input type="text" value="@GetConfigValue(field.Key)" @onchange="@(e => SetConfigValue(field.Key, e.Value?.ToString()))" class="cg-input cg-input-code" placeholder="@field.Description" />
+                                    <input id="cfg-@field.Key" type="text" value="@GetConfigValue(field.Key)" @onchange="@(e => SetConfigValue(field.Key, e.Value?.ToString()))" class="ds-input wiz__code" placeholder="@field.Description" autocomplete="off" spellcheck="false" />
                                 }
                             </div>
                         }
-                    }
+                    </div>
                 }
+
                 @if (!string.IsNullOrEmpty(SourceTestResult))
                 {
-                    <div class="cg-alert-success cg-mt-16"><i class="icon-check"></i>@SourceTestResult</div>
+                    <p class="ds-alert ds-alert--success" role="status"><i class="icon-check" aria-hidden="true"></i> @SourceTestResult</p>
                 }
                 @if (!string.IsNullOrEmpty(SourceTestError))
                 {
-                    <div class="cg-alert-error cg-mt-16" style="white-space: pre-wrap;"><i class="icon-x"></i>@SourceTestError</div>
+                    <p class="ds-alert wiz__multiline" role="alert"><i class="icon-x" aria-hidden="true"></i> @SourceTestError</p>
                 }
-
-                <div class="cg-bottom-nav cg-mt-auto">
-                    <button @onclick="PrevStep" class="cg-btn-secondary">@Loc["BtnBack"]</button>
-                    <button @onclick="ValidateSourceAndNext" class="cg-btn-primary">@Loc["ImportAndContinue"]</button>
-                </div>
             }
             else if (CurrentStep == 4)
             {
-                <!-- STEP 4: Review Elements -->
-                <div class="cg-step-title">@Loc["CreateGameStep4Title"]</div>
-                <div class="cg-step-desc cg-mt-6">@Loc["PreviewElementsCount", PreviewElements.Count]</div>
-                
-                <div class="cg-list-container">
-                    <div class="cg-list-header">
-                        <div>@Loc["ColName"]</div><div>@Loc["ColSubtitle"]</div><div>@Loc["ColGroup"]</div>
-                    </div>
+                <h1 class="wiz__title" tabindex="-1" @ref="_title">@Loc["CreateGameStep4Title"]</h1>
+                <p class="ds-muted wiz__desc">@Loc["PreviewElementsCount", PreviewElements.Count]</p>
+
+                <ul class="ds-rows wiz__rows">
+                    <li class="ds-row ds-row--head" aria-hidden="true"><span>@Loc["ColName"]</span><span>@Loc["ColSubtitle"]</span><span>@Loc["ColGroup"]</span></li>
                     @foreach (var el in PreviewElements)
                     {
-                        <div class="cg-list-row">
-                            <div class="cg-list-col-bold">@el.Name</div>
-                            <div class="cg-list-col-muted">@el.Subtitle</div>
-                            <div>@el.Group</div>
-                        </div>
+                        <li class="ds-row">
+                            <div class="ds-row__main"><span class="ds-row__title">@el.Name</span></div>
+                            <span class="ds-row__cell">@el.Subtitle</span>
+                            <span class="ds-row__cell">@el.Group</span>
+                        </li>
                     }
-                </div>
-
-                <div class="cg-bottom-nav cg-mt-auto">
-                    <button @onclick="PrevStep" class="cg-btn-secondary">@Loc["BtnBack"]</button>
-                    <button @onclick="NextStep" class="cg-btn-primary">@Loc["BtnContinue"]</button>
-                </div>
+                </ul>
             }
             else if (CurrentStep == 5)
             {
-                <!-- STEP 5: Rules -->
-                <div class="cg-step-title">@Loc["CreateGameStep5Title"]</div>
-                <div class="cg-step-desc cg-mt-6">@Loc["CreateGameRulesDesc"]</div>
+                <h1 class="wiz__title" tabindex="-1" @ref="_title">@Loc["CreateGameStep5Title"]</h1>
+                <p class="ds-muted wiz__desc">@Loc["CreateGameRulesDesc"]</p>
 
-                <div class="cg-flex-col-10">
+                <ul class="ds-rows">
                     @foreach (var rule in PreviewRules)
                     {
-                        var isMalus = rule.Points < 0;
-                        
-                        <div class="cg-rule-card">
-                            <div class="cg-rule-label">@(rule.Label.TryGetValue(_state.Culture, out var l) ? l : rule.Label.Values.FirstOrDefault())</div>
-                            <div class="cg-rule-badge @(isMalus ? "malus" : "bonus")">
-                                @(rule.Points > 0 ? "+" : "")@rule.Points
-                            </div>
-                        </div>
+                        <li class="ds-row">
+                            <div class="ds-row__main"><span class="ds-row__title">@(rule.Label.TryGetValue(_state.Culture, out var l) ? l : rule.Label.Values.FirstOrDefault())</span></div>
+                            <span class="ds-points @(rule.Points < 0 ? "ds-points--penalty" : "")">@ParticipantFormat.Points(rule.Points)</span>
+                        </li>
                     }
-                </div>
-
-                <div class="cg-bottom-nav cg-mt-auto">
-                    <button @onclick="PrevStep" class="cg-btn-secondary">@Loc["BtnBack"]</button>
-                    <button @onclick="NextStep" class="cg-btn-primary">@Loc["BtnContinue"]</button>
-                </div>
+                </ul>
             }
             else if (CurrentStep == 6)
             {
-                <!-- STEP 6: Publish -->
-                <div class="cg-step-title">@Loc["CreateGameStep6Title"]</div>
-                <div class="cg-step-desc cg-mt-6">@Loc["CreateGamePublishDesc"]</div>
+                <h1 class="wiz__title" tabindex="-1" @ref="_title">@Loc["CreateGameStep6Title"]</h1>
+                <p class="ds-muted wiz__desc">@Loc["CreateGamePublishDesc"]</p>
 
                 @if (!string.IsNullOrEmpty(CreationError))
                 {
-                    <div class="cg-error-box">
-                        @CreationError
-                    </div>
+                    <p class="ds-alert" role="alert">@CreationError</p>
                 }
-
-                <div class="cg-bottom-nav cg-mt-auto">
-                    <button @onclick="PrevStep" disabled="@IsSubmitting" class="cg-btn-secondary">@Loc["BtnBack"]</button>
-                    <button @onclick="Publish" disabled="@IsSubmitting" class="cg-btn-primary">
-                        @(IsSubmitting ? Loc["Loading"] : Loc["BtnPublish"])
-                    </button>
-                </div>
             }
         </div>
-    </div>
+    </main>
+
+    <nav class="wiz__nav" aria-label="@Loc["CreateGameTitle"]">
+        @if (CurrentStep > 1)
+        {
+            <button type="button" class="ds-btn ds-btn--l ds-btn--secondary" @onclick="PrevStep" disabled="@IsSubmitting">@Loc["BtnBack"]</button>
+        }
+        else
+        {
+            <span></span>
+        }
+
+        @switch (CurrentStep)
+        {
+            case 1:
+                <button type="button" class="ds-btn ds-btn--l ds-btn--primary" @onclick="NextStep" disabled="@string.IsNullOrEmpty(_state.DomainPackId)">@Loc["BtnContinue"]</button>
+                break;
+            case 2:
+                <button type="submit" form="settings-form" class="ds-btn ds-btn--l ds-btn--primary">@Loc["BtnContinue"]</button>
+                break;
+            case 3:
+                <button type="button" class="ds-btn ds-btn--l ds-btn--primary" @onclick="ValidateSourceAndNext">@Loc["ImportAndContinue"]</button>
+                break;
+            case 6:
+                <button type="button" class="ds-btn ds-btn--l ds-btn--primary" @onclick="Publish" disabled="@IsSubmitting">@(IsSubmitting ? Loc["Loading"] : Loc["BtnPublish"])</button>
+                break;
+            default:
+                <button type="button" class="ds-btn ds-btn--l ds-btn--primary" @onclick="NextStep">@Loc["BtnContinue"]</button>
+                break;
+        }
+    </nav>
 </div>
 
 @code {
+    private const string ManualSource = "manual";
+
     private int CurrentStep = 1;
     private GameWizardState _state = new();
     private IReadOnlyList<DomainPack> DomainPacks = Array.Empty<DomainPack>();
-    
+
     private string? SourceTestResult;
     private string? SourceTestError;
     private List<ImportedElement> PreviewElements = new();
@@ -290,14 +263,16 @@
 
     private bool IsSubmitting = false;
     private string? CreationError;
+    private ElementReference _title;
+    private bool _focusTitle;
 
     private (int Number, string Label)[] Steps => new[]
     {
-        (1, Loc["StepScope"].ToString()), 
-        (2, Loc["StepSettings"].ToString()), 
-        (3, Loc["StepSource"].ToString()), 
-        (4, Loc["StepElements"].ToString()), 
-        (5, Loc["StepRules"].ToString()), 
+        (1, Loc["StepScope"].ToString()),
+        (2, Loc["StepSettings"].ToString()),
+        (3, Loc["StepSource"].ToString()),
+        (4, Loc["StepElements"].ToString()),
+        (5, Loc["StepRules"].ToString()),
         (6, Loc["StepPublish"].ToString())
     };
 
@@ -306,9 +281,40 @@
         DomainPacks = DomainPackLoader.GetAllPacks();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusTitle)
+        {
+            _focusTitle = false;
+            await _title.FocusAsync();
+        }
+    }
+
+    private string Localized(IReadOnlyDictionary<string, string> values, string fallback) =>
+        values.TryGetValue(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, out var value) || values.TryGetValue("en", out value) ? value : fallback;
+
+    private string FieldLabel(string label) => Loc[label].ResourceNotFound ? label : Loc[label];
+
+    private string SourceDescription(string pluginId)
+    {
+        var text = Loc["SourceDesc_" + pluginId];
+        return text.ResourceNotFound ? string.Empty : text.Value;
+    }
+
+    /// <summary>Sources the pack recommends come first; every registered plugin is offered.</summary>
+    private IEnumerable<IElementSourcePlugin> SourcePlugins()
+    {
+        var recommended = DomainPackLoader.GetPack(_state.DomainPackId)?.RecommendedPlugins ?? [];
+        return PluginRegistry.GetAllPlugins()
+            .OrderBy(p => recommended.ToList().IndexOf(p.Id) is var i && i < 0 ? int.MaxValue : i)
+            .ThenBy(p => p.DisplayName, StringComparer.CurrentCulture);
+    }
+
     private void SelectDomainPack(string id)
     {
         _state.DomainPackId = id;
+        var recommended = DomainPackLoader.GetPack(id)?.RecommendedPlugins ?? [];
+        _state.SourceType = recommended.FirstOrDefault(p => PluginRegistry.GetPlugin(p) is not null) ?? ManualSource;
     }
 
     private string GetConfigValue(string key)
@@ -327,7 +333,7 @@
     private void NextStep()
     {
         if (CurrentStep == 1 && string.IsNullOrEmpty(_state.DomainPackId)) return;
-        
+
         if (CurrentStep == 4)
         {
             var pack = DomainPackLoader.GetPack(_state.DomainPackId);
@@ -337,12 +343,20 @@
             }
         }
 
-        if (CurrentStep < 6) CurrentStep++;
+        if (CurrentStep < 6)
+        {
+            CurrentStep++;
+            _focusTitle = true;
+        }
     }
 
     private void PrevStep()
     {
-        if (CurrentStep > 1) CurrentStep--;
+        if (CurrentStep > 1)
+        {
+            CurrentStep--;
+            _focusTitle = true;
+        }
     }
 
     private async Task ValidateSourceAndNext()
@@ -350,7 +364,7 @@
         SourceTestError = null;
         SourceTestResult = null;
 
-        if (_state.SourceType == "manual")
+        if (_state.SourceType == ManualSource)
         {
             PreviewElements.Clear();
             NextStep();
@@ -369,13 +383,13 @@
                     SourceTestError = string.Join("\n", validationResult.Errors);
                     return;
                 }
-                
+
                 var importResult = await plugin.ImportAsync(config, default);
                 PreviewElements = importResult.Elements.ToList();
                 SourceTestResult = Loc["SessionizeFound", PreviewElements.Count];
                 if (importResult.Warnings.Any())
                 {
-                     SourceTestError = string.Join("\n", importResult.Warnings);
+                    SourceTestError = string.Join("\n", importResult.Warnings);
                 }
                 NextStep();
             }
@@ -384,7 +398,7 @@
                 SourceTestError = Loc["SessionizeError", ex.Message];
             }
         }
-        else 
+        else
         {
             SourceTestError = Loc["SessionizeCsvError"];
         }
@@ -401,7 +415,7 @@
             string? pluginId = null;
             Dictionary<string, string>? pluginConfig = null;
 
-            if (_state.SourceType != "manual")
+            if (_state.SourceType != ManualSource)
             {
                 pluginId = _state.SourceType;
                 pluginConfig = new Dictionary<string, string>(_state.PluginConfig);
@@ -420,8 +434,8 @@
             );
 
             var newGameId = await GameCreationService.CreateGameAsync(cmd, default);
-            
-            Navigation.NavigateTo("/organizer");
+
+            Navigation.NavigateTo($"/organizer/games/{newGameId}");
         }
         catch (Exception ex)
         {
@@ -430,6 +444,3 @@
         }
     }
 }
-
-
-

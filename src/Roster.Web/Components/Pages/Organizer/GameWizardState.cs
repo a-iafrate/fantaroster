@@ -18,7 +18,8 @@ public class GameWizardState
     public decimal CaptainMultiplier { get; set; } = 2.0m;
 
     // Step 3
-    public string SourceType { get; set; } = "sessionize"; // "sessionize", "csv", "manual"
+    /// <summary>A source plugin id, or "manual" to add elements by hand.</summary>
+    public string SourceType { get; set; } = "manual";
 
     // For Sessionize (legacy binding, can keep for compatibility or remove, better replace with dictionary)
     public string? SessionizeApiId { get; set; }

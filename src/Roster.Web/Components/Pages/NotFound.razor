@@ -1,5 +1,10 @@
-﻿@page "/not-found"
-@layout MainLayout
+@page "/not-found"
+@inject IStringLocalizer<SharedResource> Loc
 
-<h3>Not Found</h3>
-<p>Sorry, the content you are looking for does not exist.</p>
+<PageTitle>@Loc["NotFoundTitle"]</PageTitle>
+
+<div class="notice-page">
+    <h1 class="notice-page__title">@Loc["NotFoundTitle"]</h1>
+    <p class="notice-page__text">@Loc["NotFoundBody"]</p>
+    <a href="/" class="ds-btn ds-btn--l ds-btn--primary">@Loc["BackHome"]</a>
+</div>

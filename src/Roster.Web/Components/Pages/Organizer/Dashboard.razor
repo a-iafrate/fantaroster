@@ -1,160 +1,191 @@
 @page "/organizer"
 @rendermode InteractiveServer
+@using System.Globalization
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.Extensions.Localization
 @using Roster.Application.Ports.Data
 @using Roster.Domain.Games
+@using Roster.DomainPacks
+@using Roster.Ui.Components
 @attribute [Authorize]
 @inject IGameRepository GameRepository
 @inject Roster.Application.Services.GameLifecycleService LifecycleService
+@inject IDomainPackLoader DomainPacks
 @inject IStringLocalizer<SharedResource> Loc
 
 <PageTitle>@Loc["DashboardTitle"]</PageTitle>
 
-<div class="dashboard-header">
-    <div class="dashboard-title">@Loc["DashboardTitle"]</div>
-    <a href="/organizer/create-game" class="new-game-btn">
-        <i class="icon-plus"></i> @Loc["NewGame"]
-    </a>
-</div>
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["DashboardTitle"]</h1>
+        </div>
+        <div class="ds-page-actions dash-new-desktop">
+            <a href="/organizer/create-game" class="ds-btn ds-btn--primary"><i class="icon-plus" aria-hidden="true"></i>@Loc["NewGame"]</a>
+        </div>
+    </header>
 
-<div class="game-filters">
-    <div class="filter-chip @(activeFilter == "All" ? "active" : "")" @onclick="@(() => SetFilter("All"))">@Loc["FilterAll"]</div>
-    <div class="filter-chip @(activeFilter == "Draft" ? "active" : "")" @onclick="@(() => SetFilter("Draft"))">@Loc["FilterDrafts"]</div>
-    <div class="filter-chip @(activeFilter == "Live" ? "active" : "")" @onclick="@(() => SetFilter("Live"))">@Loc["FilterLive"]</div>
-    <div class="filter-chip @(activeFilter == "Archived" ? "active" : "")" @onclick="@(() => SetFilter("Archived"))">@Loc["FilterArchived"]</div>
-</div>
-
-<div class="games-grid">
-    @if (Games == null)
+    @if (Games is null)
     {
-        <div>@Loc["Loading"]</div>
+        <p class="ds-muted" role="status">@Loc["Loading"]</p>
     }
     else
     {
-        var filteredGames = Games.Where(g => 
-            activeFilter == "All" || 
-            (activeFilter == "Draft" && g.State == GameState.Draft) ||
-            (activeFilter == "Live" && g.State == GameState.Live) ||
-            (activeFilter == "Archived" && g.State == GameState.Archived)
-        );
+        <div class="ds-chips" role="group" aria-label="@Loc["FilterLabel"]">
+            @foreach (var filter in Filters)
+            {
+                <button type="button" class="ds-chip" aria-pressed="@(_filter == filter ? "true" : "false")" @onclick="() => _filter = filter">
+                    @FilterLabel(filter) @Count(filter)
+                </button>
+            }
+        </div>
 
-        @foreach (var game in filteredGames)
-        {
-            var isLive = game.State == GameState.Live;
-            var dotColor = isLive ? "var(--color-success)" : "var(--color-ink-2)";
-            var actionText = isLive ? Loc["ManageLive"] : Loc["OpenGame"];
-            var statusText = Loc["State" + game.State.ToString()];
-
-            <div class="game-card">
-                <div class="game-status">
-                    <span class="status-dot" style="background: @dotColor"></span>
-                    @statusText
-                    <div class="game-menu-container">
-                        <i class="icon-ellipsis game-menu-icon" @onclick="() => ToggleMenu(game.Id)"></i>
-                        @if (activeMenuId == game.Id)
-                        {
-                            <div class="game-dropdown">
-                                <a href="/organizer/games/@game.Id" class="game-dropdown-item">@actionText</a>
-                                <button type="button" class="game-dropdown-item game-dropdown-danger" @onclick="() => AskDelete(game)">@Loc["DeleteGameMenu"]</button>
-                            </div>
-                        }
+        <ul class="dash-grid">
+            @foreach (var game in Filtered())
+            {
+                <li class="dash-card">
+                    <div class="dash-card__top">
+                        <span class="dash-status"><span class="dash-dot dash-dot--@StateClass(game.State)" aria-hidden="true"></span>@Loc["State" + game.State]</span>
+                        <button type="button" class="ds-icon-btn dash-card__menu" aria-label="@string.Format(Loc["GameActions"], game.Name)" aria-haspopup="dialog" @onclick="() => _menuGame = game">
+                            <i class="icon-ellipsis" aria-hidden="true"></i>
+                        </button>
                     </div>
-                </div>
-                <div class="game-name">@game.Name</div>
-                <div class="game-meta">
-                    Pack: @game.DomainPackId
-                </div>
-                <div class="game-footer">
-                    <span>@game.CreatedAt.ToString("MMM yyyy")</span>
-                    <a href="/organizer/games/@game.Id" class="game-action">@actionText</a>
-                </div>
-            </div>
+                    <a class="dash-card__name" href="/organizer/games/@game.Id">@game.Name</a>
+                    <div class="ds-muted dash-card__meta">@PackName(game)</div>
+                    <div class="dash-card__footer">
+                        <span>@game.CreatedAt.ToLocalTime().ToString("MMM yyyy", CultureInfo.CurrentCulture)</span>
+                        <a href="/organizer/games/@game.Id" class="dash-card__action">@(game.State == GameState.Live ? Loc["ManageLive"] : Loc["OpenGame"])</a>
+                    </div>
+                </li>
+            }
+            <li class="dash-card dash-card--ghost">
+                <i class="icon-copy" aria-hidden="true"></i>
+                <div class="dash-card__name">@Loc["DuplicateTitle"]</div>
+                <div class="ds-muted">@Loc["DuplicateDesc"]</div>
+            </li>
+        </ul>
+
+        @if (!Filtered().Any())
+        {
+            <p class="ds-muted" role="status">@Loc["NoGamesInFilter"]</p>
         }
     }
-
-    <div class="duplicate-card">
-        <i class="icon-copy"></i>
-        <div class="duplicate-title">@Loc["DuplicateTitle"]</div>
-        <div class="duplicate-desc">@Loc["DuplicateDesc"]</div>
-    </div>
 </div>
 
-@if (gameToDelete is not null)
+<a href="/organizer/create-game" class="ds-btn ds-btn--l ds-btn--primary ds-fab"><i class="icon-plus" aria-hidden="true"></i>@Loc["NewGame"]</a>
+
+@if (_menuGame is { } menuGame)
 {
-    <div class="delete-backdrop" @onclick="CancelDelete">
-        <div class="delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" @onclick:stopPropagation>
-            <h3 id="delete-title">@Loc["DeleteGameTitle"]</h3>
-            <p>@string.Format(Loc["DeleteGameWarning"], gameToDelete.Name)</p>
-            @if (!string.IsNullOrEmpty(deleteError))
-            {
-                <p class="delete-error">@deleteError</p>
-            }
-            <div class="delete-actions">
-                <button type="button" class="delete-cancel" @onclick="CancelDelete" disabled="@isDeleting">@Loc["BtnCancel"]</button>
-                <button type="button" class="delete-confirm" @onclick="ConfirmDeleteAsync" disabled="@isDeleting">@Loc["DeleteGameConfirm"]</button>
-            </div>
-        </div>
+    <button type="button" class="ds-scrim" tabindex="-1" aria-label="@Loc["BtnClose"]" @onclick="() => _menuGame = null"></button>
+    <div class="ds-sheet" role="dialog" aria-modal="true" aria-label="@menuGame.Name">
+        <div class="ds-sheet__grabber" aria-hidden="true"></div>
+        <a class="ds-menu-item" href="/organizer/games/@menuGame.Id"><i class="icon-external-link" aria-hidden="true"></i><span>@(menuGame.State == GameState.Live ? Loc["ManageLive"] : Loc["OpenGame"])</span></a>
+        <button type="button" class="ds-menu-item ds-menu-item--danger" @onclick="() => AskDelete(menuGame)"><i class="icon-trash-2" aria-hidden="true"></i><span>@Loc["DeleteGameMenu"]</span></button>
     </div>
 }
 
+@if (_gameToDelete is { } toDelete)
+{
+    <Modal Title="@Loc["DeleteGameTitle"]" CloseLabel="@Loc["BtnCancel"]" OnClose="CancelDelete">
+        <ChildContent>
+            <p class="ds-muted">@string.Format(Loc["DeleteGameWarning"], toDelete.Name)</p>
+            @if (!string.IsNullOrEmpty(_deleteError))
+            {
+                <p class="ds-alert" role="alert">@_deleteError</p>
+            }
+        </ChildContent>
+        <Actions>
+            <button type="button" class="ds-btn ds-btn--secondary" @onclick="CancelDelete" disabled="@_isDeleting">@Loc["BtnCancel"]</button>
+            <button type="button" class="ds-btn ds-btn--danger" @onclick="ConfirmDeleteAsync" disabled="@_isDeleting">@Loc["DeleteGameConfirm"]</button>
+        </Actions>
+    </Modal>
+}
+
 @code {
-    private Game? gameToDelete;
-    private bool isDeleting;
-    private string? deleteError;
+    private enum GameFilter { All, Live, Preparing, Ended }
+
+    private static readonly GameFilter[] Filters = [GameFilter.All, GameFilter.Live, GameFilter.Preparing, GameFilter.Ended];
+
+    private List<Game>? Games;
+    private GameFilter _filter = GameFilter.All;
+    private Game? _menuGame;
+    private Game? _gameToDelete;
+    private bool _isDeleting;
+    private string? _deleteError;
+
+    protected override async Task OnInitializedAsync() => Games = await GameRepository.GetAllAsync();
+
+    private IEnumerable<Game> Filtered() => (Games ?? []).Where(g => Matches(g, _filter));
+
+    private int Count(GameFilter filter) => (Games ?? []).Count(g => Matches(g, filter));
+
+    private static bool Matches(Game game, GameFilter filter) => filter switch
+    {
+        GameFilter.Live => game.State == GameState.Live,
+        GameFilter.Preparing => game.State is GameState.Draft or GameState.Open,
+        GameFilter.Ended => game.State is GameState.Ended or GameState.Archived,
+        _ => true,
+    };
+
+    private string FilterLabel(GameFilter filter) => filter switch
+    {
+        GameFilter.Live => Loc["FilterLive"],
+        GameFilter.Preparing => Loc["FilterPreparing"],
+        GameFilter.Ended => Loc["FilterEnded"],
+        _ => Loc["FilterAll"],
+    };
+
+    private static string StateClass(GameState state) => state switch
+    {
+        GameState.Live => "live",
+        GameState.Open => "open",
+        GameState.Draft => "draft",
+        _ => "done",
+    };
+
+    private string PackName(Game game)
+    {
+        var pack = DomainPacks.GetPack(game.DomainPackId);
+        return pack is null
+            ? game.DomainPackId
+            : (pack.Name.TryGetValue(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, out var name) ? name : pack.Name.Values.FirstOrDefault() ?? game.DomainPackId);
+    }
 
     private void AskDelete(Game game)
     {
-        activeMenuId = null;
-        deleteError = null;
-        gameToDelete = game;
+        _menuGame = null;
+        _deleteError = null;
+        _gameToDelete = game;
     }
 
     private void CancelDelete()
     {
-        if (!isDeleting) gameToDelete = null;
+        if (!_isDeleting)
+        {
+            _gameToDelete = null;
+        }
     }
 
     private async Task ConfirmDeleteAsync()
     {
-        if (gameToDelete is null || isDeleting) return;
+        if (_gameToDelete is null || _isDeleting)
+        {
+            return;
+        }
 
-        isDeleting = true;
+        _isDeleting = true;
         try
         {
-            await LifecycleService.DeleteGameAsync(gameToDelete.Id);
+            await LifecycleService.DeleteGameAsync(_gameToDelete.Id);
             Games = await GameRepository.GetAllAsync();
-            gameToDelete = null;
+            _gameToDelete = null;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
         {
-            deleteError = ex.Message;
+            _deleteError = ex.Message;
         }
         finally
         {
-            isDeleting = false;
+            _isDeleting = false;
         }
-    }
-
-    private List<Game>? Games;
-    private Guid? activeMenuId;
-    private string activeFilter = "All";
-
-    protected override async Task OnInitializedAsync()
-    {
-        Games = await GameRepository.GetAllAsync();
-    }
-
-    private void ToggleMenu(Guid id)
-    {
-        if (activeMenuId == id)
-            activeMenuId = null;
-        else
-            activeMenuId = id;
-    }
-
-    private void SetFilter(string filter)
-    {
-        activeFilter = filter;
     }
 }

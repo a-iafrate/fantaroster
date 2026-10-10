@@ -9,7 +9,8 @@ public sealed record DomainPack(
     [property: JsonPropertyName("requiresConsent")] bool RequiresConsent,
     [property: JsonPropertyName("recommendedPlugins")] IReadOnlyList<string> RecommendedPlugins,
     [property: JsonPropertyName("terminology")] IReadOnlyDictionary<string, PackTerminology> Terminology,
-    [property: JsonPropertyName("defaultRules")] IReadOnlyList<PackRule> DefaultRules
+    [property: JsonPropertyName("defaultRules")] IReadOnlyList<PackRule> DefaultRules,
+    [property: JsonPropertyName("icon")] string? Icon = null
 );
 
 public sealed record PackTerminology(

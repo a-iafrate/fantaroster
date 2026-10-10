@@ -1,0 +1,5 @@
+@media (min-width: 1024px) {
+    .ref-rows {
+        --ds-row-columns: minmax(0, 1fr) 160px;
+    }
+}

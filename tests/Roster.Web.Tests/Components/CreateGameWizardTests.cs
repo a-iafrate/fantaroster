@@ -68,7 +68,7 @@ public class CreateGameWizardTests : TestContext
         var cut = RenderComponent<CreateGame>();
 
         // Act - clicking continue without selecting
-        cut.Find("button.cg-btn-primary").Click();
+        cut.Find("button.ds-btn--primary").Click();
 
         // Assert - still on step 1
         cut.Markup.ShouldContain("CreateGameStep1Title");

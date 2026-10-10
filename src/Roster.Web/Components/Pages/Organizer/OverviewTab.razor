@@ -1,0 +1,117 @@
+@using Roster.Application.Services
+@using Roster.Domain.Games
+@using Roster.Web.Client.Components.Participant
+@inject GameOverviewService OverviewService
+@inject Roster.Web.Components.Layout.OrganizerContext Context
+@inject IStringLocalizer<SharedResource> Loc
+
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["NavOverview"]</h1>
+            <p class="ds-page-desc">@Loc["OverviewDesc"]</p>
+        </div>
+        <div class="ds-page-actions">
+            <a class="ds-btn ds-btn--primary" href="/organizer/games/@Game.Id/materials"><i class="icon-link" aria-hidden="true"></i>@Loc["OverviewShare"]</a>
+        </div>
+    </header>
+
+    @if (_overview is null)
+    {
+        <p class="ds-muted" role="status">@Loc["Loading"]</p>
+    }
+    else
+    {
+        <ul class="ds-stats">
+            <li class="ds-stat"><span class="ds-stat__value">@_overview.Participants</span><span class="ds-stat__label">@Loc["StatPlayers"]</span></li>
+            <li class="ds-stat"><span class="ds-stat__value">@_overview.PointsAssigned</span><span class="ds-stat__label">@Loc["StatPoints"]</span></li>
+            <li class="ds-stat">
+                <span class="ds-stat__value">@(_overview.ConsentRequired > 0 ? $"{_overview.ConsentAccepted}/{_overview.ConsentRequired}" : _overview.Elements.ToString())</span>
+                <span class="ds-stat__label">@(_overview.ConsentRequired > 0 ? Loc["StatConsents"] : Loc["StatElements"])</span>
+            </li>
+            <li class="ds-stat"><span class="ds-stat__value">@_overview.Referees</span><span class="ds-stat__label">@Loc["NavReferees"]</span></li>
+        </ul>
+
+        <div class="ds-panels ds-panels--2">
+            <section class="ds-panel" aria-labelledby="ov-todo">
+                <h2 class="ds-section-title" id="ov-todo">@Loc["TodoTitle"]</h2>
+                @foreach (var todo in Todos())
+                {
+                    <div class="ds-todo">
+                        <i class="@todo.Icon" aria-hidden="true"></i>
+                        <span>@todo.Text</span>
+                        @if (todo.Section is not null)
+                        {
+                            <a class="ds-btn ds-btn--link" href="/organizer/games/@Game.Id/@todo.Section">@Loc["TodoGo"]<span class="visually-hidden">: @todo.Text</span></a>
+                        }
+                    </div>
+                }
+            </section>
+
+            <section class="ds-panel" aria-labelledby="ov-latest">
+                <h2 class="ds-section-title" id="ov-latest">@Loc["LatestPointsTitle"]</h2>
+                @if (_overview.LatestPoints.Count == 0)
+                {
+                    <p class="ds-muted">@Loc["NoPointsYet"]</p>
+                }
+                @foreach (var point in _overview.LatestPoints)
+                {
+                    <div class="ds-todo ov-point">
+                        <span class="ds-points @(point.Points < 0 ? "ds-points--penalty" : "") @(point.Status == "Voided" ? "ds-points--voided" : "")">@ParticipantFormat.Points(point.Points)</span>
+                        <span><b>@(point.ElementName ?? point.ParticipantNickname)</b> <span class="ds-muted">@point.RuleLabel</span></span>
+                    </div>
+                }
+            </section>
+        </div>
+    }
+</div>
+
+@code {
+    private sealed record Todo(string Icon, string Text, string? Section);
+
+    [Parameter, EditorRequired] public Game Game { get; set; } = null!;
+
+    private GameOverviewDto? _overview;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _overview = await OverviewService.GetAsync(Game.Id);
+        Context.SetPendingConsents(_overview.ConsentPending);
+    }
+
+    private IEnumerable<Todo> Todos()
+    {
+        var overview = _overview!;
+        var any = false;
+
+        if (Game.State == GameState.Draft)
+        {
+            any = true;
+            yield return new Todo("icon-door-open", Loc["TodoOpenJoins"], "control");
+        }
+        if (overview.Elements == 0)
+        {
+            any = true;
+            yield return new Todo("icon-users", Loc["TodoNoElements"], "elements");
+        }
+        if (overview.ConsentPending > 0)
+        {
+            any = true;
+            yield return new Todo("icon-clock", string.Format(Loc["TodoConsentPending"], overview.ConsentPending), "elements");
+        }
+        if (overview.Rules == 0)
+        {
+            any = true;
+            yield return new Todo("icon-scale", Loc["TodoNoRules"], "rules");
+        }
+        if (overview.Referees == 0 && Game.State != GameState.Archived)
+        {
+            any = true;
+            yield return new Todo("icon-flag", Loc["TodoNoReferees"], "referees");
+        }
+        if (!any)
+        {
+            yield return new Todo("icon-check", Loc["TodoAllDone"], null);
+        }
+    }
+}

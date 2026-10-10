@@ -7,6 +7,8 @@ public sealed record GameInfo(
     bool CaptainEnabled,
     decimal CaptainMultiplier,
     string State,
+    string JoinCode,
+    string BrandName,
     GameTerms Terms)
 {
     public bool IsBeforeStart => State is "Draft" or "Open";

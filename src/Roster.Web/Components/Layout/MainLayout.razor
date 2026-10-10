@@ -1,103 +1,66 @@
 @inherits LayoutComponentBase
+@using Microsoft.Extensions.Options
+@using Roster.Web.Options
+@inject IStringLocalizer<SharedResource> Loc
+@inject IOptions<BrandOptions> Brand
+@inject TimeProvider Time
 
-<div class="pub-layout">
-    <!-- Header -->
+<a href="#main" class="skip-link">@Loc["SkipToContent"]</a>
+
+<div class="pub">
     <header class="pub-header">
-        <div class="pub-header-mobile">
-            <a href="/" class="pub-logo">
-                <img src="/assets/logo-r.svg" alt="" style="width:28px;height:28px;object-fit:contain">
-                <span style="font-size:18px;letter-spacing:-0.9px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span>
-            </a>
-            <input type="checkbox" id="pub-menu-toggle" hidden />
-            <label for="pub-menu-toggle" class="pub-menu-btn" aria-label="Menu">
-                <i class="icon-menu icon-open"></i>
-                <i class="icon-x icon-close"></i>
-            </label>
-            <div class="pub-menu-mobile">
-                <div class="pub-menu-mobile-links">
-                    <a href="/come-funziona" class="pub-mobile-link">Come funziona<i class="icon-chevron-right"></i></a>
-                    <a href="/casi/conferenze" class="pub-mobile-link">Casi d'uso<i class="icon-chevron-right"></i></a>
-                    <a href="/esempi" class="pub-mobile-link">Esempi<i class="icon-chevron-right"></i></a>
-                    <a href="/prezzi" class="pub-mobile-link">Prezzi<i class="icon-chevron-right"></i></a>
-                </div>
-                <div class="pub-mobile-settings">
-                    <button class="pub-chip"><i class="icon-globe"></i>Italiano</button>
-                    <ThemeToggle CssClass="pub-chip" />
-                </div>
-                <div class="pub-mobile-actions">
-                    <a href="/j" class="pub-btn-outline"><i class="icon-qr-code"></i>Ho un codice partita</a>
-                    <a href="/login" class="pub-btn-outline">Accedi</a>
-                    <a href="/app/nuova" class="pub-btn-primary">Crea il tuo fanta</a>
-                </div>
-            </div>
+        <a href="/" class="pub-brand"><img src="assets/logo-r.svg" alt="" /><BrandWordmark /></a>
+
+        <nav class="pub-nav" aria-label="@Loc["MainNavLabel"]">
+            <a href="/#how" class="pub-nav__link">@Loc["PubNavHow"]</a>
+            <a href="/#domains" class="pub-nav__link">@Loc["PubNavDomains"]</a>
+        </nav>
+
+        <div class="pub-actions">
+            <a href="/j" class="ds-btn ds-btn--link"><i class="icon-qr-code" aria-hidden="true"></i>@Loc["PubHaveCodeShort"]</a>
+            <a href="/login" class="ds-btn ds-btn--link">@Loc["PubSignIn"]</a>
+            <a href="/organizer/create-game" class="ds-btn ds-btn--primary">@Loc["PubCreate"]</a>
         </div>
 
-        <div class="pub-header-desktop">
-            <a href="/" class="pub-logo">
-                <img src="/assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain">
-                <span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span>
-            </a>
-            <div class="pub-nav">
-                <a href="/come-funziona" class="pub-nav-link">Come funziona</a>
-                <a href="/casi/conferenze" class="pub-nav-link">Casi d'uso <i class="icon-chevron-down"></i></a>
-                <a href="/esempi" class="pub-nav-link">Esempi</a>
-                <a href="/prezzi" class="pub-nav-link">Prezzi</a>
+        @* Phones: a native disclosure, so the menu works with the keyboard and without JavaScript. *@
+        <details class="pub-menu">
+            <summary class="pub-menu__button" aria-label="@Loc["PubMenu"]"><i class="icon-menu" aria-hidden="true"></i></summary>
+            <div class="pub-menu__panel">
+                <a href="/#how" class="pub-menu__link">@Loc["PubNavHow"]<i class="icon-chevron-right" aria-hidden="true"></i></a>
+                <a href="/#domains" class="pub-menu__link">@Loc["PubNavDomains"]<i class="icon-chevron-right" aria-hidden="true"></i></a>
+                <div class="pub-menu__settings"><ThemeToggle CssClass="ds-chip" /></div>
+                <a href="/j" class="ds-btn ds-btn--l ds-btn--block ds-btn--secondary"><i class="icon-qr-code" aria-hidden="true"></i>@Loc["PubHaveCode"]</a>
+                <a href="/login" class="ds-btn ds-btn--l ds-btn--block ds-btn--secondary">@Loc["PubSignIn"]</a>
+                <a href="/organizer/create-game" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary">@Loc["PubCreate"]</a>
             </div>
-            <div class="pub-actions">
-                <a href="/j" class="pub-btn-text"><i class="icon-qr-code"></i>Ho un codice</a>
-                <a href="/login" class="pub-btn-text">Accedi</a>
-                <a href="/app/nuova" class="pub-btn-primary">Crea il tuo fanta</a>
-            </div>
-        </div>
+        </details>
     </header>
 
-    <main class="pub-main">
+    <main id="main" class="pub-main">
         @Body
     </main>
 
-    <!-- Footer -->
-    <footer class="pub-footer">
-        <div class="pub-footer-content">
-            <div class="pub-footer-brand">
-                <div class="pub-logo-white">
-                    <img src="/assets/logo-r.svg" alt="" style="width:36px;height:36px;object-fit:contain">
-                    <span style="font-size:22px;letter-spacing:-1.1px"><b style="font-weight:800">fanta</b><span style="font-weight:500">roster</span></span>
-                </div>
-                <p class="pub-footer-desc">Il fanta di qualsiasi cosa. In inglese è <span class="pub-footer-highlight">imagiroster.com</span></p>
+    <footer class="pub-footer" data-theme="dark">
+        <div class="pub-footer__content">
+            <div class="pub-footer__brand">
+                <span class="pub-footer__logo"><img src="assets/logo-r.svg" alt="" /><BrandWordmark /></span>
+                <p>@Loc["HeroTitle"]</p>
             </div>
-            <div class="pub-footer-links">
-                <div class="pub-footer-col">
-                    <h4>Prodotto</h4>
-                    <a href="/come-funziona">Come funziona</a>
-                    <a href="/prezzi">Prezzi</a>
-                    <a href="/schermo">Maxischermo</a>
-                </div>
-                <div class="pub-footer-col">
-                    <h4>Casi d'uso</h4>
-                    <a href="/casi/conferenze">Conferenze</a>
-                    <a href="/casi/matrimoni">Matrimoni</a>
-                    <a href="/casi/tornei">Tornei</a>
-                </div>
-                <div class="pub-footer-col">
-                    <h4>Aiuto</h4>
-                    <a href="/guida">Guida organizzatori</a>
-                    <a href="/contatti">Contatti</a>
-                    <a href="/stato">Stato del servizio</a>
-                </div>
-                <div class="pub-footer-col">
-                    <h4>Legale</h4>
-                    <a href="/termini">Termini</a>
-                    <a href="/privacy">Privacy</a>
-                    <a href="/cookie">Cookie</a>
-                </div>
-            </div>
+            <nav class="pub-footer__col" aria-label="@Loc["PubFooterPlay"]">
+                <h2>@Loc["PubFooterPlay"]</h2>
+                <a href="/j">@Loc["PubHaveCode"]</a>
+                <a href="/#how">@Loc["PubNavHow"]</a>
+            </nav>
+            <nav class="pub-footer__col" aria-label="@Loc["PubFooterOrganize"]">
+                <h2>@Loc["PubFooterOrganize"]</h2>
+                <a href="/login">@Loc["PubSignIn"]</a>
+                <a href="/organizer/create-game">@Loc["PubCreate"]</a>
+                <a href="/#domains">@Loc["PubNavDomains"]</a>
+            </nav>
         </div>
-        <div class="pub-footer-bottom">
-            <span>© 2026 FantaRoster</span>
-            <div class="pub-footer-settings">
-                <button class="pub-chip-dark"><i class="icon-globe"></i>Italiano</button>
-                <ThemeToggle CssClass="pub-chip-dark" />
-            </div>
+        <div class="pub-footer__bottom">
+            <span>@string.Format(Loc["PubCopyright"], Time.GetUtcNow().Year, Brand.Value.Name)</span>
+            <ThemeToggle CssClass="pub-footer__chip" />
         </div>
     </footer>
 </div>

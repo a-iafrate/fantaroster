@@ -1,137 +1,138 @@
-@using Microsoft.Extensions.Localization
 @using Roster.Application.Services
 @using Roster.Domain.Games
+@using Roster.Web.Client.Components.Participant
 @inject RuleManagementService RuleService
 @inject IStringLocalizer<SharedResource> Loc
 
-<div class="mg-section">
-    <div class="mg-section-title">@Loc["RuleEditorTitle"]</div>
-    <div class="mg-section-desc">@Loc["RuleEditorDesc"]</div>
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["NavRules"]</h1>
+            <p class="ds-page-desc">@Loc["RuleEditorDesc"]</p>
+        </div>
+        @if (CanEdit)
+        {
+            <div class="ds-page-actions">
+                <button type="button" class="ds-btn ds-btn--primary" @onclick="AddNewRule"><i class="icon-plus" aria-hidden="true"></i>@Loc["BtnAddRule"]</button>
+            </div>
+        }
+    </header>
 
-    @if (Rules == null)
+    <p class="ds-alert ds-alert--info"><i class="icon-info" aria-hidden="true"></i> @Loc["RulesEthicsNote"]</p>
+
+    @if (!CanEdit)
     {
-        <div>@Loc["Loading"]</div>
+        <p class="ds-alert ds-alert--info" role="status">@Loc["RuleEditorDisabledInfo"]</p>
+    }
+
+    @if (Rules is null)
+    {
+        <p class="ds-muted" role="status">@Loc["Loading"]</p>
+    }
+    else if (Rules.Count == 0)
+    {
+        <p class="ds-muted" role="status">@Loc["NoRules"]</p>
     }
     else
     {
-        @if (CanEdit)
-        {
-            <div class="rules-actions-top">
-                <button class="mg-btn-primary" @onclick="AddNewRule">@Loc["BtnAddRule"]</button>
-            </div>
-        }
-        else
-        {
-            <div class="mg-alert-info">
-                @Loc["RuleEditorDisabledInfo"]
-            </div>
-        }
-
-        <div class="cg-list-container">
-            <div class="cg-list-header">
-                <div>@Loc["ColLabel"]</div>
-                <div>@Loc["ColPoints"]</div>
-                <div>@Loc["ColCategory"]</div>
-                <div>@Loc["ColTarget"]</div>
-                @if (CanEdit)
-                {
-                    <div style="text-align: right;">@Loc["ColActions"]</div>
-                }
-            </div>
-            
-            @if (Rules.Count == 0)
+        <ul class="ds-rows rule-rows">
+            <li class="ds-row ds-row--head" aria-hidden="true">
+                <span>@Loc["ColLabel"]</span><span>@Loc["ColTarget"]</span><span>@Loc["ColPoints"]</span><span></span>
+            </li>
+            @for (var i = 0; i < Rules.Count; i++)
             {
-                <div class="cg-list-row">
-                    <div class="cg-list-col-muted">@Loc["NoRules"]</div>
-                </div>
-            }
-            else
-            {
-                @for (int i = 0; i < Rules.Count; i++)
-                {
-                    var rule = Rules[i];
-                    var isFirst = i == 0;
-                    var isLast = i == Rules.Count - 1;
-                    
-                    <div class="cg-list-row">
-                        <div class="cg-list-col-bold">@rule.Label</div>
-                        <div>
-                            <span class="element-badge @(rule.Points > 0 ? "badge-success" : "badge-warning")">
-                                @(rule.Points > 0 ? "+" : "")@rule.Points
-                            </span>
-                        </div>
-                        <div>@rule.Category</div>
-                        <div>@(rule.Target == RuleTarget.Element ? Loc["TargetElement"] : Loc["TargetParticipant"])</div>
-                        
-                        @if (CanEdit)
+                var rule = Rules[i];
+                var index = i;
+                <li class="ds-row">
+                    <div class="ds-row__main">
+                        <span class="ds-row__title">@rule.Label</span>
+                        @if (!string.IsNullOrWhiteSpace(rule.Category))
                         {
-                            <div class="element-actions" style="justify-content: flex-end;">
-                                <button class="mg-btn-icon" @onclick="() => MoveRuleUp(rule)" disabled="@isFirst" title="@Loc["MoveUp"]"><i class="icon-arrow-up"></i></button>
-                                <button class="mg-btn-icon" @onclick="() => MoveRuleDown(rule)" disabled="@isLast" title="@Loc["MoveDown"]"><i class="icon-arrow-down"></i></button>
-                                <button class="mg-btn-text" @onclick="() => EditRule(rule)">@Loc["BtnEdit"]</button>
-                                <button class="mg-btn-text text-danger" @onclick="() => DeleteRule(rule)">@Loc["BtnDelete"]</button>
-                            </div>
+                            <span class="ds-row__sub">@rule.Category</span>
                         }
                     </div>
-                }
-            }
-        </div>
-    }
-
-    @if (EditingRule != null || IsAdding)
-    {
-        <div class="modal-backdrop">
-            <div class="modal">
-                <div class="modal-title">@(IsAdding ? Loc["AddRuleTitle"] : Loc["EditRuleTitle"])</div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>@Loc["ColLabel"]</label>
-                        <input type="text" @bind="EditLabel" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label>@Loc["ColPoints"]</label>
-                        <input type="number" @bind="EditPoints" class="form-control" />
-                        @if (EditPoints == 0)
-                        {
-                            <div class="form-hint text-danger">@Loc["PointsNonZeroError"]</div>
-                        }
-                    </div>
-                    <div class="form-group">
-                        <label>@Loc["ColCategory"]</label>
-                        <input type="text" @bind="EditCategory" class="form-control" />
-                    </div>
-                    @if (IsAdding)
+                    <span class="ds-row__cell">@(rule.Target == RuleTarget.Element ? Loc["TargetElement"] : Loc["TargetParticipant"])</span>
+                    <span class="ds-points @(rule.Points < 0 ? "ds-points--penalty" : "")">@ParticipantFormat.Points(rule.Points)</span>
+                    @if (CanEdit)
                     {
-                        <div class="form-group">
-                            <label>@Loc["ColTarget"]</label>
-                            <select @bind="EditTarget" class="form-control">
-                                <option value="@RuleTarget.Element">@Loc["TargetElement"]</option>
-                                <option value="@RuleTarget.Participant">@Loc["TargetParticipant"]</option>
-                            </select>
+                        <div class="ds-row__actions">
+                            <button type="button" class="ds-icon-btn" disabled="@(index == 0)" aria-label="@string.Format(Loc["MoveUpRule"], rule.Label)" @onclick="() => MoveRuleUp(rule)"><i class="icon-arrow-up" aria-hidden="true"></i></button>
+                            <button type="button" class="ds-icon-btn" disabled="@(index == Rules.Count - 1)" aria-label="@string.Format(Loc["MoveDownRule"], rule.Label)" @onclick="() => MoveRuleDown(rule)"><i class="icon-arrow-down" aria-hidden="true"></i></button>
+                            <button type="button" class="ds-icon-btn" aria-label="@string.Format(Loc["EditRuleNamed"], rule.Label)" @onclick="() => EditRule(rule)"><i class="icon-pencil-line" aria-hidden="true"></i></button>
                         </div>
                     }
-                </div>
-                <div class="modal-actions">
-                    <button class="mg-btn-secondary" @onclick="CancelEdit">@Loc["BtnCancel"]</button>
-                    <button class="mg-btn-primary" @onclick="SaveEdit" disabled="@(EditPoints == 0 || string.IsNullOrWhiteSpace(EditLabel))">@Loc["BtnSave"]</button>
-                </div>
-            </div>
-        </div>
+                </li>
+            }
+        </ul>
     }
 </div>
 
+@if (EditingRule is not null || IsAdding)
+{
+    <Modal Title="@(IsAdding ? Loc["AddRuleTitle"] : Loc["EditRuleTitle"])" CloseLabel="@Loc["BtnCancel"]" OnClose="CancelEdit">
+        <ChildContent>
+            <div class="ds-form">
+                <div class="ds-field">
+                    <label class="ds-label" for="rule-label">@Loc["RuleWhatHappens"]</label>
+                    <input id="rule-label" type="text" class="ds-input" @bind="EditLabel" @bind:event="oninput" maxlength="120" />
+                </div>
+
+                <div class="ds-segmented" role="group" aria-label="@Loc["ColPoints"]">
+                    <button type="button" aria-pressed="@(EditPoints > 0 ? "true" : "false")" @onclick="() => SetBonus(true)"><i class="icon-plus" aria-hidden="true"></i> @Loc["RuleBonus"]</button>
+                    <button type="button" aria-pressed="@(EditPoints < 0 ? "true" : "false")" @onclick="() => SetBonus(false)"><i class="icon-minus" aria-hidden="true"></i> @Loc["RuleMalus"]</button>
+                </div>
+
+                <div class="rule-points" role="group" aria-label="@Loc["ColPoints"]">
+                    <span class="ds-label">@Loc["ColPoints"]</span>
+                    <span class="ds-stepper">
+                        <button type="button" class="ds-icon-btn" aria-label="@Loc["PointsLess"]" @onclick="() => Step(-1)"><i class="icon-minus" aria-hidden="true"></i></button>
+                        <output class="ds-stepper__value" aria-live="polite">@ParticipantFormat.Points(EditPoints)</output>
+                        <button type="button" class="ds-icon-btn" aria-label="@Loc["PointsMore"]" @onclick="() => Step(1)"><i class="icon-plus" aria-hidden="true"></i></button>
+                    </span>
+                </div>
+
+                <div class="ds-field">
+                    <label class="ds-label" for="rule-category">@Loc["ColCategory"]</label>
+                    <input id="rule-category" type="text" class="ds-input" @bind="EditCategory" maxlength="60" />
+                </div>
+
+                @if (IsAdding)
+                {
+                    <div class="ds-field">
+                        <label class="ds-label" for="rule-target">@Loc["ColTarget"]</label>
+                        <select id="rule-target" class="ds-select" @bind="EditTarget">
+                            <option value="@RuleTarget.Element">@Loc["TargetElement"]</option>
+                            <option value="@RuleTarget.Participant">@Loc["TargetParticipant"]</option>
+                        </select>
+                    </div>
+                }
+            </div>
+        </ChildContent>
+        <Actions>
+            <button type="button" class="ds-btn ds-btn--secondary" @onclick="CancelEdit">@Loc["BtnCancel"]</button>
+            <button type="button" class="ds-btn ds-btn--primary" @onclick="SaveEdit" disabled="@(EditPoints == 0 || string.IsNullOrWhiteSpace(EditLabel))">@Loc["BtnSaveRule"]</button>
+            @if (!IsAdding && EditingRule is { } editing)
+            {
+                <button type="button" class="ds-btn ds-btn--danger" @onclick="() => DeleteRule(editing)">@Loc["BtnDelete"]</button>
+            }
+        </Actions>
+    </Modal>
+}
+
 @code {
+    private const int MaxPoints = 999;
+
     [Parameter] public Guid GameId { get; set; }
     [Parameter] public GameState GameState { get; set; }
     [Parameter] public EventCallback<string> OnError { get; set; }
 
     private List<Rule>? Rules;
-    
+
     private bool CanEdit => GameState == GameState.Draft || GameState == GameState.Open;
 
     private bool IsAdding = false;
     private Rule? EditingRule;
-    
+
     private string EditLabel = "";
     private int EditPoints = 1;
     private string EditCategory = "";
@@ -174,6 +175,16 @@
         EditTarget = rule.Target;
     }
 
+    private void SetBonus(bool bonus) => EditPoints = bonus ? Math.Abs(EditPoints) : -Math.Abs(EditPoints);
+
+    /// <summary>Changes the size of the points, keeping the sign and never reaching zero.</summary>
+    private void Step(int delta)
+    {
+        var sign = EditPoints < 0 ? -1 : 1;
+        var size = Math.Clamp(Math.Abs(EditPoints) + delta, 1, MaxPoints);
+        EditPoints = sign * size;
+    }
+
     private void CancelEdit()
     {
         IsAdding = false;
@@ -210,6 +221,7 @@
         try
         {
             await RuleService.DeleteRuleAsync(GameId, rule.Id);
+            CancelEdit();
             await LoadRules();
         }
         catch (Exception ex)
@@ -227,7 +239,7 @@
             var prev = Rules[index - 1];
             Rules[index - 1] = rule;
             Rules[index] = prev;
-            
+
             await SaveOrder();
         }
     }
@@ -241,7 +253,7 @@
             var next = Rules[index + 1];
             Rules[index + 1] = rule;
             Rules[index] = next;
-            
+
             await SaveOrder();
         }
     }

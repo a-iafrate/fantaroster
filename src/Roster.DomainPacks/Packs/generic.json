@@ -8,6 +8,7 @@
     "en": "A flexible foundation for any game.",
     "it": "Una base flessibile per qualsiasi gioco."
   },
+  "icon": "icon-sparkles",
   "requiresConsent": false,
   "recommendedPlugins": [ "csv" ],
   "terminology": {

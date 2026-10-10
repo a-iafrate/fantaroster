@@ -1,0 +1,28 @@
+@* A brand name as a wordmark: the first word in bold, the rest regular ("fanta" + "roster"). The name comes from configuration. *@
+<span class="wordmark" aria-label="@Name"><b>@Prefix</b>@Rest</span>
+
+@code {
+    [Parameter, EditorRequired] public string Name { get; set; } = string.Empty;
+
+    /// <summary>Splits at the second capital letter of the name (FantaRoster becomes Fanta and Roster).</summary>
+    private string Safe => Name ?? string.Empty;
+
+    private int SplitIndex
+    {
+        get
+        {
+            for (var i = 1; i < Safe.Length; i++)
+            {
+                if (char.IsUpper(Safe[i]))
+                {
+                    return i;
+                }
+            }
+            return Safe.Length;
+        }
+    }
+
+    private string Prefix => Safe.ToLowerInvariant()[..SplitIndex];
+
+    private string Rest => Safe.ToLowerInvariant()[SplitIndex..];
+}

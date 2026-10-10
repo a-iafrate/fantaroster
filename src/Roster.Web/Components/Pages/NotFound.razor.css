@@ -1,0 +1,21 @@
+.notice-page {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    max-width: 560px;
+    margin: 0 auto;
+    padding: var(--space-16) var(--space-5);
+}
+
+.notice-page__title {
+    margin: 0;
+    font: var(--text-h1);
+    letter-spacing: var(--tracking-h1);
+}
+
+.notice-page__text {
+    margin: 0;
+    color: var(--color-ink-2);
+    font: var(--text-body-l);
+}

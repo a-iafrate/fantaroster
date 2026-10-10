@@ -160,18 +160,6 @@
   <data name="StepPublish" xml:space="preserve">
     <value>Publish</value>
   </data>
-  <data name="SourceSessionize" xml:space="preserve">
-    <value>Sessionize</value>
-  </data>
-  <data name="SourceSessionizeDesc" xml:space="preserve">
-    <value>Speakers and sessions from your event API.</value>
-  </data>
-  <data name="SourceCSV" xml:space="preserve">
-    <value>CSV</value>
-  </data>
-  <data name="SourceCSVDesc" xml:space="preserve">
-    <value>One row per element (not fully supported yet).</value>
-  </data>
   <data name="SourceNone" xml:space="preserve">
     <value>None</value>
   </data>
@@ -389,7 +377,7 @@
     <value>No elements require consent in this game.</value>
   </data>
   <data name="ConsentStatus_NotRequired">
-    <value>Not Required</value>
+    <value>Not required</value>
   </data>
   <data name="ConsentStatus_Pending">
     <value>Pending</value>
@@ -401,10 +389,10 @@
     <value>Declined</value>
   </data>
   <data name="BtnGenerateConsentLink">
-    <value>Generate Link</value>
+    <value>Generate consent link</value>
   </data>
   <data name="BtnRegenerateConsentLink">
-    <value>Regenerate Link</value>
+    <value>Generate a new consent link</value>
   </data>
   <data name="ConsentLinkGenerated">
     <value>Consent Link Generated</value>
@@ -431,10 +419,10 @@
     <value>Do you accept to participate in the game as {0}?</value>
   </data>
   <data name="BtnDeclineConsent">
-    <value>Decline</value>
+    <value>No, thanks</value>
   </data>
   <data name="BtnAcceptConsent">
-    <value>Accept</value>
+    <value>Yes, put me in the game</value>
   </data>
   <data name="ConsentInvalidToken">
     <value>Invalid or expired consent token.</value>
@@ -555,6 +543,393 @@
   </data>
   <data name="LinkCopied" xml:space="preserve">
     <value>Link copied</value>
+  </data>
+  <data name="AccountMenu" xml:space="preserve">
+    <value>Account menu</value>
+  </data>
+  <data name="BackToGames" xml:space="preserve">
+    <value>Back to my games</value>
+  </data>
+  <data name="BtnSaveRule" xml:space="preserve">
+    <value>Save rule</value>
+  </data>
+  <data name="ColDisplayName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ControlDesc" xml:space="preserve">
+    <value>Phases of the game and what is happening live.</value>
+  </data>
+  <data name="ControlPhases" xml:space="preserve">
+    <value>Game phases</value>
+  </data>
+  <data name="DeleteRefereeNamed" xml:space="preserve">
+    <value>Delete referee {0}</value>
+  </data>
+  <data name="EditRuleNamed" xml:space="preserve">
+    <value>Edit rule {0}</value>
+  </data>
+  <data name="ElementActions" xml:space="preserve">
+    <value>Actions for {0}</value>
+  </data>
+  <data name="EndGameConfirmBody" xml:space="preserve">
+    <value>Ending the game stops scoring and shows the final leaderboard. This cannot be undone.</value>
+  </data>
+  <data name="EndGameTypeCode" xml:space="preserve">
+    <value>Type the game code {0} to confirm</value>
+  </data>
+  <data name="FilterEnded" xml:space="preserve">
+    <value>Ended</value>
+  </data>
+  <data name="FilterLabel" xml:space="preserve">
+    <value>Filter games</value>
+  </data>
+  <data name="FilterPreparing" xml:space="preserve">
+    <value>In preparation</value>
+  </data>
+  <data name="GameActions" xml:space="preserve">
+    <value>Actions for {0}</value>
+  </data>
+  <data name="LatestPointsTitle" xml:space="preserve">
+    <value>Latest points</value>
+  </data>
+  <data name="MainNavLabel" xml:space="preserve">
+    <value>Main navigation</value>
+  </data>
+  <data name="MaterialsDesc" xml:space="preserve">
+    <value>QR code, link and poster to get people in.</value>
+  </data>
+  <data name="MenuClose" xml:space="preserve">
+    <value>Close menu</value>
+  </data>
+  <data name="MenuOpen" xml:space="preserve">
+    <value>Open menu</value>
+  </data>
+  <data name="MoveDownRule" xml:space="preserve">
+    <value>Move {0} down</value>
+  </data>
+  <data name="MoveUpRule" xml:space="preserve">
+    <value>Move {0} up</value>
+  </data>
+  <data name="NavControl" xml:space="preserve">
+    <value>Control</value>
+  </data>
+  <data name="NavElements" xml:space="preserve">
+    <value>Elements</value>
+  </data>
+  <data name="NavMaterials" xml:space="preserve">
+    <value>Materials</value>
+  </data>
+  <data name="NavOverview" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="NavReferees" xml:space="preserve">
+    <value>Referees</value>
+  </data>
+  <data name="NavRules" xml:space="preserve">
+    <value>Rules</value>
+  </data>
+  <data name="NavSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="NoElementsYet" xml:space="preserve">
+    <value>No elements to show.</value>
+  </data>
+  <data name="NoGamesInFilter" xml:space="preserve">
+    <value>No games here.</value>
+  </data>
+  <data name="NoPointsYet" xml:space="preserve">
+    <value>No points assigned yet.</value>
+  </data>
+  <data name="OpenBigScreen" xml:space="preserve">
+    <value>Open big screen</value>
+  </data>
+  <data name="OpensNewTab" xml:space="preserve">
+    <value>(opens in a new tab)</value>
+  </data>
+  <data name="Optional" xml:space="preserve">
+    <value>optional</value>
+  </data>
+  <data name="OverviewDesc" xml:space="preserve">
+    <value>Game status and things to do.</value>
+  </data>
+  <data name="OverviewShare" xml:space="preserve">
+    <value>Share the game</value>
+  </data>
+  <data name="PointsLess" xml:space="preserve">
+    <value>Fewer points</value>
+  </data>
+  <data name="PointsMore" xml:space="preserve">
+    <value>More points</value>
+  </data>
+  <data name="RuleBonus" xml:space="preserve">
+    <value>Bonus</value>
+  </data>
+  <data name="RuleMalus" xml:space="preserve">
+    <value>Penalty</value>
+  </data>
+  <data name="RuleWhatHappens" xml:space="preserve">
+    <value>What happens</value>
+  </data>
+  <data name="RulesEthicsNote" xml:space="preserve">
+    <value>Reward moments, never the quality of people.</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="SkipToContent" xml:space="preserve">
+    <value>Skip to content</value>
+  </data>
+  <data name="StatConsents" xml:space="preserve">
+    <value>Consents</value>
+  </data>
+  <data name="StatElements" xml:space="preserve">
+    <value>Elements</value>
+  </data>
+  <data name="StatPlayers" xml:space="preserve">
+    <value>Players</value>
+  </data>
+  <data name="StatPoints" xml:space="preserve">
+    <value>Points assigned</value>
+  </data>
+  <data name="StatTotal" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="StatusHidden" xml:space="preserve">
+    <value>Hidden</value>
+  </data>
+  <data name="ToDo" xml:space="preserve">
+    <value>To do:</value>
+  </data>
+  <data name="TodoAllDone" xml:space="preserve">
+    <value>Nothing to fix. You are ready.</value>
+  </data>
+  <data name="TodoConsentPending" xml:space="preserve">
+    <value>{0} elements have not answered the consent request yet</value>
+  </data>
+  <data name="TodoGo" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="TodoNoElements" xml:space="preserve">
+    <value>Nothing is in play yet</value>
+  </data>
+  <data name="TodoNoReferees" xml:space="preserve">
+    <value>No referee has been invited yet</value>
+  </data>
+  <data name="TodoNoRules" xml:space="preserve">
+    <value>There are no rules yet</value>
+  </data>
+  <data name="TodoOpenJoins" xml:space="preserve">
+    <value>The game is a draft: open joins so people can enter</value>
+  </data>
+  <data name="TodoTitle" xml:space="preserve">
+    <value>To fix</value>
+  </data>
+  <data name="ViewAsPlayer" xml:space="preserve">
+    <value>View as player</value>
+  </data>
+  <data name="PhasePrepare" xml:space="preserve">
+    <value>Preparation</value>
+  </data>
+  <data name="PhasePrepareNote" xml:space="preserve">
+    <value>Elements and rules</value>
+  </data>
+  <data name="PhaseJoins" xml:space="preserve">
+    <value>Joins open</value>
+  </data>
+  <data name="PhaseJoinsNote" xml:space="preserve">
+    <value>Players pick their roster</value>
+  </data>
+  <data name="PhaseLive" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="PhaseLiveNote" xml:space="preserve">
+    <value>Rosters locked, scoring</value>
+  </data>
+  <data name="PhaseEnded" xml:space="preserve">
+    <value>Ended</value>
+  </data>
+  <data name="PhaseEndedNote" xml:space="preserve">
+    <value>Final leaderboard</value>
+  </data>
+  <data name="WizardClose" xml:space="preserve">
+    <value>Close the wizard</value>
+  </data>
+  <data name="StepOfTotal" xml:space="preserve">
+    <value>Step {0} of {1}</value>
+  </data>
+  <data name="SourceDesc_sessionize" xml:space="preserve">
+    <value>Import the elements from the public API of your event.</value>
+  </data>
+  <data name="SourceDesc_csv" xml:space="preserve">
+    <value>Import the elements from a spreadsheet file, one row each.</value>
+  </data>
+  <data name="PubNavHow" xml:space="preserve">
+    <value>How it works</value>
+  </data>
+  <data name="PubNavDomains" xml:space="preserve">
+    <value>Use cases</value>
+  </data>
+  <data name="PubHaveCode" xml:space="preserve">
+    <value>I have a game code</value>
+  </data>
+  <data name="PubHaveCodeShort" xml:space="preserve">
+    <value>I have a code</value>
+  </data>
+  <data name="PubSignIn" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="PubCreate" xml:space="preserve">
+    <value>Create your game</value>
+  </data>
+  <data name="PubMenu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="PubFooterPlay" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="PubFooterOrganize" xml:space="preserve">
+    <value>Organize</value>
+  </data>
+  <data name="PubCopyright" xml:space="preserve">
+    <value>© {0} {1}</value>
+  </data>
+  <data name="HeroTitle" xml:space="preserve">
+    <value>Fantasy for anything</value>
+  </data>
+  <data name="HeroSub" xml:space="preserve">
+    <value>Pick what is in play, open a QR code and let the leaderboard do the rest.</value>
+  </data>
+  <data name="HeroCardLabel" xml:space="preserve">
+    <value>Your next game</value>
+  </data>
+  <data name="HowTitle" xml:space="preserve">
+    <value>How it works</value>
+  </data>
+  <data name="How1Title" xml:space="preserve">
+    <value>Create the game</value>
+  </data>
+  <data name="How1Desc" xml:space="preserve">
+    <value>Pick a use case, import what is in play and set the rules.</value>
+  </data>
+  <data name="How2Title" xml:space="preserve">
+    <value>Share the QR code</value>
+  </data>
+  <data name="How2Desc" xml:space="preserve">
+    <value>People join with a nickname. No account, no download.</value>
+  </data>
+  <data name="How3Title" xml:space="preserve">
+    <value>Score live</value>
+  </data>
+  <data name="How3Desc" xml:space="preserve">
+    <value>Referees assign points from their phone and the leaderboard moves in seconds.</value>
+  </data>
+  <data name="DomainsTitle" xml:space="preserve">
+    <value>One game, many use cases</value>
+  </data>
+  <data name="DomainsDesc" xml:space="preserve">
+    <value>Each use case comes with its own words, rules and sources.</value>
+  </data>
+  <data name="NotFoundTitle" xml:space="preserve">
+    <value>Page not found</value>
+  </data>
+  <data name="NotFoundBody" xml:space="preserve">
+    <value>The page you are looking for does not exist or has moved.</value>
+  </data>
+  <data name="BackHome" xml:space="preserve">
+    <value>Back to the home page</value>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Something went wrong</value>
+  </data>
+  <data name="ErrorBody" xml:space="preserve">
+    <value>We could not complete your request. Try again in a moment.</value>
+  </data>
+  <data name="ErrorRequestId" xml:space="preserve">
+    <value>Request ID: {0}</value>
+  </data>
+  <data name="LoginPageTitle" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Sign in to organize</value>
+  </data>
+  <data name="LoginIntro" xml:space="preserve">
+    <value>We send you a link by email: no password to remember. If it is your first time, we create your account.</value>
+  </data>
+  <data name="LoginEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="LoginEmailPlaceholder" xml:space="preserve">
+    <value>name@example.com</value>
+  </data>
+  <data name="LoginSend" xml:space="preserve">
+    <value>Send me the link</value>
+  </data>
+  <data name="LoginSending" xml:space="preserve">
+    <value>Sending...</value>
+  </data>
+  <data name="LoginJustPlaying" xml:space="preserve">
+    <value>Just here to play?</value>
+  </data>
+  <data name="LoginExpiredTitle" xml:space="preserve">
+    <value>This link has expired</value>
+  </data>
+  <data name="LoginExpiredBody" xml:space="preserve">
+    <value>Links last 15 minutes and work only once. We can send you a new one right away.</value>
+  </data>
+  <data name="LoginExpiredCta" xml:space="preserve">
+    <value>Send me a new link</value>
+  </data>
+  <data name="LoginSentTitle" xml:space="preserve">
+    <value>Check your inbox</value>
+  </data>
+  <data name="LoginSentBody" xml:space="preserve">
+    <value>We sent the link to {0}. It lasts 15 minutes.</value>
+  </data>
+  <data name="LoginSentHint" xml:space="preserve">
+    <value>Cannot find it? Look in Spam or Promotions.</value>
+  </data>
+  <data name="LoginOpenMail" xml:space="preserve">
+    <value>Open the mail app</value>
+  </data>
+  <data name="LoginWrongEmail" xml:space="preserve">
+    <value>Wrong email? Change it</value>
+  </data>
+  <data name="ConsentGreeting" xml:space="preserve">
+    <value>Hello {0},</value>
+  </data>
+  <data name="ConsentHeadline" xml:space="preserve">
+    <value>{0} would like you in the game</value>
+  </data>
+  <data name="ConsentIntro" xml:space="preserve">
+    <value>Players will be able to pick you for their roster and score points on the moments of the event.</value>
+  </data>
+  <data name="ConsentWhatItMeans" xml:space="preserve">
+    <value>What it means</value>
+  </data>
+  <data name="ConsentPoint1" xml:space="preserve">
+    <value>Players can pick you and follow your points live.</value>
+  </data>
+  <data name="ConsentPoint2" xml:space="preserve">
+    <value>Points reward observable moments, never your quality or your looks.</value>
+  </data>
+  <data name="ConsentPoint3" xml:space="preserve">
+    <value>You can change your mind at any time by asking the organizer.</value>
+  </data>
+  <data name="ConsentPoint4" xml:space="preserve">
+    <value>Your choice only applies to this game.</value>
+  </data>
+  <data name="ConsentAcceptedLine" xml:space="preserve">
+    <value>You are in the game.</value>
+  </data>
+  <data name="ConsentDeclinedLine" xml:space="preserve">
+    <value>You are not in the game.</value>
+  </data>
+  <data name="ConsentAnsweredBody" xml:space="preserve">
+    <value>Thank you. You can close this page.</value>
+  </data>
+  <data name="ConsentRulesExamples" xml:space="preserve">
+    <value>Examples of rules in this game</value>
   </data>
 </root>
 

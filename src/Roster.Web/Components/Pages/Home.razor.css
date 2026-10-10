@@ -1,0 +1,293 @@
+.hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: 1200px;
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-5) var(--space-10);
+}
+
+.hero__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.hero__title {
+    margin: 0;
+    font: var(--text-display);
+    font-size: 2.75rem;
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+}
+
+.hero__sub {
+    max-width: 600px;
+    margin: 0;
+    color: var(--color-ink-2);
+    font: var(--text-body-l);
+}
+
+.hero__ctas {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+/* Three fanned cards (decorative) */
+.hero__art {
+    position: relative;
+    height: 220px;
+}
+
+.hero__card {
+    position: absolute;
+    border-radius: var(--radius-l);
+}
+
+.hero__card--cyan {
+    left: 10%;
+    top: 30px;
+    width: 120px;
+    height: 160px;
+    background: var(--color-cyan);
+    transform: rotate(-12deg);
+}
+
+.hero__card--blue {
+    right: 10%;
+    top: 30px;
+    width: 120px;
+    height: 160px;
+    background: var(--color-blue);
+    transform: rotate(12deg);
+}
+
+.hero__card--main {
+    left: 50%;
+    top: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 140px;
+    height: 180px;
+    margin-left: -70px;
+    padding: var(--space-3);
+    border: 2px solid var(--color-primary);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lift);
+}
+
+.hero__card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    color: var(--color-link);
+    font-size: 1.5rem;
+}
+
+.hero__card-label {
+    font: var(--text-small);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.band {
+    padding: var(--space-8) var(--space-5);
+}
+
+.band--surface {
+    border-block: 1px solid var(--color-line);
+    background: var(--color-surface);
+}
+
+.band > * {
+    max-width: 1200px;
+    margin-inline: auto;
+}
+
+.band__title {
+    margin: 0 auto var(--space-4);
+    font: var(--text-h1);
+    font-size: 1.75rem;
+    letter-spacing: var(--tracking-h1);
+}
+
+.band__desc {
+    margin: calc(var(--space-2) * -1) auto var(--space-5);
+    color: var(--color-ink-2);
+    font: var(--text-body);
+}
+
+.steps,
+.domains {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: 0;
+    list-style: none;
+}
+
+.step {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: var(--space-3);
+}
+
+.step__n {
+    grid-row: 1 / 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: 800;
+}
+
+.step__title {
+    margin: 0;
+    font: var(--text-body);
+    font-weight: 800;
+}
+
+.step__desc {
+    margin: 0;
+    color: var(--color-ink-2);
+    font: var(--text-small);
+}
+
+.domain {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+}
+
+.domain > i {
+    color: var(--color-link);
+    font-size: 1.75rem;
+}
+
+.domain__title {
+    margin: 0;
+    font: var(--text-body-l);
+    font-weight: 800;
+}
+
+.domain__desc {
+    margin: 0;
+    color: var(--color-ink-2);
+    font: var(--text-small);
+}
+
+@media (min-width: 768px) {
+    .hero__ctas {
+        flex-direction: row;
+    }
+
+    .domains {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-12);
+        padding: var(--space-16) var(--space-10) var(--space-20);
+    }
+
+    .hero__text {
+        flex: 1;
+        gap: var(--space-6);
+    }
+
+    .hero__title {
+        font-size: 5.5rem;
+        line-height: .95;
+        letter-spacing: -3px;
+    }
+
+    .hero__sub {
+        font: var(--text-h3);
+        font-weight: 500;
+    }
+
+    .hero__art {
+        flex: 0 0 560px;
+        height: 420px;
+    }
+
+    .hero__card--cyan {
+        left: 30px;
+        top: 70px;
+        width: 220px;
+        height: 300px;
+    }
+
+    .hero__card--blue {
+        right: 40px;
+        left: auto;
+        top: 70px;
+        width: 220px;
+        height: 300px;
+    }
+
+    .hero__card--main {
+        top: 30px;
+        width: 240px;
+        height: 320px;
+        margin-left: -120px;
+        padding: var(--space-5);
+    }
+
+    .hero__card-label {
+        font: var(--text-h3);
+    }
+
+    .band {
+        padding: var(--space-16) var(--space-10);
+    }
+
+    .band__title {
+        font-size: 2.5rem;
+    }
+
+    .steps {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-6);
+    }
+
+    .step {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .step__n {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-m);
+        font-size: 1.375rem;
+    }
+
+    .step__title {
+        font: var(--text-h3);
+        font-weight: 800;
+    }
+
+    .step__desc {
+        font: var(--text-body);
+    }
+
+    .domains {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}

@@ -55,7 +55,7 @@ public class RuleEditorTests : TestContext
         cut.Markup.ShouldContain("Rule 1");
         cut.Markup.ShouldContain("Rule 2");
         cut.Markup.ShouldContain("+10");
-        cut.Markup.ShouldContain("-5");
+        cut.Markup.ShouldContain("−5");
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class RuleEditorTests : TestContext
             .Add(p => p.GameState, GameState.Draft));
 
         // Act
-        cut.Find("button.mg-btn-primary").Click();
+        cut.Find("button.ds-btn--primary").Click();
 
         // Assert
         cut.Markup.ShouldContain("AddRuleTitle");

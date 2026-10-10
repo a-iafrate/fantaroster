@@ -1,43 +1,44 @@
-@using Microsoft.Extensions.Localization
 @using Roster.Application.Services
 @using Roster.Domain.Games
 @inject GameSettingsService SettingsService
 @inject IStringLocalizer<SharedResource> Loc
 
-<div class="mg-section">
-    <div class="mg-section-title">@Loc["SettingsTitle"]</div>
-    <div class="mg-section-desc">@Loc["SettingsDesc"]</div>
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["NavSettings"]</h1>
+            <p class="ds-page-desc">@Loc["SettingsDesc"]</p>
+        </div>
+    </header>
 
     @if (_canEdit is null)
     {
-        <div>@Loc["Loading"]</div>
+        <p class="ds-muted" role="status">@Loc["Loading"]</p>
     }
     else
     {
         @if (_canEdit == false)
         {
-            <div class="mg-alert-info">@Loc["SettingsLockedNotice"]</div>
+            <p class="ds-alert ds-alert--info" role="status">@Loc["SettingsLockedNotice"]</p>
         }
 
-        <div class="settings-form">
-            <div class="settings-field">
-                <label for="settings-name">@Loc["CreateGameNameLabel"]</label>
-                <input id="settings-name" class="settings-input" @bind="_name" maxlength="100" />
+        <form class="ds-form settings-form" @onsubmit="SaveAsync">
+            <div class="ds-field">
+                <label class="ds-label" for="settings-name">@Loc["CreateGameNameLabel"]</label>
+                <input id="settings-name" class="ds-input" @bind="_name" maxlength="100" required />
             </div>
-            <div class="settings-field">
-                <label for="settings-size">@Loc["CreateGameLineupSizeLabel"]</label>
-                <input id="settings-size" type="number" min="1" class="settings-input" @bind="_lineupSize" disabled="@(_canEdit != true)" />
+            <div class="ds-field">
+                <label class="ds-label" for="settings-size">@Loc["CreateGameLineupSizeLabel"]</label>
+                <input id="settings-size" type="number" min="1" inputmode="numeric" class="ds-input" @bind="_lineupSize" disabled="@(_canEdit != true)" />
             </div>
 
             @if (_saved)
             {
-                <div class="settings-saved" role="status">@Loc["SettingsSaved"]</div>
+                <p class="ds-alert ds-alert--success" role="status">@Loc["SettingsSaved"]</p>
             }
 
-            <div>
-                <button type="button" class="mg-btn-primary" @onclick="SaveAsync" disabled="@_isSaving">@Loc["BtnSave"]</button>
-            </div>
-        </div>
+            <button type="submit" class="ds-btn ds-btn--l ds-btn--primary" disabled="@_isSaving">@Loc["BtnSave"]</button>
+        </form>
     }
 </div>
 

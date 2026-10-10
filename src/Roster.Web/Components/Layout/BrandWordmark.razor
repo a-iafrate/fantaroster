@@ -1,0 +1,5 @@
+@using Microsoft.Extensions.Options
+@using Roster.Web.Options
+@inject IOptions<BrandOptions> Brand
+
+<Roster.Web.Client.Shared.Wordmark Name="@Brand.Value.Name" />

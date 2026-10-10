@@ -1,50 +1,82 @@
 @page "/consent/{Token}"
-@using Microsoft.Extensions.Localization
+@rendermode InteractiveServer
+@layout Roster.Web.Components.Layout.EmptyLayout
 @using Roster.Application.Services
 @using Roster.Application.Ports.Data
 @using Roster.Domain.Elements
+@using Roster.Domain.Games
+@using Roster.Web.Client.Components.Participant
 @inject IStringLocalizer<SharedResource> Loc
 @inject ConsentManagementService ConsentService
+@inject RuleManagementService RuleService
 @inject IElementRepository ElementRepository
-@inject NavigationManager Navigation
+@inject IGameRepository GameRepository
 
 <PageTitle>@Loc["ConsentPageTitle"]</PageTitle>
 
-<div class="consent-container">
-    @if (IsLoading)
-    {
-        <div class="consent-loading">@Loc["Loading"]</div>
-    }
-    else if (ErrorMessage != null)
-    {
-        <div class="consent-error">
-            <h2>@Loc["ConsentErrorTitle"]</h2>
-            <p>@ErrorMessage</p>
-        </div>
-    }
-    else if (IsAnswered)
-    {
-        <div class="consent-success">
-            <h2>@Loc["ConsentSuccessTitle"]</h2>
-            <p>@Loc["ConsentSuccessDesc"]</p>
-        </div>
-    }
-    else if (Element != null)
-    {
-        <div class="consent-card">
-            <h2>@Loc["ConsentRequestTitle"]</h2>
-            <p>@string.Format(Loc["ConsentRequestDesc"].Value, Element.Name)</p>
-            
-            <div class="consent-actions">
-                <button class="btn-decline" @onclick="() => Answer(false)" disabled="@IsProcessing">@Loc["BtnDeclineConsent"]</button>
-                <button class="btn-accept" @onclick="() => Answer(true)" disabled="@IsProcessing">@Loc["BtnAcceptConsent"]</button>
-            </div>
-            
-            @if (SubmitError != null)
+@* Consent page for whoever or whatever is in play (mockup 04, screen 18). Calm tone: both answers weigh the same. *@
+<div class="consent">
+    <main class="consent__main">
+        <a href="/" class="consent__brand"><img src="assets/logo-r.svg" alt="" /><BrandWordmark /></a>
+
+        @if (IsLoading)
+        {
+            <p class="consent__text" role="status">@Loc["Loading"]</p>
+        }
+        else if (ErrorMessage is not null)
+        {
+            <h1 class="consent__title">@Loc["ConsentErrorTitle"]</h1>
+            <p class="consent__text" role="alert">@ErrorMessage</p>
+        }
+        else if (_element is { } element && _game is { } game)
+        {
+            @if (_answer is { } accepted)
             {
-                <div class="consent-submit-error">@SubmitError</div>
+                <h1 class="consent__title" tabindex="-1">@(accepted ? Loc["ConsentAcceptedLine"] : Loc["ConsentDeclinedLine"])</h1>
+                <p class="consent__text" role="status">@Loc["ConsentAnsweredBody"]</p>
             }
-        </div>
+            else
+            {
+                <p class="consent__greeting">@string.Format(Loc["ConsentGreeting"], element.Name)</p>
+                <h1 class="consent__title">@string.Format(Loc["ConsentHeadline"], game.Name)</h1>
+                <p class="consent__text">@Loc["ConsentIntro"]</p>
+
+                <div class="consent__actions">
+                    <button type="button" class="ds-btn ds-btn--l ds-btn--primary" disabled="@IsProcessing" @onclick="() => AnswerAsync(true)">@Loc["BtnAcceptConsent"]</button>
+                    <button type="button" class="ds-btn ds-btn--l ds-btn--secondary" disabled="@IsProcessing" @onclick="() => AnswerAsync(false)">@Loc["BtnDeclineConsent"]</button>
+                </div>
+
+                @if (SubmitError is not null)
+                {
+                    <p class="ds-alert" role="alert">@SubmitError</p>
+                }
+                <p class="consent__note">@Loc["ConsentPoint4"]</p>
+            }
+        }
+    </main>
+
+    @if (_element is not null && _answer is null && ErrorMessage is null)
+    {
+        <aside class="consent__aside" aria-labelledby="consent-means">
+            <h2 class="consent__aside-title" id="consent-means">@Loc["ConsentWhatItMeans"]</h2>
+            <ul class="consent__points">
+                <li><i class="icon-users" aria-hidden="true"></i><span>@Loc["ConsentPoint1"]</span></li>
+                <li><i class="icon-heart-handshake" aria-hidden="true"></i><span>@Loc["ConsentPoint2"]</span></li>
+                <li><i class="icon-undo-2" aria-hidden="true"></i><span>@Loc["ConsentPoint3"]</span></li>
+            </ul>
+            @if (_exampleRules.Count > 0)
+            {
+                <div class="consent__rules">
+                    <h3 class="consent__rules-title">@Loc["ConsentRulesExamples"]</h3>
+                    <ul class="consent__chips">
+                        @foreach (var rule in _exampleRules)
+                        {
+                            <li class="consent__chip">@rule.Label <span class="ds-points @(rule.Points < 0 ? "ds-points--penalty" : "")">@ParticipantFormat.Points(rule.Points)</span></li>
+                        }
+                    </ul>
+                </div>
+            }
+        </aside>
     }
 </div>
 
@@ -52,35 +84,50 @@
     [Parameter] public string Token { get; set; } = string.Empty;
 
     private bool IsLoading = true;
-    private bool IsProcessing = false;
-    private bool IsAnswered = false;
+    private bool IsProcessing;
     private string? ErrorMessage;
     private string? SubmitError;
-    private Element? Element;
+    private Element? _element;
+    private Game? _game;
+    private List<Rule> _exampleRules = [];
+
+    /// <summary>The answer already given (now or earlier), once there is one.</summary>
+    private bool? _answer;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var invitation = await ConsentService.GetInvitationByTokenAsync(Token);
-            if (invitation == null)
+            if (invitation is null)
             {
                 ErrorMessage = Loc["ConsentInvalidToken"];
+                return;
             }
-            else if (invitation.AnsweredAt.HasValue)
+
+            _element = await ElementRepository.GetByIdAsync(invitation.ElementId);
+            if (_element is null)
             {
-                IsAnswered = true;
+                ErrorMessage = Loc["ConsentInvalidElement"];
+                return;
             }
-            else
+
+            _game = await GameRepository.GetByIdAsync(_element.GameId);
+            if (invitation.AnsweredAt.HasValue)
             {
-                Element = await ElementRepository.GetByIdAsync(invitation.ElementId);
-                if (Element == null)
-                {
-                    ErrorMessage = Loc["ConsentInvalidElement"];
-                }
+                _answer = _element.ConsentStatus == ConsentStatus.Accepted;
+                return;
+            }
+
+            if (_game is not null)
+            {
+                // Two examples of what scores in this game: the biggest bonus and the biggest penalty.
+                var rules = (await RuleService.GetRulesByGameAsync(_game.Id)).Where(r => r.Target == RuleTarget.Element).ToList();
+                _exampleRules = rules.Where(r => r.Points > 0).OrderByDescending(r => r.Points).Take(1)
+                    .Concat(rules.Where(r => r.Points < 0).OrderBy(r => r.Points).Take(1)).ToList();
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
         {
             ErrorMessage = ex.Message;
         }
@@ -90,7 +137,7 @@
         }
     }
 
-    private async Task Answer(bool accepted)
+    private async Task AnswerAsync(bool accepted)
     {
         if (IsProcessing) return;
         IsProcessing = true;
@@ -99,9 +146,9 @@
         try
         {
             await ConsentService.AnswerInvitationAsync(Token, accepted);
-            IsAnswered = true;
+            _answer = accepted;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
         {
             SubmitError = ex.Message;
         }

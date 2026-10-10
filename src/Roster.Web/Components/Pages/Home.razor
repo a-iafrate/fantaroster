@@ -1,195 +1,59 @@
 @page "/"
+@using System.Globalization
+@using Microsoft.Extensions.Options
+@using Roster.DomainPacks
+@using Roster.Web.Options
+@inject IDomainPackLoader DomainPacks
+@inject IOptions<BrandOptions> Brand
+@inject IStringLocalizer<SharedResource> Loc
 
-<PageTitle>FantaRoster - Il fanta di qualsiasi cosa</PageTitle>
+<PageTitle>@Brand.Value.Name - @Loc["HeroTitle"]</PageTitle>
 
-<div class="hero-section">
-    <div class="hero-content">
-        <h1 class="hero-title">Il fanta di qualsiasi cosa</h1>
-        <p class="hero-subtitle">Conferenze, matrimoni, tornei. Scegli cosa è in gioco e apri un QR. Al resto pensa la classifica.</p>
-        <div class="hero-actions">
-            <a href="/app/nuova" class="btn-primary-large">Crea il tuo fanta</a>
-            <a href="/j" class="btn-outline-large"><i class="icon-qr-code"></i> Ho un codice partita</a>
+@* Landing (mockup 04, screen 17). Everything about a use case comes from the domain packs, never from this page. *@
+<section class="hero">
+    <div class="hero__text">
+        <h1 class="hero__title">@Loc["HeroTitle"]</h1>
+        <p class="hero__sub">@Loc["HeroSub"]</p>
+        <div class="hero__ctas">
+            <a href="/organizer/create-game" class="ds-btn ds-btn--l ds-btn--primary">@Loc["PubCreate"]</a>
+            <a href="/j" class="ds-btn ds-btn--l ds-btn--secondary"><i class="icon-qr-code" aria-hidden="true"></i>@Loc["PubHaveCode"]</a>
         </div>
     </div>
-    
-    <div class="hero-illustration">
-        <!-- Abstract representation or illustration -->
-        <div class="illustration-card card-cyan"></div>
-        <div class="illustration-card card-blue"></div>
-        <div class="illustration-card card-main">
-            <div class="card-header">
-                <i class="icon-star"></i>
-                <span class="badge-lime">+10</span>
-            </div>
-            <div class="card-title">Il tuo prossimo fanta</div>
-        </div>
+    <div class="hero__art" aria-hidden="true">
+        <span class="hero__card hero__card--cyan"></span>
+        <span class="hero__card hero__card--blue"></span>
+        <span class="hero__card hero__card--main">
+            <span class="hero__card-top"><i class="icon-star"></i><span class="ds-points">+10</span></span>
+            <span class="hero__card-label">@Loc["HeroCardLabel"]</span>
+        </span>
     </div>
-</div>
+</section>
 
-<style>
-    .hero-section {
-        display: flex;
-        flex-direction: column;
-        gap: 48px;
-        padding: 64px 24px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    
-    @@media (min-width: 1024px) {
-        .hero-section {
-            flex-direction: row;
-            align-items: center;
-            padding: 120px 72px;
-            gap: 80px;
+<section class="band band--surface" id="how" aria-labelledby="how-title">
+    <h2 class="band__title" id="how-title">@Loc["HowTitle"]</h2>
+    <ol class="steps">
+        <li class="step"><span class="step__n" aria-hidden="true">1</span><h3 class="step__title">@Loc["How1Title"]</h3><p class="step__desc">@Loc["How1Desc"]</p></li>
+        <li class="step"><span class="step__n" aria-hidden="true">2</span><h3 class="step__title">@Loc["How2Title"]</h3><p class="step__desc">@Loc["How2Desc"]</p></li>
+        <li class="step"><span class="step__n" aria-hidden="true">3</span><h3 class="step__title">@Loc["How3Title"]</h3><p class="step__desc">@Loc["How3Desc"]</p></li>
+    </ol>
+</section>
+
+<section class="band" id="domains" aria-labelledby="domains-title">
+    <h2 class="band__title" id="domains-title">@Loc["DomainsTitle"]</h2>
+    <p class="band__desc">@Loc["DomainsDesc"]</p>
+    <ul class="domains">
+        @foreach (var pack in DomainPacks.GetAllPacks())
+        {
+            <li class="domain">
+                <i class="@(string.IsNullOrEmpty(pack.Icon) ? "icon-sparkles" : pack.Icon)" aria-hidden="true"></i>
+                <h3 class="domain__title">@Localized(pack.Name, pack.Id)</h3>
+                <p class="domain__desc">@Localized(pack.Description, string.Empty)</p>
+            </li>
         }
-    }
-    
-    .hero-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-    }
-    
-    .hero-title {
-        font-size: 56px;
-        font-weight: 800;
-        line-height: 1.05;
-        letter-spacing: -1.5px;
-        margin: 0;
-    }
-    
-    @@media (min-width: 1024px) {
-        .hero-title {
-            font-size: 72px;
-        }
-    }
-    
-    .hero-subtitle {
-        font-size: 20px;
-        color: var(--color-ink-2);
-        line-height: 1.5;
-        max-width: 540px;
-        margin: 0;
-    }
-    
-    .hero-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        margin-top: 16px;
-    }
-    
-    @@media (min-width: 768px) {
-        .hero-actions {
-            flex-direction: row;
-            align-items: center;
-        }
-    }
-    
-    .btn-primary-large {
-        height: 64px;
-        padding: 0 32px;
-        border-radius: 16px;
-        background: var(--color-primary);
-        color: var(--color-on-primary);
-        font-size: 18px;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-    }
-    
-    .btn-outline-large {
-        height: 64px;
-        padding: 0 32px;
-        border-radius: 16px;
-        border: 2px solid var(--color-line-strong);
-        color: var(--color-ink);
-        font-size: 18px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        text-decoration: none;
-    }
-    
-    .hero-illustration {
-        flex: 1;
-        position: relative;
-        height: 400px;
-        display: none;
-    }
-    
-    @@media (min-width: 1024px) {
-        .hero-illustration {
-            display: block;
-        }
-    }
-    
-    .illustration-card {
-        position: absolute;
-        width: 240px;
-        height: 320px;
-        border-radius: 24px;
-    }
-    
-    .card-cyan {
-        background: var(--color-cyan);
-        transform: rotate(-14deg);
-        left: 0;
-        top: 40px;
-    }
-    
-    .card-blue {
-        background: var(--color-blue);
-        transform: rotate(14deg);
-        right: 40px;
-        top: 40px;
-    }
-    
-    .card-main {
-        background: var(--color-surface);
-        box-shadow: 16px 16px 0 0 var(--color-primary-tint);
-        border: 2px solid var(--color-line);
-        left: 50%;
-        top: 0;
-        transform: translateX(-50%);
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-    
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .card-header i {
-        font-size: 40px;
-        color: var(--color-primary);
-    }
-    
-    .badge-lime {
-        height: 36px;
-        padding: 0 12px;
-        border-radius: 10px;
-        background: var(--color-lime);
-        color: var(--color-on-lime);
-        font-size: 18px;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-    }
-    
-    .card-title {
-        font-size: 24px;
-        font-weight: 800;
-        line-height: 1.2;
-    }
-</style>
+    </ul>
+</section>
+
+@code {
+    private static string Localized(IReadOnlyDictionary<string, string> values, string fallback) =>
+        values.TryGetValue(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, out var value) || values.TryGetValue("en", out value) ? value : fallback;
+}

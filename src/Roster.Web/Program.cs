@@ -31,6 +31,8 @@ builder.Services.AddScoped<RefereeManagementService>();
 builder.Services.AddScoped<ParticipantManagementService>();
 builder.Services.AddScoped<LeaderboardService>();
 builder.Services.AddScoped<ActivityFeedService>();
+builder.Services.AddScoped<GameOverviewService>();
+builder.Services.AddScoped<Roster.Web.Components.Layout.OrganizerContext>();
 builder.Services.AddScoped<ScoreManagementService>();
 builder.Services.AddSingleton<Roster.Application.Games.Queries.LeaderboardStateStore>();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -141,8 +143,10 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(Roster.Web.Client._Imports).Assembly);
 
 app.MapAuthEndpoints();
+app.MapRefereeEndpoints();
 app.MapParticipantEndpoints();
-app.MapGameEndpoints();
+
+app.MapGameEndpoints();
 app.MapPwaEndpoints();
 app.MapScoreEndpoints();
 app.MapHub<Roster.Web.Hubs.GameHub>("/hubs/game");

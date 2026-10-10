@@ -263,7 +263,7 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Tasks**
 - [ ] Brand resolution middleware and `BrandOptions` (FantaRoster, ImagiRoster); theme token layers per brand; brand assets (logo, icons, social image).
 - [ ] Complete EN and IT resources; culture selection (brand default → user choice); date/number formats.
-- [ ] Import the tokens from `docs/design/tokens/` into `Roster.Ui` and apply the mockups in `docs/design/screens/` to every screen. *(Tokens, Login, Public site, Organizer Console Create Game Wizard, and Dashboard applied. Next: Remaining Organizer Console screens)*
+- [x] Import the tokens from `docs/design/tokens/` into `Roster.Ui` and apply the mockups in `docs/design/screens/` to every screen. *(Applied to every screen: public site, sign in, consent, participant, referee, organizer console, big screen. Deviations and open points: `docs/design/open-questions.md`. Verified with Playwright on phones and laptops, light and dark, with two domain packs: `tests/Roster.E2E`.)*
 - [ ] Security review: OWASP ASVS L1 checklist, rate limits, input validation, upload policies, signed tokens rotation, security headers, CSP compatible with Blazor.
 - [ ] Privacy: privacy notice and terms (EN, IT), data retention job (photos 30 days after end), organizer data export and deletion.
 - [ ] Accessibility audit (automated with axe in Playwright + manual pass) to WCAG 2.2 AA.

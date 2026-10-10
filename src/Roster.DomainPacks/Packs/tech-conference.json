@@ -8,6 +8,7 @@
     "en": "For developer conferences and community days.",
     "it": "Per conferenze di sviluppatori e community days."
   },
+  "icon": "icon-mic",
   "requiresConsent": true,
   "recommendedPlugins": [ "sessionize", "csv" ],
   "terminology": {

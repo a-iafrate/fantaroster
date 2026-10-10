@@ -1,4 +1,3 @@
-@using Microsoft.Extensions.Localization
 @using Roster.Application.Services
 @using Roster.Application.Ports
 @using Roster.Application.Ports.Data
@@ -6,129 +5,165 @@
 @using Roster.Domain.Games
 @using Roster.Domain.Sources
 @inject ElementManagementService ElementService
+@inject ConsentManagementService ConsentService
 @inject ISourceBindingRepository SourceBindingRepository
 @inject IResyncService ResyncService
 @inject IStringLocalizer<SharedResource> Loc
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject Roster.Web.Components.Layout.OrganizerContext Context
 
-<div class="mg-section">
-    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <div>
-            <div class="mg-section-title">@Loc["ElementManagementTitle"]</div>
-            <div class="mg-section-desc">@Loc["ElementManagementDesc"]</div>
+@* Elements and their consent (mockup 03, screen 11): rows on phones, a table-like list from 1024 px. *@
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["NavElements"]</h1>
+            <p class="ds-page-desc">@Loc["ElementManagementDesc"]</p>
         </div>
-        <div>
-            @if (SourceBindings != null && SourceBindings.Count > 0)
+        <div class="ds-page-actions">
+            @if (SourceBindings is { Count: > 0 })
             {
-                <button class="mg-btn-secondary" @onclick="ForceResync" disabled="@IsResyncing">
-                    <i class="icon-refresh-cw"></i> @(IsResyncing ? Loc["Loading"] : Loc["BtnResync"])
+                <button type="button" class="ds-btn ds-btn--secondary" @onclick="ForceResync" disabled="@IsResyncing">
+                    <i class="icon-refresh-cw" aria-hidden="true"></i>@(IsResyncing ? Loc["Loading"] : Loc["BtnResync"])
                 </button>
             }
-            else if (SourceBindings != null && SourceBindings.Count == 0)
+            else if (SourceBindings is { Count: 0 })
             {
-                <button class="mg-btn-primary" @onclick="OpenAddElement">
-                    <i class="icon-plus"></i> @Loc["BtnAddElement"]
+                <button type="button" class="ds-btn ds-btn--primary" @onclick="OpenAddElement">
+                    <i class="icon-plus" aria-hidden="true"></i>@Loc["BtnAddElement"]
                 </button>
             }
         </div>
-    </div>
+    </header>
 
-    @if (Elements == null)
+    @if (Elements is null)
     {
-        <div>@Loc["Loading"]</div>
+        <p class="ds-muted" role="status">@Loc["Loading"]</p>
     }
     else
     {
-        <div class="cg-list-container">
-            <div class="cg-list-header">
-                <div>@Loc["ColName"]</div>
-                <div>@Loc["ColGroup"]</div>
-                <div>@Loc["ColStatus"]</div>
-                <div>@Loc["ColActions"]</div>
+        @if (ConsentMatters)
+        {
+            <ul class="ds-stats">
+                <li class="ds-stat"><span class="ds-stat__value">@Elements.Count</span><span class="ds-stat__label">@Loc["StatTotal"]</span></li>
+                <li class="ds-stat"><span class="ds-stat__value">@Count(ConsentStatus.Accepted)</span><span class="ds-stat__label ds-stat__label--ok"><i class="icon-check" aria-hidden="true"></i> @Loc["ConsentStatus_Accepted"]</span></li>
+                <li class="ds-stat"><span class="ds-stat__value">@Count(ConsentStatus.Pending)</span><span class="ds-stat__label ds-stat__label--wait"><i class="icon-clock" aria-hidden="true"></i> @Loc["ConsentStatus_Pending"]</span></li>
+                <li class="ds-stat"><span class="ds-stat__value">@Count(ConsentStatus.Declined)</span><span class="ds-stat__label ds-stat__label--no"><i class="icon-x" aria-hidden="true"></i> @Loc["ConsentStatus_Declined"]</span></li>
+            </ul>
+
+            <div class="ds-chips" role="group" aria-label="@Loc["FilterLabel"]">
+                <button type="button" class="ds-chip" aria-pressed="@(_filter is null ? "true" : "false")" @onclick="() => _filter = null">@Loc["FilterAll"] @Elements.Count</button>
+                <button type="button" class="ds-chip" aria-pressed="@(_filter == ConsentStatus.Pending ? "true" : "false")" @onclick="() => _filter = ConsentStatus.Pending">@Loc["ConsentStatus_Pending"] @Count(ConsentStatus.Pending)</button>
+                <button type="button" class="ds-chip" aria-pressed="@(_filter == ConsentStatus.Declined ? "true" : "false")" @onclick="() => _filter = ConsentStatus.Declined">@Loc["ConsentStatus_Declined"] @Count(ConsentStatus.Declined)</button>
             </div>
-            @foreach (var el in Elements)
+        }
+
+        <ul class="ds-rows el-rows">
+            <li class="ds-row ds-row--head" aria-hidden="true">
+                <span></span><span>@Loc["ColName"]</span><span>@Loc["ColGroup"]</span><span>@Loc["ColStatus"]</span><span></span>
+            </li>
+            @foreach (var el in Visible())
             {
-                <div class="cg-list-row @(el.IsHidden ? "element-hidden" : "")">
-                    <div class="cg-list-col-bold" style="display: flex; align-items: center; gap: 8px;">
-                        @if (!string.IsNullOrEmpty(el.ImageUrl))
+                <li class="ds-row @(el.IsHidden ? "ds-row--muted" : "")">
+                    <Avatar Name="@el.Name" Seed="@el.Id.ToString()" ImageUrl="@el.ImageUrl" />
+                    <div class="ds-row__main">
+                        <span class="ds-row__title">@el.Name</span>
+                        @if (!string.IsNullOrEmpty(el.Subtitle))
                         {
-                            <img src="@el.ImageUrl" alt="" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-line);" />
+                            <span class="ds-row__sub">@el.Subtitle</span>
                         }
-                        <div>
-                            @el.Name
-                            @if (!string.IsNullOrEmpty(el.Subtitle))
-                            {
-                                <div class="element-subtitle">@el.Subtitle</div>
-                            }
-                        </div>
                     </div>
-                    <div>@el.Group</div>
-                    <div class="element-status-col">
-                        <span class="element-badge @(el.IsSelectable ? "badge-success" : "badge-neutral")">
-                            @(el.IsSelectable ? Loc["StatusSelectable"] : Loc["StatusNotSelectable"])
-                        </span>
-                        @if (el.SourceState == SourceState.MissingFromSource)
-                        {
-                            <span class="element-badge badge-warning">@Loc["StatusMissing"]</span>
-                        }
-                        <span class="element-badge badge-info">@el.ConsentStatus.ToString()</span>
-                    </div>
-                    <div class="element-actions">
-                        <button class="mg-btn-text" @onclick="() => EditElement(el)">@Loc["BtnEdit"]</button>
-                        
+                    <span class="ds-row__cell">@el.Group</span>
+                    <span class="el-status">
+                        <span class="ds-status @ConsentClass(el.ConsentStatus)"><i class="@ConsentIcon(el.ConsentStatus)" aria-hidden="true"></i>@Loc["ConsentStatus_" + el.ConsentStatus]</span>
                         @if (el.IsHidden)
                         {
-                            <button class="mg-btn-text" @onclick="() => ToggleVisibility(el, false)">@Loc["BtnShow"]</button>
+                            <span class="ds-row__cell">@Loc["StatusHidden"]</span>
                         }
-                        else
+                        else if (!el.IsSelectable)
                         {
-                            <button class="mg-btn-text" @onclick="() => ToggleVisibility(el, true)">@Loc["BtnHide"]</button>
+                            <span class="ds-row__cell">@Loc["StatusNotSelectable"]</span>
                         }
-
-                        @if (el.IsSelectable)
+                        @if (el.SourceState == SourceState.MissingFromSource)
                         {
-                            <button class="mg-btn-text" @onclick="() => ToggleSelectability(el, false)">@Loc["BtnMakeNotSelectable"]</button>
+                            <span class="ds-status ds-status--wait"><i class="icon-triangle-alert" aria-hidden="true"></i>@Loc["StatusMissing"]</span>
                         }
-                        else
-                        {
-                            <button class="mg-btn-text" @onclick="() => ToggleSelectability(el, true)" disabled="@(el.ConsentStatus == ConsentStatus.Declined)">@Loc["BtnMakeSelectable"]</button>
-                        }
+                    </span>
+                    <div class="ds-row__actions">
+                        <button type="button" class="ds-icon-btn" aria-haspopup="dialog" aria-label="@string.Format(Loc["ElementActions"], el.Name)" @onclick="() => _actionsFor = el">
+                            <i class="icon-ellipsis-vertical" aria-hidden="true"></i>
+                        </button>
                     </div>
-                </div>
+                </li>
             }
-        </div>
-    }
+        </ul>
 
-    @if (EditingElement != null || IsAddingElement)
-    {
-        <div class="modal-backdrop">
-            <div class="modal">
-                <div class="modal-title">@(IsAddingElement ? Loc["AddElementTitle"] : Loc["EditElementTitle"])</div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>@Loc["ColName"]</label>
-                        <input type="text" @bind="EditName" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label>@Loc["ColSubtitle"]</label>
-                        <input type="text" @bind="EditSubtitle" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label>@Loc["ColGroup"]</label>
-                        <input type="text" @bind="EditGroup" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label>@Loc["ColImageUrl"]</label>
-                        <input type="text" @bind="EditImageUrl" class="form-control" placeholder="https://..." />
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button class="mg-btn-secondary" @onclick="CancelEdit">@Loc["BtnCancel"]</button>
-                    <button class="mg-btn-primary" @onclick="SaveElement">@Loc["BtnSave"]</button>
-                </div>
-            </div>
-        </div>
+        @if (!Visible().Any())
+        {
+            <p class="ds-muted" role="status">@Loc["NoElementsYet"]</p>
+        }
     }
 </div>
+
+@if (_actionsFor is { } target)
+{
+    <Modal Title="@target.Name" CloseLabel="@Loc["BtnClose"]" OnClose="() => _actionsFor = null">
+        <div class="el-actions">
+            <button type="button" class="ds-menu-item" @onclick="() => StartEdit(target)"><i class="icon-pencil-line" aria-hidden="true"></i><span>@Loc["BtnEdit"]</span></button>
+            <button type="button" class="ds-menu-item" @onclick="() => ToggleVisibility(target, !target.IsHidden)">
+                <i class="@(target.IsHidden ? "icon-eye" : "icon-eye-off")" aria-hidden="true"></i><span>@(target.IsHidden ? Loc["BtnShow"] : Loc["BtnHide"])</span>
+            </button>
+            @if (target.IsSelectable)
+            {
+                <button type="button" class="ds-menu-item" @onclick="() => ToggleSelectability(target, false)"><i class="icon-ban" aria-hidden="true"></i><span>@Loc["BtnMakeNotSelectable"]</span></button>
+            }
+            else
+            {
+                <button type="button" class="ds-menu-item" disabled="@(target.ConsentStatus == ConsentStatus.Declined)" @onclick="() => ToggleSelectability(target, true)"><i class="icon-check" aria-hidden="true"></i><span>@Loc["BtnMakeSelectable"]</span></button>
+            }
+            @if (ConsentMatters)
+            {
+                <button type="button" class="ds-menu-item" disabled="@_busy" @onclick="() => GenerateLinkAsync(target)">
+                    <i class="icon-send" aria-hidden="true"></i><span>@(target.ConsentStatus == ConsentStatus.Pending ? Loc["BtnRegenerateConsentLink"] : Loc["BtnGenerateConsentLink"])</span>
+                </button>
+            }
+        </div>
+    </Modal>
+}
+
+@if (EditingElement is not null || IsAddingElement)
+{
+    <Modal Title="@(IsAddingElement ? Loc["AddElementTitle"] : Loc["EditElementTitle"])" CloseLabel="@Loc["BtnCancel"]" OnClose="CancelEdit">
+        <ChildContent>
+            <div class="ds-form">
+                <div class="ds-field"><label class="ds-label" for="el-name">@Loc["ColName"]</label><input id="el-name" type="text" class="ds-input" @bind="EditName" maxlength="200" /></div>
+                <div class="ds-field"><label class="ds-label" for="el-sub">@Loc["ColSubtitle"]</label><input id="el-sub" type="text" class="ds-input" @bind="EditSubtitle" maxlength="300" /></div>
+                <div class="ds-field"><label class="ds-label" for="el-group">@Loc["ColGroup"]</label><input id="el-group" type="text" class="ds-input" @bind="EditGroup" maxlength="100" /></div>
+                <div class="ds-field"><label class="ds-label" for="el-image">@Loc["ColImageUrl"]</label><input id="el-image" type="url" class="ds-input" @bind="EditImageUrl" placeholder="https://" /></div>
+            </div>
+        </ChildContent>
+        <Actions>
+            <button type="button" class="ds-btn ds-btn--secondary" @onclick="CancelEdit">@Loc["BtnCancel"]</button>
+            <button type="button" class="ds-btn ds-btn--primary" disabled="@string.IsNullOrWhiteSpace(EditName)" @onclick="SaveElement">@Loc["BtnSave"]</button>
+        </Actions>
+    </Modal>
+}
+
+@if (_generatedToken is not null)
+{
+    <Modal Title="@Loc["ConsentLinkGenerated"]" CloseLabel="@Loc["BtnClose"]" OnClose="() => _generatedToken = null">
+        <ChildContent>
+            <p class="ds-muted">@Loc["ConsentLinkGeneratedDesc"]</p>
+            <div class="ds-link-field">
+                <span>@ConsentLink(_generatedToken)</span>
+                <button type="button" class="ds-btn ds-btn--primary" @onclick="() => CopyAsync(ConsentLink(_generatedToken))"><i class="icon-copy" aria-hidden="true"></i>@(_copied ? Loc["LinkCopied"] : Loc["BtnCopyLink"])</button>
+            </div>
+        </ChildContent>
+        <Actions>
+            <button type="button" class="ds-btn ds-btn--secondary" @onclick="() => _generatedToken = null">@Loc["BtnClose"]</button>
+        </Actions>
+    </Modal>
+}
 
 @code {
     [Parameter] public Guid GameId { get; set; }
@@ -137,15 +172,23 @@
 
     private IReadOnlyList<Element>? Elements;
     private List<SourceBinding>? SourceBindings;
-    
+
     private Element? EditingElement;
+    private Element? _actionsFor;
     private bool IsAddingElement;
     private bool IsResyncing;
-    
+    private bool _busy;
+    private bool _copied;
+    private string? _generatedToken;
+    private ConsentStatus? _filter;
+
     private string EditName = "";
     private string? EditSubtitle;
     private string? EditGroup;
     private string? EditImageUrl;
+
+    /// <summary>Consent columns and filters only appear when at least one element needs consent.</summary>
+    private bool ConsentMatters => Elements?.Any(e => e.ConsentStatus != ConsentStatus.NotRequired) == true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -153,11 +196,32 @@
         await LoadElements();
     }
 
+    private int Count(ConsentStatus status) => Elements?.Count(e => e.ConsentStatus == status) ?? 0;
+
+    private IEnumerable<Element> Visible() => (Elements ?? []).Where(e => _filter is null || e.ConsentStatus == _filter);
+
+    private static string ConsentClass(ConsentStatus status) => status switch
+    {
+        ConsentStatus.Accepted => "ds-status--ok",
+        ConsentStatus.Pending => "ds-status--wait",
+        ConsentStatus.Declined => "ds-status--no",
+        _ => "ds-status--off",
+    };
+
+    private static string ConsentIcon(ConsentStatus status) => status switch
+    {
+        ConsentStatus.Accepted => "icon-check",
+        ConsentStatus.Pending => "icon-clock",
+        ConsentStatus.Declined => "icon-x",
+        _ => "icon-minus",
+    };
+
     private async Task LoadElements()
     {
         try
         {
             Elements = await ElementService.GetElementsByGameAsync(GameId);
+            Context.SetPendingConsents(Count(ConsentStatus.Pending));
         }
         catch (Exception ex)
         {
@@ -165,8 +229,9 @@
         }
     }
 
-    private void EditElement(Element element)
+    private void StartEdit(Element element)
     {
+        _actionsFor = null;
         IsAddingElement = false;
         EditingElement = element;
         EditName = element.Name;
@@ -205,7 +270,7 @@
             {
                 await ElementService.UpdateElementDetailsAsync(EditingElement.Id, EditName, EditSubtitle, EditGroup, EditImageUrl);
             }
-            
+
             CancelEdit();
             await LoadElements();
         }
@@ -217,6 +282,7 @@
 
     private async Task ToggleVisibility(Element element, bool isHidden)
     {
+        _actionsFor = null;
         try
         {
             await ElementService.SetElementVisibilityAsync(element.Id, isHidden);
@@ -230,6 +296,7 @@
 
     private async Task ToggleSelectability(Element element, bool isSelectable)
     {
+        _actionsFor = null;
         try
         {
             await ElementService.SetElementSelectabilityAsync(element.Id, isSelectable);
@@ -241,10 +308,39 @@
         }
     }
 
+    private async Task GenerateLinkAsync(Element element)
+    {
+        if (_busy) return;
+        _busy = true;
+        try
+        {
+            _actionsFor = null;
+            _copied = false;
+            _generatedToken = await ConsentService.GenerateInvitationAsync(element.Id, null);
+            await LoadElements();
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private string ConsentLink(string token) => Navigation.ToAbsoluteUri($"/consent/{token}").AbsoluteUri;
+
+    private async Task CopyAsync(string text)
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        _copied = true;
+    }
+
     private async Task ForceResync()
     {
         if (SourceBindings == null || SourceBindings.Count == 0 || IsResyncing) return;
-        
+
         IsResyncing = true;
         try
         {

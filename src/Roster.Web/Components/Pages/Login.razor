@@ -2,172 +2,72 @@
 @layout Roster.Web.Components.Layout.EmptyLayout
 @using Microsoft.AspNetCore.Identity
 @using Roster.Infrastructure.Data
-@inject NavigationManager Navigation
 @inject ILogger<Login> Logger
 @inject UserManager<OrganizerUser> UserManager
 @inject IEmailSender<OrganizerUser> EmailSender
 @inject LinkGenerator LinkGenerator
 @inject IHttpContextAccessor HttpContextAccessor
+@inject IStringLocalizer<SharedResource> Loc
 
-<PageTitle>Accesso - Organizer</PageTitle>
+<PageTitle>@Loc["LoginPageTitle"]</PageTitle>
 
-<style>
-    .auth-page { display: flex; min-height: 100vh; background: var(--color-bg); color: var(--color-ink); }
-    .auth-left { display: none; }
-    .auth-right { flex: 1; display: flex; flex-direction: column; padding: 24px; }
-    
-    @@media (min-width: 1024px) {
-        .auth-left { display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; background: var(--color-primary); color: var(--color-on-primary); padding: 48px 72px; flex: 1; }
-        .auth-right { flex: 0 0 600px; padding: 64px 72px; justify-content: center; background: var(--color-surface); }
-    }
-    
-    .auth-logo { display: flex; align-items: center; gap: 10px; font-size: 22px; letter-spacing: -1.1px; }
-    .auth-logo b { font-weight: 800; }
-    .auth-logo span { font-weight: 500; }
-
-    .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
-    .input-label { font-size: 14px; font-weight: 700; }
-    .input-field { height: 52px; border-radius: 12px; border: 2px solid var(--color-primary); background: var(--color-surface); padding: 0 14px; font-size: 17px; font-weight: 600; width: 100%; box-sizing: border-box; }
-    .input-field:focus { outline: 3px solid var(--color-focus); outline-offset: 1px; }
-    
-    .btn-primary { height: 56px; border-radius: 14px; background: var(--color-primary); color: var(--color-on-primary); font-weight: 800; font-size: 17px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: none; width: 100%; }
-    .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
-    
-    .divider { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--color-ink-2); margin: 24px 0; }
-    .divider .line { flex: 1; height: 1px; background: var(--color-line); }
-
-    .btn-secondary { height: 56px; border-radius: 14px; border: 1.5px solid var(--color-line-strong); background: var(--color-surface); font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; }
-
-    .auth-footer { margin-top: auto; display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
-    @@media (min-width: 1024px) {
-        .auth-footer { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--color-line); align-items: flex-start; text-align: left; }
-    }
-</style>
-
-<div class="auth-page">
-    @if (!string.IsNullOrEmpty(ErrorParam))
-    {
-        <!-- C Link scaduto -->
-        <div style="flex:1; display:flex; flex-direction:column; background:var(--color-bg);">
-            <div style="height:80px; padding:0 28px; display:flex; align-items:center; gap:10px;">
-                <div class="auth-logo"><i class="icon-zap"></i> <b>fanta</b><span>roster</span></div>
-            </div>
-            <div style="flex:1; display:flex; align-items:center; justify-content:center; padding: 24px;">
-                <div style="width:100%; max-width:520px; padding:40px; border-radius:24px; background:var(--color-surface); border:1px solid var(--color-line); display:flex; flex-direction:column; gap:16px;">
-                    <div style="width:72px; height:72px; border-radius:18px; background:var(--color-warning-bg); color:var(--color-warning); display:flex; align-items:center; justify-content:center; font-size:34px;">
-                        <i class="icon-clock-alert"></i>
-                    </div>
-                    <div style="font-size:32px; line-height:1.15; font-weight:800; letter-spacing:-0.8px;">Questo link è scaduto</div>
-                    <div style="font-size:16px; line-height:1.5; color:var(--color-ink-2);">
-                        I link valgono 15 minuti e si usano una volta sola. Te ne mandiamo uno nuovo in un attimo.
-                    </div>
-                    <a href="/login" style="text-decoration:none; margin-top: 16px;">
-                        <button class="btn-primary"><i class="icon-send"></i> Mandami un nuovo link</button>
-                    </a>
-                </div>
-            </div>
+@* Sign in (mockup 05): the form, "check your inbox" and "link expired" states. No password: a magic link by email. *@
+<div class="auth">
+    <aside class="auth__panel" data-theme="stage" aria-hidden="true">
+        <a href="/" class="auth__brand" tabindex="-1"><img src="assets/logo-r.svg" alt="" /><BrandWordmark /></a>
+        <div class="auth__cards">
+            <span class="auth__card auth__card--cyan"></span>
+            <span class="auth__card auth__card--blue"></span>
+            <span class="auth__card auth__card--main">
+                <span class="auth__card-top"><i class="icon-star"></i><span class="ds-points">+10</span></span>
+                <span class="auth__card-label">@Loc["HeroCardLabel"]</span>
+            </span>
         </div>
-    }
-    else if (_showSuccessMessage)
-    {
-        <!-- B Controlla la posta -->
-        <div style="flex:1; display:flex; flex-direction:column; background:var(--color-bg);">
-            <div style="height:80px; padding:0 28px; display:flex; align-items:center; gap:10px; background:var(--color-surface);">
-                <div class="auth-logo"><i class="icon-zap"></i> <b>fanta</b><span>roster</span></div>
-            </div>
-            <div style="flex:1; display:flex; align-items:center; justify-content:center; padding: 24px;">
-                <div style="width:100%; max-width:520px; display:flex; flex-direction:column; gap:22px;">
-                    <div style="width:88px; height:88px; border-radius:20px; background:var(--color-lime); color:var(--color-on-lime); display:flex; align-items:center; justify-content:center; font-size:40px;">
-                        <i class="icon-mail-check"></i>
-                    </div>
-                    <div style="font-size:40px; line-height:1.1; font-weight:800; letter-spacing:-1px;">Controlla la posta</div>
-                    <div style="font-size:17px; line-height:1.55;">Abbiamo mandato il link a <b>@Email</b>. Vale 15 minuti.</div>
-                    
-                    <div style="padding:14px; border-radius:14px; background:var(--color-surface); border:1px solid var(--color-line); font-size:15px; color:var(--color-ink-2); line-height:1.5; display:flex; gap:10px;">
-                        <i class="icon-info" style="font-size:18px; color:var(--color-info);"></i>
-                        <span>Non lo trovi? Guarda in Spam o Promozioni. Il mittente è accesso@fantaroster.com.</span>
-                    </div>
-
-                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 16px;">
-                        <a href="mailto:" style="text-decoration:none; flex:1;">
-                            <button class="btn-primary"><i class="icon-mail"></i> Apri l'app di posta</button>
-                        </a>
-                        <a href="/login" style="text-decoration:none; flex:1;">
-                            <button class="btn-secondary" style="color:var(--color-link); font-size:15px; border-color:transparent; background:transparent;">Email sbagliata? Cambiala</button>
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <div class="auth__pitch">
+            <p class="auth__pitch-title">@Loc["HeroTitle"]</p>
+            <p class="auth__pitch-sub">@Loc["HeroSub"]</p>
         </div>
-    }
-    else
-    {
-        <!-- A Accedi -->
-        <div class="auth-left">
-            <div class="auth-logo">
-                <i class="icon-zap"></i> <b>fanta</b><span>roster</span>
-            </div>
-            
-            <div style="position:relative; height: 350px; margin-top: 40px;">
-                <div style="position:absolute; left:150px; top:20px; width:200px; height:270px; border-radius:20px; background:var(--color-cyan); transform:rotate(-14deg);"></div>
-                <div style="position:absolute; left:360px; top:20px; width:200px; height:270px; border-radius:20px; background:var(--color-blue); transform:rotate(14deg);"></div>
-                <div style="position:absolute; left:250px; top:-20px; width:220px; height:296px; border-radius:20px; background:var(--color-surface); color:var(--color-ink); box-shadow:12px 12px 0 0 var(--color-primary-hover); padding:20px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between;">
-                    <div style="display:flex; justify-content:space-between;">
-                        <i class="icon-star" style="font-size:32px; color:var(--color-primary);"></i>
-                        <span style="height:32px; padding:0 10px; border-radius:9px; background:var(--color-lime); font-size:16px; font-weight:800; display:flex; align-items:center;">+10</span>
+    </aside>
+
+    <main class="auth__main">
+        <a href="/" class="auth__brand auth__brand--mobile"><img src="assets/logo-r.svg" alt="" /><BrandWordmark /></a>
+
+        <div class="auth__box">
+            @if (ErrorParam == "invalid_link")
+            {
+                <span class="auth__icon auth__icon--warn" aria-hidden="true"><i class="icon-timer-off"></i></span>
+                <h1 class="auth__title">@Loc["LoginExpiredTitle"]</h1>
+                <p class="auth__text">@Loc["LoginExpiredBody"]</p>
+                <a href="/login" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary"><i class="icon-send" aria-hidden="true"></i>@Loc["LoginExpiredCta"]</a>
+            }
+            else if (_showSuccessMessage)
+            {
+                <span class="auth__icon" aria-hidden="true"><i class="icon-mail-check"></i></span>
+                <h1 class="auth__title">@Loc["LoginSentTitle"]</h1>
+                <p class="auth__text">@string.Format(Loc["LoginSentBody"], Email)</p>
+                <p class="ds-alert ds-alert--info"><i class="icon-info" aria-hidden="true"></i> @Loc["LoginSentHint"]</p>
+                <a href="mailto:" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary"><i class="icon-mail" aria-hidden="true"></i>@Loc["LoginOpenMail"]</a>
+                <a href="/login" class="ds-btn ds-btn--block ds-btn--link">@Loc["LoginWrongEmail"]</a>
+            }
+            else
+            {
+                <h1 class="auth__title">@Loc["LoginTitle"]</h1>
+                <p class="auth__text">@Loc["LoginIntro"]</p>
+
+                <EditForm Model="this" OnValidSubmit="HandleSubmit" FormName="login-form" class="ds-form">
+                    <div class="ds-field">
+                        <label for="email" class="ds-label">@Loc["LoginEmail"]</label>
+                        <InputText id="email" @bind-Value="Email" class="ds-input" type="email" required autocomplete="email" inputmode="email" placeholder="@Loc["LoginEmailPlaceholder"]" />
                     </div>
-                    <div style="font-size:20px; font-weight:800; line-height:1.2;">Il tuo prossimo fanta</div>
-                </div>
-            </div>
-            
-            <div style="display:flex; flex-direction:column; gap:12px; max-width: 620px; margin-bottom: 40px;">
-                <div style="font-size:52px; font-weight:800; line-height:1.02; letter-spacing:-1.5px;">Il fanta di qualsiasi cosa</div>
-                <div style="font-size:18px; line-height:1.5; color:rgba(255,255,255,0.8);">Crea la partita, importa gli elementi, apri il QR. Al resto pensa la classifica.</div>
-            </div>
+                    <button type="submit" disabled="@_isSubmitting" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary">
+                        <i class="icon-send" aria-hidden="true"></i>@(_isSubmitting ? Loc["LoginSending"] : Loc["LoginSend"])
+                    </button>
+                </EditForm>
+
+                <p class="auth__footer">@Loc["LoginJustPlaying"] <a href="/j">@Loc["PubHaveCode"]</a></p>
+            }
         </div>
-
-        <div class="auth-right">
-            <!-- Mobile Header Logo -->
-            <div class="auth-logo" style="margin-bottom: 40px; display: flex; @( "/* will be hidden on desktop by media query? no just let it stay or hide with css */" )">
-                <i class="icon-zap"></i> <b>fanta</b><span>roster</span>
-            </div>
-
-            <div style="font-size:36px; line-height:1.1; font-weight:800; letter-spacing:-1px; margin-bottom: 12px;">Entra per organizzare</div>
-            <div style="font-size:16px; color:var(--color-ink-2); line-height:1.5; margin-bottom: 24px;">
-                Ti mandiamo un link via email: niente password da ricordare. Se è la prima volta, creiamo il tuo account.
-            </div>
-
-            <EditForm Model="this" OnValidSubmit="HandleSubmit" FormName="login-form">
-                <div class="input-group">
-                    <label for="email" class="input-label">Email</label>
-                    <InputText id="email" @bind-Value="Email" class="input-field" type="email" required placeholder="es. user@mail.com" />
-                </div>
-                
-                <button type="submit" disabled="@_isSubmitting" class="btn-primary">
-                    <i class="icon-send"></i> @(_isSubmitting ? "Invio in corso..." : "Inviami il link")
-                </button>
-            </EditForm>
-
-            <div class="divider">
-                <div class="line"></div>
-                oppure
-                <div class="line"></div>
-            </div>
-
-            <button type="button" class="btn-secondary">
-                <i class="icon-fingerprint"></i> Accedi con passkey
-            </button>
-
-            <div class="auth-footer">
-                <div style="font-size:14px; color:var(--color-ink-2);">
-                    Devi solo giocare? <a href="/" style="color:var(--color-link); font-weight:700; text-decoration:none;">Hai un codice partita</a>
-                </div>
-                <div style="font-size:12px; color:var(--color-ink-2);">
-                    Continuando accetti termini e privacy.
-                </div>
-            </div>
-        </div>
-    }
+    </main>
 </div>
 
 @code {
@@ -186,17 +86,17 @@
             return;
 
         _isSubmitting = true;
-        
+
         var delay = Random.Shared.Next(100, 500);
         await Task.Delay(delay);
 
         var user = await UserManager.FindByEmailAsync(Email);
-        
+
         if (user == null)
         {
-            user = new OrganizerUser 
-            { 
-                UserName = Email, 
+            user = new OrganizerUser
+            {
+                UserName = Email,
                 Email = Email,
                 DisplayName = Email.Split('@')[0]
             };
@@ -211,7 +111,7 @@
         }
 
         var token = await UserManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, "MagicLink");
-        
+
         var httpContext = HttpContextAccessor.HttpContext;
         if (httpContext != null)
         {

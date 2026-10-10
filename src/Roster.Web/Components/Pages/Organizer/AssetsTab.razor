@@ -1,108 +1,61 @@
-@using Microsoft.Extensions.Localization
 @using Roster.Domain.Games
 @inject IStringLocalizer<SharedResource> Loc
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
-<div class="mg-section">
-    <div class="mg-section-title">@Loc["AssetsTitle"]</div>
-    <div class="mg-section-desc">@Loc["AssetsDesc"]</div>
-
-    @if (Game != null)
-    {
-        <div class="cg-grid-2">
-            <div class="asset-card">
-                <div class="asset-title">@Loc["JoinCode"]</div>
-                <div class="asset-value join-code">@Game.JoinCode</div>
-                <div class="asset-desc">@Loc["JoinCodeDesc"]</div>
-            </div>
-            
-            <div class="asset-card">
-                <div class="asset-title">@Loc["JoinUrl"]</div>
-                <div class="asset-value">
-                    <input type="text" readonly class="form-control" value="@GetJoinUrl()" />
-                </div>
-                <div class="asset-desc">@Loc["JoinUrlDesc"]</div>
-            </div>
+@* Join materials (mockup 03, screen 14): QR and code, a link to copy, the poster and the big screen. *@
+<div class="ds-page assets">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["NavMaterials"]</h1>
+            <p class="ds-page-desc">@Loc["MaterialsDesc"]</p>
         </div>
+    </header>
 
-        <div class="asset-card" style="margin-top: var(--space-4);">
-            <div class="asset-title">@Loc["PrintableQr"]</div>
-            <div class="qr-container">
-                @((MarkupString)GenerateQrCodeSvg(GetJoinUrl()))
+    <div class="assets__layout">
+        <section class="ds-panel assets__qr" aria-labelledby="assets-qr-title">
+            <h2 class="visually-hidden" id="assets-qr-title">@Loc["PrintableQr"]</h2>
+            <div class="ds-qr" role="img" aria-label="@Loc["PrintableQr"]">
+                @((MarkupString)GenerateQrCodeSvg(JoinUrl))
             </div>
-            <div class="asset-desc" style="text-align: center; margin-top: var(--space-2);">@Loc["PrintableQrDesc"]</div>
-            <div style="display: flex; justify-content: center; margin-top: var(--space-4);">
-                <a href="/organizer/games/@Game.Id/poster" target="_blank" class="mg-btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="icon-printer"></i> @Loc["BtnPrintPoster"]
-                </a>
+            <div class="assets__code" aria-label="@Loc["JoinCode"]">@Game.JoinCode</div>
+            <p class="ds-muted assets__hint">@Loc["PrintableQrDesc"]</p>
+        </section>
+
+        <div class="assets__side">
+            <div class="ds-link-field">
+                <span>@JoinUrl</span>
+                <button type="button" class="ds-btn ds-btn--primary" @onclick="CopyAsync"><i class="icon-copy" aria-hidden="true"></i>@(_copied ? Loc["LinkCopied"] : Loc["BtnCopyLink"])</button>
             </div>
+            <p class="ds-muted assets__hint">@Loc["JoinUrlDesc"]</p>
+
+            <a class="assets__link" href="/organizer/games/@Game.Id/poster" target="_blank" rel="noopener">
+                <i class="icon-file-text" aria-hidden="true"></i><span>@Loc["BtnPrintPoster"]</span><i class="icon-external-link" aria-hidden="true"></i><span class="visually-hidden">@Loc["OpensNewTab"]</span>
+            </a>
+            <a class="assets__link" href="/games/@Game.Id/big-screen" target="_blank" rel="noopener">
+                <i class="icon-monitor" aria-hidden="true"></i><span>@Loc["OpenBigScreen"]</span><i class="icon-external-link" aria-hidden="true"></i><span class="visually-hidden">@Loc["OpensNewTab"]</span>
+            </a>
         </div>
-    }
+    </div>
 </div>
-
-<style>
-    .asset-card {
-        padding: var(--space-4);
-        border: 1px solid var(--color-line);
-        border-radius: var(--radius-m);
-        background: var(--color-surface);
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-2);
-    }
-    .asset-title {
-        font: var(--text-small);
-        font-weight: 700;
-        color: var(--color-ink-2);
-    }
-    .asset-value {
-        font: var(--text-h3);
-        font-weight: 800;
-        color: var(--color-ink);
-    }
-    .join-code {
-        letter-spacing: 2px;
-    }
-    .asset-desc {
-        font: var(--text-small);
-        color: var(--color-ink-2);
-    }
-    .qr-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: var(--space-6);
-        background: var(--color-surface-2);
-        border-radius: var(--radius-s);
-    }
-    .qr-placeholder {
-        width: 200px;
-        height: 200px;
-        background: var(--color-line);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--color-ink-3);
-        border-radius: var(--radius-s);
-        font-weight: 700;
-        font: var(--text-small);
-    }
-</style>
 
 @code {
     [Parameter, EditorRequired] public Game Game { get; set; } = null!;
     [Parameter] public EventCallback<string> OnError { get; set; }
 
-    private string GetJoinUrl()
+    private bool _copied;
+
+    private string JoinUrl => Navigation.ToAbsoluteUri($"/join/{Game.JoinCode}").AbsoluteUri;
+
+    private async Task CopyAsync()
     {
-        return Navigation.ToAbsoluteUri($"/join/{Game.JoinCode}").ToString();
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", JoinUrl);
+        _copied = true;
     }
 
-    private string GenerateQrCodeSvg(string text)
+    private static string GenerateQrCodeSvg(string text)
     {
         var qr = Net.Codecrete.QrCodeGenerator.QrCode.EncodeText(text, Net.Codecrete.QrCodeGenerator.QrCode.Ecc.Medium);
         return qr.ToSvgString(4).Replace("stroke=\"none\" fill=\"#000000\"", "stroke=\"none\" fill=\"currentColor\"");
     }
 }
-
-

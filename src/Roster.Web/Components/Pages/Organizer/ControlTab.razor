@@ -1,0 +1,187 @@
+@using Roster.Application.Services
+@using Roster.Domain.Games
+@inject GameOverviewService OverviewService
+@inject GameLifecycleService LifecycleService
+@inject IStringLocalizer<SharedResource> Loc
+
+@* Game control (mockup 03, screen 13): the phases as a sequence and one primary button that changes with the phase. *@
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["NavControl"]</h1>
+            <p class="ds-page-desc">@Loc["ControlDesc"]</p>
+        </div>
+    </header>
+
+    <ol class="ctl-phases" aria-label="@Loc["ControlPhases"]">
+        @for (var i = 0; i < Phases.Length; i++)
+        {
+            var index = i;
+            <li class="ctl-phase @(index == CurrentPhase ? "ctl-phase--current" : "") @(index < CurrentPhase ? "ctl-phase--done" : "")" aria-current="@(index == CurrentPhase ? "step" : null)">
+                <span class="ctl-phase__dot" aria-hidden="true"><i class="@(index < CurrentPhase ? "icon-check" : Phases[index].Icon)"></i></span>
+                <span class="ctl-phase__text">
+                    <span class="ctl-phase__label">@Loc[Phases[index].Label]</span>
+                    <span class="ctl-phase__note">@Loc[Phases[index].Note]</span>
+                </span>
+            </li>
+        }
+    </ol>
+
+    @if (_overview is not null)
+    {
+        <ul class="ds-stats">
+            <li class="ds-stat"><span class="ds-stat__value">@_overview.Participants</span><span class="ds-stat__label">@Loc["StatPlayers"]</span></li>
+            <li class="ds-stat"><span class="ds-stat__value">@_overview.Elements</span><span class="ds-stat__label">@Loc["StatElements"]</span></li>
+            <li class="ds-stat"><span class="ds-stat__value">@_overview.PointsAssigned</span><span class="ds-stat__label">@Loc["StatPoints"]</span></li>
+            <li class="ds-stat"><span class="ds-stat__value">@_overview.Referees</span><span class="ds-stat__label">@Loc["NavReferees"]</span></li>
+        </ul>
+    }
+
+    @if (_error is not null)
+    {
+        <p class="ds-alert" role="alert">@_error</p>
+    }
+
+    @if (Game.State == GameState.Archived)
+    {
+        <p class="ds-alert ds-alert--info" role="status">@Loc["StateArchived"]</p>
+    }
+    else
+    {
+        <div class="ctl-action">
+            <button type="button" class="ds-btn ds-btn--l ds-btn--block @(Game.State == GameState.Live ? "ds-btn--danger" : "ds-btn--primary")" disabled="@_busy" @onclick="Advance">
+                <i class="@ActionIcon" aria-hidden="true"></i>@ActionLabel
+            </button>
+            <p class="ds-muted ctl-action__note">@ActionNote</p>
+        </div>
+    }
+</div>
+
+@if (_confirmEnd)
+{
+    <Modal Title="@Loc["ActionEndGame"]" CloseLabel="@Loc["BtnCancel"]" OnClose="() => _confirmEnd = false">
+        <ChildContent>
+            <p class="ds-muted">@Loc["EndGameConfirmBody"]</p>
+            <div class="ds-field">
+                <label class="ds-label" for="end-code">@string.Format(Loc["EndGameTypeCode"], Game.JoinCode)</label>
+                <input id="end-code" type="text" class="ds-input ctl-code" autocomplete="off" autocapitalize="characters" spellcheck="false" @bind="_typedCode" @bind:event="oninput" />
+            </div>
+        </ChildContent>
+        <Actions>
+            <button type="button" class="ds-btn ds-btn--secondary" @onclick="() => _confirmEnd = false">@Loc["BtnCancel"]</button>
+            <button type="button" class="ds-btn ds-btn--danger" disabled="@(!CodeMatches || _busy)" @onclick="EndAsync">@Loc["BtnEndGame"]</button>
+        </Actions>
+    </Modal>
+}
+
+@code {
+    private sealed record Phase(string Label, string Note, string Icon);
+
+    private static readonly Phase[] Phases =
+    [
+        new("PhasePrepare", "PhasePrepareNote", "icon-pencil-ruler"),
+        new("PhaseJoins", "PhaseJoinsNote", "icon-door-open"),
+        new("PhaseLive", "PhaseLiveNote", "icon-radio"),
+        new("PhaseEnded", "PhaseEndedNote", "icon-flag"),
+    ];
+
+    [Parameter, EditorRequired] public Game Game { get; set; } = null!;
+
+    /// <summary>Raised after the game changed state, so the page reloads it.</summary>
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private GameOverviewDto? _overview;
+    private bool _busy;
+    private bool _confirmEnd;
+    private string _typedCode = string.Empty;
+    private string? _error;
+
+    private int CurrentPhase => Game.State switch
+    {
+        GameState.Draft => 0,
+        GameState.Open => 1,
+        GameState.Live => 2,
+        _ => 3,
+    };
+
+    private bool CodeMatches => string.Equals(_typedCode.Trim(), Game.JoinCode, StringComparison.OrdinalIgnoreCase);
+
+    private string ActionLabel => Game.State switch
+    {
+        GameState.Draft => Loc["BtnOpenGame"],
+        GameState.Open => Loc["BtnGoLive"],
+        GameState.Live => Loc["BtnEndGame"],
+        _ => Loc["BtnArchive"],
+    };
+
+    private string ActionIcon => Game.State switch
+    {
+        GameState.Draft => "icon-door-open",
+        GameState.Open => "icon-radio",
+        GameState.Live => "icon-flag",
+        _ => "icon-archive",
+    };
+
+    private string ActionNote => Game.State switch
+    {
+        GameState.Draft => Loc["ActionOpenJoinsDesc"],
+        GameState.Open => Loc["ActionGoLiveDesc"],
+        GameState.Live => Loc["ActionEndGameDesc"],
+        _ => Loc["ActionArchiveDesc"],
+    };
+
+    protected override async Task OnInitializedAsync() => _overview = await OverviewService.GetAsync(Game.Id);
+
+    private async Task Advance()
+    {
+        if (Game.State == GameState.Live)
+        {
+            _typedCode = string.Empty;
+            _confirmEnd = true;
+            return;
+        }
+
+        await RunAsync(Game.State switch
+        {
+            GameState.Draft => () => LifecycleService.OpenGameAsync(Game.Id),
+            GameState.Open => () => LifecycleService.GoLiveAsync(Game.Id),
+            _ => () => LifecycleService.ArchiveGameAsync(Game.Id),
+        });
+    }
+
+    private async Task EndAsync()
+    {
+        if (!CodeMatches)
+        {
+            return;
+        }
+
+        _confirmEnd = false;
+        await RunAsync(() => LifecycleService.EndGameAsync(Game.Id));
+    }
+
+    private async Task RunAsync(Func<Task> action)
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        _error = null;
+        try
+        {
+            await action();
+            await OnChanged.InvokeAsync();
+            _overview = await OverviewService.GetAsync(Game.Id);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

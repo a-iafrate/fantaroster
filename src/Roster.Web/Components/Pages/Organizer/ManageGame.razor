@@ -1,203 +1,98 @@
-@page "/organizer/games/{Id:guid}"
+@page "/organizer/games/{Id:guid}/{Section?}"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.Extensions.Localization
 @using Roster.Application.Ports.Data
-@using Roster.Application.Services
 @using Roster.Domain.Games
+@using Roster.Web.Components.Layout
 @attribute [Authorize]
 @inject IGameRepository GameRepository
-@inject GameLifecycleService LifecycleService
 @inject IStringLocalizer<SharedResource> Loc
 @inject NavigationManager Navigation
+@inject OrganizerContext Context
+@implements IDisposable
 
 <PageTitle>@Loc["ManageGameTitle"]</PageTitle>
 
 @if (IsLoading)
 {
-    <div>@Loc["Loading"]</div>
+    <p class="ds-muted" role="status">@Loc["Loading"]</p>
 }
-else if (Game == null)
+else if (Game is null)
 {
-    <div class="mg-error">@Loc["GameNotFound"]</div>
+    <div class="ds-page">
+        <h1 class="ds-page-title">@Loc["GameNotFound"]</h1>
+        <a href="/organizer" class="ds-btn ds-btn--primary">@Loc["BackToDashboard"]</a>
+    </div>
 }
 else
 {
-    <div class="mg-header">
-        <a href="/organizer" class="mg-back"><i class="icon-arrow-left"></i> @Loc["BackToDashboard"]</a>
-        <div class="mg-title">@Game.Name</div>
-        <div class="mg-status">
-            <span class="status-dot" style="background: @GetStatusColor(Game.State)"></span>
-            <span class="status-badge">@Loc["State" + Game.State.ToString()]</span>
-        </div>
-    </div>
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <p class="ds-alert mg-error" role="alert">@ErrorMessage</p>
+    }
 
-    <div class="mg-layout">
-        <div class="mg-nav">
-            <div class="mg-nav-item @(ActiveTab == "Lifecycle" ? "active" : "")" @onclick="@(() => SetTab("Lifecycle"))">@Loc["LifecycleControlsTitle"]</div>
-            <div class="mg-nav-item @(ActiveTab == "Elements" ? "active" : "")" @onclick="@(() => SetTab("Elements"))">@Loc["ElementManagementTitle"]</div>
-            <div class="mg-nav-item @(ActiveTab == "Rules" ? "active" : "")" @onclick="@(() => SetTab("Rules"))">@Loc["RuleEditorTitle"]</div>
-            <div class="mg-nav-item @(ActiveTab == "Consent" ? "active" : "")" @onclick="@(() => SetTab("Consent"))">@Loc["ConsentFlowTitle"]</div>
-            <div class="mg-nav-item @(ActiveTab == "Assets" ? "active" : "")" @onclick="@(() => SetTab("Assets"))">@Loc["AssetsTitle"]</div>
-            <div class="mg-nav-item @(ActiveTab == "Referees" ? "active" : "")" @onclick="@(() => SetTab("Referees"))">@Loc["RefereesTitle"]</div>
-            <div class="mg-nav-item @(ActiveTab == "Settings" ? "active" : "")" @onclick="@(() => SetTab("Settings"))">@Loc["SettingsTitle"]</div>
-        </div>
-
-        <div class="mg-content">
-            @if (!string.IsNullOrEmpty(ErrorMessage))
-            {
-                <div class="mg-error">@ErrorMessage</div>
-            }
-
-            @if (ActiveTab == "Lifecycle")
-            {
-                <div class="mg-section">
-                    <div class="mg-section-title">@Loc["LifecycleControlsTitle"]</div>
-                    <div class="mg-section-desc">@Loc["LifecycleControlsDesc"]</div>
-
-                    <div class="mg-actions">
-                        @if (Game.State == GameState.Draft)
-                        {
-                            <div class="mg-action-card">
-                                <div class="mg-action-info">
-                                    <div class="mg-action-title">@Loc["ActionOpenJoins"]</div>
-                                    <div class="mg-action-desc">@Loc["ActionOpenJoinsDesc"]</div>
-                                </div>
-                                <button class="mg-btn-primary" @onclick="OpenGame" disabled="@IsProcessing">@Loc["BtnOpenGame"]</button>
-                            </div>
-                        }
-                        else if (Game.State == GameState.Open)
-                        {
-                            <div class="mg-action-card">
-                                <div class="mg-action-info">
-                                    <div class="mg-action-title">@Loc["ActionGoLive"]</div>
-                                    <div class="mg-action-desc">@Loc["ActionGoLiveDesc"]</div>
-                                </div>
-                                <button class="mg-btn-primary" @onclick="GoLive" disabled="@IsProcessing">@Loc["BtnGoLive"]</button>
-                            </div>
-                        }
-                        else if (Game.State == GameState.Live)
-                        {
-                            <div class="mg-action-card">
-                                <div class="mg-action-info">
-                                    <div class="mg-action-title">@Loc["ActionEndGame"]</div>
-                                    <div class="mg-action-desc">@Loc["ActionEndGameDesc"]</div>
-                                </div>
-                                <button class="mg-btn-primary" @onclick="EndGame" disabled="@IsProcessing">@Loc["BtnEndGame"]</button>
-                            </div>
-                        }
-                        else if (Game.State == GameState.Ended)
-                        {
-                            <div class="mg-action-card">
-                                <div class="mg-action-info">
-                                    <div class="mg-action-title">@Loc["ActionArchive"]</div>
-                                    <div class="mg-action-desc">@Loc["ActionArchiveDesc"]</div>
-                                </div>
-                                <button class="mg-btn-secondary" @onclick="ArchiveGame" disabled="@IsProcessing">@Loc["BtnArchive"]</button>
-                            </div>
-                        }
-                        else if (Game.State == GameState.Archived)
-                        {
-                            <div class="mg-alert-info">
-                                @Loc["StateArchived"]
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-            else if (ActiveTab == "Elements")
-            {
-                <ElementsTab GameId="Id" GameState="Game.State" OnError="HandleError" />
-            }
-            else if (ActiveTab == "Rules")
-            {
-                <RulesTab GameId="Id" GameState="Game.State" OnError="HandleError" />
-            }
-            else if (ActiveTab == "Consent")
-            {
-                <ConsentFlowTab GameId="Id" GameState="Game.State" OnError="HandleError" />
-            }
-            else if (ActiveTab == "Assets")
-            {
-                <AssetsTab Game="Game" OnError="HandleError" />
-            }
-            else if (ActiveTab == "Referees")
-            {
-                <RefereesTab GameId="Id" OnError="HandleError" />
-            }
-            else if (ActiveTab == "Settings")
-            {
-                <SettingsTab Game="Game" OnSaved="LoadGame" OnError="HandleError" />
-            }
-        </div>
-    </div>
+    @switch (Section?.ToLowerInvariant())
+    {
+        case "elements":
+            <ElementsTab GameId="Id" GameState="Game.State" OnError="HandleError" />
+            break;
+        case "rules":
+            <RulesTab GameId="Id" GameState="Game.State" OnError="HandleError" />
+            break;
+        case "referees":
+            <RefereesTab GameId="Id" OnError="HandleError" />
+            break;
+        case "control":
+            <ControlTab Game="Game" OnChanged="LoadGame" />
+            break;
+        case "materials":
+            <AssetsTab Game="Game" OnError="HandleError" />
+            break;
+        case "settings":
+            <SettingsTab Game="Game" OnSaved="LoadGame" OnError="HandleError" />
+            break;
+        default:
+            <OverviewTab Game="Game" />
+            break;
+    }
 }
 
 @code {
     [Parameter]
     public Guid Id { get; set; }
 
+    [Parameter]
+    public string? Section { get; set; }
+
     private Game? Game { get; set; }
     private bool IsLoading = true;
-    private bool IsProcessing = false;
     private string? ErrorMessage;
-    private string ActiveTab = "Lifecycle";
+    private string? _lastSection;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        await LoadGame();
-        IsLoading = false;
+        // Moving between sections must not leave an error from the previous one on screen.
+        if (!string.Equals(_lastSection, Section, StringComparison.Ordinal))
+        {
+            ErrorMessage = null;
+            _lastSection = Section;
+        }
+
+        if (Game?.Id != Id)
+        {
+            IsLoading = true;
+            await LoadGame();
+            IsLoading = false;
+        }
     }
 
-    private void SetTab(string tab)
-    {
-        ActiveTab = tab;
-        ErrorMessage = null;
-    }
-
-    private void HandleError(string message)
-    {
-        ErrorMessage = message;
-    }
+    private void HandleError(string message) => ErrorMessage = message;
 
     private async Task LoadGame()
     {
         Game = await GameRepository.GetByIdAsync(Id);
+        Context.SetGame(Game is null ? null : new OrganizerGameInfo(Game.Id, Game.Name, Game.State));
     }
 
-    private string GetStatusColor(GameState state) => state switch
-    {
-        GameState.Live => "var(--color-success)",
-        GameState.Ended => "var(--color-ink-2)",
-        GameState.Archived => "var(--color-ink-3)",
-        _ => "var(--color-primary)"
-    };
-
-    private async Task ExecuteAction(Func<Task> action)
-    {
-        if (IsProcessing) return;
-        IsProcessing = true;
-        ErrorMessage = null;
-
-        try
-        {
-            await action();
-            await LoadGame();
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = ex.Message;
-        }
-        finally
-        {
-            IsProcessing = false;
-        }
-    }
-
-    private Task OpenGame() => ExecuteAction(() => LifecycleService.OpenGameAsync(Id));
-    private Task GoLive() => ExecuteAction(() => LifecycleService.GoLiveAsync(Id));
-    private Task EndGame() => ExecuteAction(() => LifecycleService.EndGameAsync(Id));
-    private Task ArchiveGame() => ExecuteAction(() => LifecycleService.ArchiveGameAsync(Id));
+    public void Dispose() => Context.SetGame(null);
 }
-
-

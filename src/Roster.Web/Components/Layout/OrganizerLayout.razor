@@ -1,79 +1,14 @@
 @inherits LayoutComponentBase
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.Extensions.Localization
-@using Roster.Infrastructure.Security
 @inject IStringLocalizer<SharedResource> Loc
-@inject AuthenticationStateProvider AuthStateProvider
+
+<a href="#main" class="skip-link">@Loc["SkipToContent"]</a>
 
 <div class="org-layout">
-    <div class="org-sidebar">
-        <a href="/organizer" class="org-brand">
-            <img src="/assets/logo-r.svg" alt="">
-            <span><b>fanta</b>roster</span>
-        </a>
-        
-        <nav class="org-nav">
-            <a href="/organizer" class="org-nav-item active">
-                <i class="icon-layout-grid"></i> @Loc["DashboardTitle"]
-            </a>
-            <a href="/organizer/templates" class="org-nav-item">
-                <i class="icon-copy"></i> @Loc["NavTemplates"]
-            </a>
-            <a href="/organizer/billing" class="org-nav-item">
-                <i class="icon-credit-card"></i> @Loc["NavBilling"]
-            </a>
-            <a href="/organizer/help" class="org-nav-item">
-                <i class="icon-life-buoy"></i> @Loc["NavHelp"]
-            </a>
-        </nav>
+    <OrganizerChrome @rendermode="InteractiveServer" />
 
-        <div class="org-plan">
-            <div class="org-plan-title">@Loc["PlanFree"]</div>
-            <div class="org-plan-desc">@Loc["PlanFreeDesc"]</div>
-            <a href="/organizer/billing" class="org-plan-link">@Loc["PlanUpgrade"]</a>
-        </div>
-
-        <div class="org-account-btn">
-            <div class="org-avatar">@_initials</div>
-            <div class="org-account-info">
-                <div class="org-account-name">@_displayName</div>
-                <div class="org-account-email">@_email</div>
-            </div>
-            <i class="icon-chevrons-up-down"></i>
-        </div>
-    </div>
-    
-    <main class="org-main">
+    <main id="main" class="org-main">
         @Body
     </main>
 </div>
 
 <Roster.Web.Client.Layout.ErrorBanner />
-
-@code {
-    private string _displayName = string.Empty;
-    private string _email = string.Empty;
-    private string _initials = string.Empty;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var user = (await AuthStateProvider.GetAuthenticationStateAsync()).User;
-
-        _email = user.FindFirstValue(ClaimTypes.Email) ?? user.Identity?.Name ?? string.Empty;
-        _displayName = user.FindFirstValue(OrganizerClaimsPrincipalFactory.DisplayNameClaimType)
-            ?? _email.Split('@')[0];
-        _initials = GetInitials(_displayName);
-    }
-
-    private static string GetInitials(string name)
-    {
-        var parts = name.Split([' ', '.', '_', '-'], StringSplitOptions.RemoveEmptyEntries);
-        return parts.Length switch
-        {
-            0 => string.Empty,
-            1 => parts[0][..1].ToUpperInvariant(),
-            _ => string.Concat(parts[0][..1], parts[^1][..1]).ToUpperInvariant()
-        };
-    }
-}

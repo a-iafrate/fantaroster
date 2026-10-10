@@ -1,236 +1,121 @@
-.dashboard-header {
-    display: flex;
-    align-items: center;
+.dash-new-desktop {
+    display: none;
 }
 
-.dashboard-title {
-    font: var(--text-h1);
-    letter-spacing: var(--tracking-h1);
-}
-
-.new-game-btn {
-    margin-left: auto;
-    height: 48px;
-    padding: 0 var(--space-5);
-    border-radius: var(--radius-m);
-    background: var(--color-primary);
-    color: var(--color-on-primary);
-    font-weight: 800;
-    font: var(--text-body);
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    text-decoration: none;
-}
-
-.game-filters {
-    display: flex;
-    gap: var(--space-2);
-}
-
-.filter-chip {
-    height: 36px;
-    padding: 0 var(--space-4);
-    border-radius: var(--radius-pill);
-    font: var(--text-small);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    background: transparent;
-    color: var(--color-ink);
-    border: 1.5px solid var(--color-line-strong);
-    cursor: pointer;
-}
-
-.filter-chip.active {
-    background: var(--color-ink);
-    color: var(--color-bg);
-    border-color: var(--color-ink);
-}
-
-.games-grid {
+.dash-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-.game-card {
+.dash-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border: 1px solid var(--color-line);
     border-radius: var(--radius-l);
     background: var(--color-surface);
-    border: 1px solid var(--color-line);
-    padding: var(--space-5);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
 }
 
-.game-status {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font: var(--text-micro);
-    font-weight: 700;
-}
-
-.status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: var(--radius-pill);
-}
-
-.game-menu-icon {
-    margin-left: auto;
-    font-size: 20px;
-    color: var(--color-ink-2);
-    cursor: pointer;
-}
-
-.game-name {
-    font: var(--text-h3);
-    letter-spacing: var(--tracking-h3);
-}
-
-.game-meta {
-    font: var(--text-small);
-    color: var(--color-ink-2);
-}
-
-.game-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--color-line);
-    font: var(--text-micro);
-    color: var(--color-ink-2);
-}
-
-.game-action {
-    font-weight: 800;
-    color: var(--color-link);
-    text-decoration: none;
-}
-
-.duplicate-card {
-    border-radius: var(--radius-l);
-    border: 1.5px dashed var(--color-line-strong);
-    padding: var(--space-5);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+.dash-card--ghost {
     justify-content: center;
     align-items: flex-start;
-    cursor: pointer;
-}
-
-.duplicate-card i {
-    font-size: 24px;
-    color: var(--color-ink-2);
-}
-
-.duplicate-title {
-    font: var(--text-body);
-    font-weight: 700;
-}
-
-.duplicate-desc {
-    font: var(--text-small);
-    color: var(--color-ink-2);
-}
-
-.game-menu-container {
-    margin-left: auto;
-    position: relative;
-    display: inline-block;
-}
-
-.game-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: var(--space-1);
-    background: var(--color-surface);
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-m);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-    min-width: 150px;
-    display: flex;
-    flex-direction: column;
-}
-
-.game-dropdown-item {
-    padding: var(--space-2) var(--space-4);
-    font: var(--text-small);
+    border: 1.5px dashed var(--color-line-strong);
+    background: transparent;
     color: var(--color-ink);
-    text-decoration: none;
-    cursor: pointer;
 }
 
-.game-dropdown-item:hover {
-    background: var(--color-bg);
+.dash-card--ghost > i {
+    color: var(--color-ink-2);
+    font-size: 1.5rem;
 }
 
-.game-dropdown-item {
-    background: none;
-    border: 0;
-    text-align: left;
-    width: 100%;
-}
-
-.game-dropdown-danger {
-    color: var(--color-danger);
-}
-
-.delete-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+.dash-card__top {
     display: flex;
     align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    justify-content: space-between;
+    gap: var(--space-2);
 }
 
-.delete-dialog {
-    background: var(--color-surface);
-    border-radius: var(--radius-m);
-    padding: var(--space-6);
-    max-width: 480px;
-    width: calc(100% - var(--space-8));
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-}
-
-.delete-error {
-    color: var(--color-danger);
-}
-
-.delete-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3);
-}
-
-.delete-cancel,
-.delete-confirm {
-    min-height: 44px;
-    padding: 0 var(--space-4);
-    border-radius: var(--radius-m);
-    font: var(--text-body);
+.dash-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font: var(--text-small);
     font-weight: 700;
-    cursor: pointer;
 }
 
-.delete-cancel {
-    background: var(--color-surface);
-    border: 1px solid var(--color-line-strong);
-    color: var(--color-ink);
+.dash-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-primary);
 }
 
-.delete-confirm {
-    background: var(--color-danger);
+.dash-dot--live { background: var(--color-success); }
+.dash-dot--open { background: var(--color-warning); }
+.dash-dot--done { background: var(--color-ink-2); }
+
+.dash-card__menu {
     border: 0;
-    color: var(--color-surface);
+    margin: calc(var(--space-2) * -1);
+}
+
+.dash-card__name {
+    font: var(--text-h3);
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+}
+
+a.dash-card__name:hover {
+    color: var(--color-link);
+}
+
+.dash-card__meta {
+    font: var(--text-small);
+}
+
+.dash-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-line);
+    color: var(--color-ink-2);
+    font: var(--text-small);
+}
+
+.dash-card__action {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target-min);
+    font-weight: 800;
+}
+
+@media (min-width: 640px) {
+    .dash-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .dash-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-4);
+    }
+
+    .dash-card {
+        padding: var(--space-5);
+    }
+
+    .dash-new-desktop {
+        display: flex;
+    }
 }

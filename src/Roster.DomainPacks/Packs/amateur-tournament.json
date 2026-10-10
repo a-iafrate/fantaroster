@@ -8,6 +8,7 @@
     "en": "For five-a-side, padel or volleyball tournaments.",
     "it": "Per tornei di calcetto, padel o pallavolo."
   },
+  "icon": "icon-trophy",
   "requiresConsent": true,
   "recommendedPlugins": [ "csv" ],
   "terminology": {

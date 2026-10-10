@@ -1,0 +1,9 @@
+.wordmark {
+    font-weight: 500;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+}
+
+.wordmark b {
+    font-weight: 800;
+}
