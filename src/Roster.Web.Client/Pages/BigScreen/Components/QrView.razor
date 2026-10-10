@@ -1,0 +1,21 @@
+@using Net.Codecrete.QrCodeGenerator
+@using Microsoft.AspNetCore.Components
+
+<div class="qr-container">
+    @((MarkupString)_svg)
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+
+    private string _svg = "";
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(Text))
+        {
+            var qr = QrCode.EncodeText(Text, QrCode.Ecc.Medium);
+            _svg = qr.ToSvgString(4);
+        }
+    }
+}

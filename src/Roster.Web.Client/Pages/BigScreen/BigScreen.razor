@@ -1,0 +1,345 @@
+@page "/games/{GameId:guid}/big-screen"
+@using Roster.Web.Client.Services
+@using Roster.Web.Client.Pages.BigScreen.Components
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json.Serialization
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject GameHubClient HubClient
+@implements IAsyncDisposable
+
+<div class="big-screen @(_kiosk ? "kiosk-mode" : "")">
+    @if (_loading)
+    {
+        <div class="loading">Loading Big Screen...</div>
+    }
+    else
+    {
+        <div class="layout-grid">
+            <div class="header">
+                <div class="brand">@_gameName</div>
+                <div class="qr-box">
+                    <QrView Text="@_joinUrl" />
+                    <span>Scan to join!</span>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="leaderboard-section">
+                    <h2>Leaderboard</h2>
+                    <div class="leaderboard">
+                        @foreach (var pos in _leaderboard)
+                        {
+                            <div class="rank-row" style="--rank-index: @(pos.Rank);" @key="pos.ParticipantId">
+                                <span class="rank">#@pos.Rank</span>
+                                <span class="name">@pos.Nickname</span>
+                                <span class="score">@pos.TotalScore</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="ticker-section">
+                    <h2>Latest Points</h2>
+                    <div class="ticker">
+                        @foreach (var score in _recentScores.Where(s => s.Status != "Voided"))
+                        {
+                            var elName = _elements.FirstOrDefault(e => e.Id == score.ElementId)?.Name ?? "Unknown";
+                            var ruleLabel = _rules.FirstOrDefault(r => r.Id == score.RuleId)?.Label ?? "Unknown";
+
+                            <div class="score-card" @key="score.Id">
+                                <div class="score-details">
+                                    <strong>@elName</strong>
+                                    <div class="rule-label">@ruleLabel</div>
+                                </div>
+                                <div><span class="badge @(score.PointsSnapshot > 0 ? "bonus" : "penalty")">@(score.PointsSnapshot > 0 ? "+" : "")@score.PointsSnapshot</span></div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .big-screen {
+        width: 100vw;
+        height: 100vh;
+        background: var(--color-ink, #111);
+        color: var(--color-surface, #fff);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .kiosk-mode {
+        cursor: none;
+    }
+
+    .layout-grid {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 40px; /* Safe area */
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 120px;
+        margin-bottom: 30px;
+    }
+
+    .brand {
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    .qr-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: var(--color-surface, #fff);
+        color: var(--color-ink, #000);
+        padding: 10px;
+        border-radius: 12px;
+        font-weight: bold;
+    }
+    
+    .qr-box .qr-container {
+        width: 80px;
+        height: 80px;
+    }
+
+    .content {
+        flex: 1;
+        display: flex;
+        gap: 60px;
+        overflow: hidden;
+    }
+
+    .leaderboard-section {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ticker-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-left: 2px solid var(--color-ink-2, #333);
+        padding-left: 40px;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: var(--color-line-strong, #888);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .leaderboard {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .rank-row {
+        display: flex;
+        align-items: center;
+        background: var(--color-ink-2, #222);
+        padding: 20px 30px;
+        border-radius: 12px;
+        font-size: 1.8rem;
+        transition: transform 0.5s ease-in-out;
+        animation: fadein 0.5s;
+    }
+    
+    @@keyframes fadein {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @@media (prefers-reduced-motion: no-preference) {
+        .rank-row {
+            /* Example animation placeholder */
+        }
+    }
+
+    .rank {
+        width: 80px;
+        font-weight: 900;
+        color: #ffcc00;
+    }
+
+    .name {
+        flex: 1;
+        font-weight: 600;
+    }
+
+    .score {
+        font-weight: 800;
+        font-size: 2rem;
+    }
+
+    .ticker {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .score-card {
+        background: var(--color-ink-2, #222);
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.5rem;
+    }
+
+    .score-details {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .rule-label {
+        font-size: 1rem;
+        color: #aaa;
+        margin-top: 5px;
+    }
+
+    .badge {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .bonus { background: #28a745; color: #fff; }
+    .penalty { background: #dc3545; color: #fff; }
+
+</style>
+
+@code {
+    [Parameter] public Guid GameId { get; set; }
+    
+    private bool _loading = true;
+    private bool _kiosk = true;
+    
+    private string _gameName = "FantaRoster";
+    private string _joinUrl = "";
+    
+    private List<LeaderboardDto> _leaderboard = new();
+    private List<ScoreEntryDto> _recentScores = new();
+
+    private List<ElementDto> _elements = new();
+    private List<RuleDto> _rules = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(Nav.Uri);
+        _joinUrl = $"{uri.Scheme}://{uri.Authority}/games/{GameId}/join";
+
+        await LoadDataAsync();
+
+        HubClient.OnLeaderboardUpdated += OnLeaderboardUpdated;
+        HubClient.OnScoreEntryAdded += OnScoreEntryAdded;
+        HubClient.OnScoreEntryVoided += OnScoreEntryVoided;
+        
+        await HubClient.StartAsync(GameId);
+
+        _loading = false;
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            var lbTask = Http.GetFromJsonAsync<LeaderboardResponseDto>($"/api/games/{GameId}/participant/leaderboard");
+            var scoresTask = Http.GetFromJsonAsync<List<ScoreEntryDto>>($"/api/games/{GameId}/score-entries?count=5");
+            var elementsTask = Http.GetFromJsonAsync<List<ElementDto>>($"/api/games/{GameId}/elements");
+            var rulesTask = Http.GetFromJsonAsync<List<RuleDto>>($"/api/games/{GameId}/rules");
+            var gameInfoTask = Http.GetFromJsonAsync<GameInfoDto>($"/api/games/{GameId}"); 
+
+            await Task.WhenAll(lbTask!, scoresTask!, elementsTask!, rulesTask!);
+            
+            var lb = lbTask.Result;
+            if (lb != null && lb.TopPositions != null)
+            {
+                _leaderboard = lb.TopPositions.ToList();
+            }
+
+            _recentScores = scoresTask.Result ?? new();
+            _elements = elementsTask.Result ?? new();
+            _rules = rulesTask.Result ?? new();
+
+            try {
+                var gameInfo = await gameInfoTask!;
+                if (gameInfo != null) _gameName = gameInfo.Name;
+            } catch { }
+            StateHasChanged();
+        }
+        catch { }
+    }
+
+    private void OnLeaderboardUpdated(long version)
+    {
+        _ = InvokeAsync(LoadDataAsync);
+    }
+
+    private void OnScoreEntryAdded(Guid entryId)
+    {
+        _ = InvokeAsync(LoadDataAsync);
+    }
+
+    private void OnScoreEntryVoided(Guid entryId)
+    {
+        _ = InvokeAsync(LoadDataAsync);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        HubClient.OnLeaderboardUpdated -= OnLeaderboardUpdated;
+        HubClient.OnScoreEntryAdded -= OnScoreEntryAdded;
+        HubClient.OnScoreEntryVoided -= OnScoreEntryVoided;
+        await HubClient.DisposeAsync();
+    }
+
+    // Local DTOs
+    public class LeaderboardResponseDto
+    {
+        public LeaderboardDto? MyPosition { get; set; }
+        public List<LeaderboardDto> TopPositions { get; set; } = new();
+    }
+
+    public class LeaderboardDto
+    {
+        public int Rank { get; set; }
+        public Guid ParticipantId { get; set; }
+        public string Nickname { get; set; } = "";
+        public int TotalScore { get; set; }
+    }
+
+    public class ScoreEntryDto
+    {
+        public Guid Id { get; set; }
+        public Guid? ElementId { get; set; }
+        public Guid RuleId { get; set; }
+        public int PointsSnapshot { get; set; }
+        public string Status { get; set; } = "";
+    }
+
+    public class ElementDto { public Guid Id { get; set; } public string Name { get; set; } = ""; }
+    public class RuleDto { public Guid Id { get; set; } public string Label { get; set; } = ""; }
+    
+    public class GameInfoDto
+    {
+        public string Name { get; set; } = "";
+    }
+}

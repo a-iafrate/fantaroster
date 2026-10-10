@@ -1,4 +1,4 @@
-# Development Plan — FantaRoster / ImagiRoster
+﻿# Development Plan — FantaRoster / ImagiRoster
 
 > **Version:** 1.0 — October 2026
 > **Scope:** from an empty repository to the pilot event (P0), then the first post-pilot release (P1).
@@ -222,15 +222,15 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Goal:** points flow from referees to every screen in under two seconds.
 
 **Tasks**
-- [ ] SignalR hub `/hubs/game`: group per game, server-to-client events only (`LeaderboardUpdated`, `ScoreEntryAdded`, `ScoreEntryVoided`, `GameStateChanged`), versioned payloads.
-- [ ] Azure SignalR Service configuration for production; local SignalR in development.
-- [ ] Score endpoints: assign (with idempotency key), void (with reason), list recent; authorization by referee token.
-- [ ] Leaderboard recompute on every change and broadcast of the new version (single replica, in-memory cache per game rebuilt from the database on start).
-- [ ] Referee console (Interactive WebAssembly): pick element → pick rule → confirm (**three taps**), undo within 10 seconds, recent history with void.
-- [ ] One-handed layout: large targets, thumb zone, a low-light theme (dark halls, evening parties) and good daylight contrast (outdoor pitches).
-- [ ] **Offline queue:** store pending assignments locally with their idempotency keys; replay on reconnect; show pending state.
-- [ ] Rate limiting and audit log for referee actions.
-- [ ] Load test (e.g. k6 or NBomber): 1,000 connected clients, 1 point every 5 seconds, p95 propagation < 2 s.
+- [x] SignalR hub `/hubs/game`: group per game, server-to-client events only (`LeaderboardUpdated`, `ScoreEntryAdded`, `ScoreEntryVoided`, `GameStateChanged`), versioned payloads.
+- [x] Azure SignalR Service configuration for production; local SignalR in development.
+- [x] Score endpoints: assign (with idempotency key), void (with reason), list recent; authorization by referee token.
+- [x] Leaderboard recompute on every change and broadcast of the new version (single replica, in-memory cache per game rebuilt from the database on start).
+- [x] Referee console (Interactive WebAssembly): pick element → pick rule → confirm (**three taps**), undo within 10 seconds, recent history with void.
+- [x] One-handed layout: large targets, thumb zone, a low-light theme (dark halls, evening parties) and good daylight contrast (outdoor pitches).
+- [x] **Offline queue:** store pending assignments locally with their idempotency keys; replay on reconnect; show pending state.
+- [x] Rate limiting and audit log for referee actions.
+- [x] Load test (e.g. k6 or NBomber): 1,000 connected clients, 1 point every 5 seconds, p95 propagation < 2 s.
 
 **Deliverables:** real-time pipeline, referee console, load-test report.
 
@@ -245,11 +245,11 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Goal:** a big-screen view (projector or TV) that keeps the audience engaged between moments: sessions, matches, courses, episodes.
 
 **Tasks**
-- [ ] Full-screen read-only view (Interactive WebAssembly): leaderboard, latest points ticker, join QR, game name and brand.
-- [ ] Readability from 15 meters on a 1920×1080 projector; high contrast; safe areas for projector overscan.
-- [ ] Subtle, single animation when ranks change; respects reduced motion.
-- [ ] Optional "in between" rotation: leaderboard → latest points → join QR.
-- [ ] Kiosk mode: no cursor, no navigation, auto-reconnect.
+- [x] Full-screen read-only view (Interactive WebAssembly): leaderboard, latest points ticker, join QR, game name and brand.
+- [x] Readability from 15 meters on a 1920×1080 projector; high contrast; safe areas for projector overscan.
+- [x] Subtle, single animation when ranks change; respects reduced motion.
+- [x] Optional "in between" rotation: leaderboard → latest points → join QR.
+- [x] Kiosk mode: no cursor, no navigation, auto-reconnect.
 
 **Exit criteria**
 - Readable at distance in a real room test; runs 8 hours without memory growth.
