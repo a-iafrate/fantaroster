@@ -1,7 +1,7 @@
 using System.Globalization;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
-using Roster.Web.Components.Layout;
+using Roster.Web.Client.Shared;
 using Shouldly;
 using Xunit;
 

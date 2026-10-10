@@ -6,78 +6,75 @@
 
 <PageTitle>@Loc["EnterCodePageTitle"]</PageTitle>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-sm text-center p-4">
-                <div class="mb-4">
-                    <i class="icon-qr-code" style="font-size: 48px; color: var(--color-primary, #3b82f6);"></i>
-                </div>
-                <h2 class="h4 mb-3">@Loc["EnterCodeTitle"]</h2>
-                <p class="text-muted mb-4">@Loc["EnterCodeHelp"]</p>
-                
-                @if (_errorMessage is not null)
-                {
-                    <div class="alert alert-danger" role="alert">@_errorMessage</div>
-                }
+<div class="code">
+    <img class="code__logo" src="assets/logo-r.svg" alt="" />
 
-                <form @onsubmit="Submit">
-                    <div class="mb-3">
-                        <input type="text" class="form-control form-control-lg text-center" style="letter-spacing: 0.25em; text-transform: uppercase;" 
-                               placeholder="XXXXX" maxlength="5" @bind="_joinCode" @bind:event="oninput" />
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-lg w-100" disabled="@(string.IsNullOrWhiteSpace(_joinCode) || _joinCode.Length != 5 || _isChecking)">
-                        @Loc["GoToGame"]
-                    </button>
-                </form>
-            </div>
-        </div>
+    <div class="code__intro">
+        <span class="code__icon" aria-hidden="true"><i class="icon-qr-code"></i></span>
+        <h1 class="ds-title">@Loc["EnterCodeTitle"]</h1>
+        <p class="ds-muted">@Loc["EnterCodeHelp"]</p>
     </div>
+
+    <form class="code__form" @onsubmit="SubmitAsync" novalidate>
+        <div>
+            <label class="ds-label" for="join-code">@Loc["JoinCodeLabel"]</label>
+            <input id="join-code" class="ds-input code__input" type="text" inputmode="text" autocapitalize="characters" autocomplete="off"
+                   spellcheck="false" maxlength="@CodeLength"
+                   aria-describedby="@(_error is null ? null : "join-code-error")"
+                   aria-invalid="@(_error is null ? null : "true")"
+                   @bind="_code" @bind:event="oninput" />
+            @if (_error is not null)
+            {
+                <p class="ds-alert code__error" id="join-code-error" role="alert">@_error</p>
+            }
+        </div>
+        <button type="submit" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" disabled="@(!IsComplete || _checking)">
+            @Loc["GoToGame"]
+        </button>
+    </form>
 </div>
 
 @code {
-    private string _joinCode = string.Empty;
+    private const int CodeLength = 5;
 
-    private bool _isChecking;
-    private string? _errorMessage;
+    private string _code = string.Empty;
+    private bool _checking;
+    private string? _error;
 
-    private async Task Submit()
+    private bool IsComplete => _code.Trim().Length == CodeLength;
+
+    private async Task SubmitAsync()
     {
-        if (string.IsNullOrWhiteSpace(_joinCode) || _joinCode.Length != 5 || _isChecking)
+        if (!IsComplete || _checking)
+        {
             return;
+        }
 
-        _isChecking = true;
-        _errorMessage = null;
+        _checking = true;
+        _error = null;
         try
         {
-            var response = await Http.GetAsync($"/api/join-codes/{Uri.EscapeDataString(_joinCode.ToUpperInvariant())}");
-            if (response.IsSuccessStatusCode)
+            var code = Uri.EscapeDataString(_code.Trim().ToUpperInvariant());
+            using var response = await Http.GetAsync(new Uri($"/api/join-codes/{code}", UriKind.Relative));
+            if (response.IsSuccessStatusCode && await response.Content.ReadFromJsonAsync<JoinCodeResponse>() is { } result)
             {
-                var result = await response.Content.ReadFromJsonAsync<JoinCodeResponse>();
-                if (result is not null)
-                {
-                    Navigation.NavigateTo($"/games/{result.GameId}/join");
-                    return;
-                }
+                Navigation.NavigateTo(ParticipantRoutes.Join(result.GameId));
+                return;
             }
 
-            _errorMessage = response.StatusCode == System.Net.HttpStatusCode.NotFound
+            _error = response.StatusCode == System.Net.HttpStatusCode.NotFound
                 ? Loc["JoinCodeNotFound"]
                 : Loc["NetworkErrorTryAgain"];
         }
         catch (HttpRequestException)
         {
-            _errorMessage = Loc["NetworkErrorTryAgain"];
+            _error = Loc["NetworkErrorTryAgain"];
         }
         finally
         {
-            _isChecking = false;
+            _checking = false;
         }
     }
 
-    public class JoinCodeResponse
-    {
-        public Guid GameId { get; set; }
-    }
+    private sealed record JoinCodeResponse(Guid GameId);
 }

@@ -61,5 +61,7 @@ public class ActivityFeedServiceTests
         result[0].Points.ShouldBe(10);
         result[0].RuleLabel.ShouldBe("Cool Rule");
         result[0].Status.ShouldBe(ScoreStatus.Valid.ToString());
+        result[0].ElementId.ShouldBe(elementId);
+        result[0].ParticipantId.ShouldBeNull();
     }
 }

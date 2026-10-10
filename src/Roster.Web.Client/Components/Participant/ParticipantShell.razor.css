@@ -1,0 +1,248 @@
+/* Mobile first: app bar on top, four fixed tabs at the bottom (mockup 06, section 3). */
+.pshell {
+    min-height: 100dvh;
+    padding-bottom: calc(var(--ds-tabbar-height) + env(safe-area-inset-bottom));
+}
+
+.pshell__bar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--ds-appbar-height);
+    padding: max(var(--space-2), env(safe-area-inset-top)) max(var(--space-3), env(safe-area-inset-right)) var(--space-2) max(var(--space-5), env(safe-area-inset-left));
+    background: var(--color-bg);
+}
+
+.pshell__titles {
+    flex: 1;
+    min-width: 0;
+}
+
+.pshell__game {
+    display: block;
+    overflow: hidden;
+    color: var(--color-ink-2);
+    font: var(--text-micro);
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.pshell__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.pshell__title {
+    margin: 0;
+    font: var(--text-h2);
+    font-weight: 800;
+    letter-spacing: var(--tracking-h2);
+}
+
+.pshell__title:focus {
+    outline: none;
+}
+
+.pshell__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-width: var(--target-min);
+    min-height: var(--target-min);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-m);
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+}
+
+.pshell__nickname {
+    display: none;
+}
+
+.pshell__tabs {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    height: calc(var(--ds-tabbar-height) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--color-line);
+    background: var(--color-surface);
+}
+
+.pshell__tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: var(--target-min);
+    color: var(--color-ink-2);
+    font: var(--text-micro);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pshell__tab:hover {
+    color: var(--color-ink);
+}
+
+.pshell__tab[aria-current="page"] {
+    color: var(--color-link);
+    font-weight: 700;
+}
+
+.pshell__tab-icon {
+    position: relative;
+    font-size: 1.375rem;
+    line-height: 1;
+}
+
+.pshell__dot {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--color-surface);
+    border-radius: 50%;
+    background: var(--color-lime);
+}
+
+.pshell__content {
+    width: 100%;
+    max-width: var(--ds-content-max);
+    margin-inline: auto;
+    padding: var(--space-2) max(var(--space-5), env(safe-area-inset-right)) var(--space-6) max(var(--space-5), env(safe-area-inset-left));
+}
+
+.pshell__menu-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0 var(--space-2) var(--space-4);
+}
+
+.pshell__menu-name {
+    font: var(--text-body-l);
+    font-weight: 800;
+}
+
+.pshell__menu-sub {
+    font: var(--text-small);
+}
+
+.pshell__loading,
+.pshell__message {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: var(--ds-content-max);
+    margin-inline: auto;
+    padding: var(--space-16) var(--space-5) var(--space-6);
+}
+
+.pshell__message {
+    gap: var(--space-4);
+}
+
+.pshell__skeleton-row {
+    height: var(--ds-control-l);
+}
+
+/* Desktop: tabs move into the top bar, the menu opens as a dropdown. */
+@media (min-width: 1024px) {
+    .pshell {
+        padding-bottom: 0;
+    }
+
+    .pshell__bar {
+        min-height: 72px;
+        padding-inline: var(--space-10);
+        border-bottom: 1px solid var(--color-line);
+        background: var(--color-surface);
+    }
+
+    .pshell__titles {
+        flex: 0 1 auto;
+    }
+
+    .pshell__game {
+        font: var(--text-small);
+        font-weight: 700;
+    }
+
+    .pshell__title {
+        font: var(--text-h3);
+        font-weight: 800;
+    }
+
+    .pshell__tabs {
+        position: static;
+        display: flex;
+        gap: var(--space-6);
+        height: auto;
+        margin-inline: var(--space-6) auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+    }
+
+    .pshell__tab {
+        flex-direction: row;
+        gap: var(--space-2);
+        min-height: 72px;
+        border-bottom: 3px solid transparent;
+        font: var(--text-body);
+        font-weight: 600;
+    }
+
+    .pshell__tab[aria-current="page"] {
+        border-bottom-color: var(--color-primary);
+        font-weight: 700;
+    }
+
+    .pshell__tab-icon {
+        font-size: 1.125rem;
+    }
+
+    .pshell__avatar {
+        padding: 0 var(--space-1) 0 var(--space-3);
+        border: 1.5px solid var(--color-line-strong);
+    }
+
+    .pshell__nickname {
+        display: inline;
+        font: var(--text-small);
+        font-weight: 700;
+    }
+
+    .pshell__content {
+        padding-top: var(--space-8);
+    }
+
+    .pshell__menu {
+        inset: 68px var(--space-10) auto auto;
+        width: 300px;
+        padding: var(--space-2);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-l);
+        animation: none;
+    }
+
+    .pshell__menu .ds-sheet__grabber {
+        display: none;
+    }
+}

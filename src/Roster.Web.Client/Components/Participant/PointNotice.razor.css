@@ -1,0 +1,120 @@
+.notice {
+    align-items: center;
+    text-align: center;
+}
+
+.notice__art {
+    position: relative;
+    width: 180px;
+    height: 200px;
+}
+
+.notice__backdrop {
+    position: absolute;
+    top: 20px;
+    left: 10px;
+    width: 150px;
+    height: 180px;
+    border-radius: var(--radius-l);
+    background: var(--color-lime);
+    transform: rotate(-6deg);
+}
+
+.notice__card {
+    position: absolute;
+    top: 0;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 150px;
+    height: 186px;
+    padding: var(--space-4);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lift);
+    text-align: start;
+    transform: rotate(4deg);
+}
+
+.notice__card-name {
+    font: var(--text-body);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.notice__points {
+    position: absolute;
+    top: -10px;
+    right: -18px;
+    display: flex;
+    align-items: center;
+    height: var(--ds-control-m);
+    padding: 0 var(--space-4);
+    border: 2px solid var(--color-on-lime);
+    border-radius: var(--radius-m);
+    background: var(--color-lime);
+    color: var(--color-on-lime);
+    font: var(--text-h2);
+    font-weight: 800;
+    transform: rotate(8deg);
+}
+
+.notice__title:focus {
+    outline: none;
+}
+
+.notice__body {
+    margin: 0;
+    font: var(--text-body);
+}
+
+.notice-banner {
+    position: fixed;
+    top: max(var(--space-3), env(safe-area-inset-top));
+    inset-inline: var(--space-4);
+    z-index: var(--z-toast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    max-width: 480px;
+    margin-inline: auto;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-overlay);
+    animation: notice-drop var(--dur-slow) var(--ease-standard);
+}
+
+.notice-banner__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.notice-banner__title {
+    font: var(--text-body);
+    font-weight: 700;
+}
+
+.notice-banner__sub {
+    font: var(--text-small);
+}
+
+.notice-banner__close {
+    border: 0;
+    color: var(--color-ink-2);
+}
+
+@keyframes notice-drop {
+    from { transform: translateY(-120%); }
+    to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .notice-banner {
+        animation: none;
+    }
+}

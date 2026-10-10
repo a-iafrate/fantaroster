@@ -17,6 +17,9 @@ public class GameHubClient : IAsyncDisposable
     public event Action<Guid>? OnScoreEntryVoided;
     public event Action<string>? OnGameStateChanged;
 
+    /// <summary>Raised after an automatic reconnection: events may have been missed, so listeners refetch.</summary>
+    public event Action? OnReconnected;
+
     public GameHubClient(NavigationManager navigationManager, ILogger<GameHubClient> logger)
     {
         _navigationManager = navigationManager;
@@ -51,6 +54,13 @@ public class GameHubClient : IAsyncDisposable
         {
             OnGameStateChanged?.Invoke(state);
         });
+
+        // Group membership does not survive a reconnection: join the game group again.
+        _hubConnection.Reconnected += async _ =>
+        {
+            await _hubConnection.InvokeAsync("JoinGame", gameId.ToString());
+            OnReconnected?.Invoke();
+        };
 
         try
         {

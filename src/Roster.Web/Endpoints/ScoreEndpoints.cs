@@ -33,8 +33,7 @@ public static class ScoreEndpoints
                 return Results.Unauthorized();
 
             var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-            // Basic hash for demo. Real app uses proper hashing from a service.
-            var tokenHash = Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(token)));
+            var tokenHash = RefereeTokens.Hash(token);
 
             var referees = await refereeRepository.GetByGameIdAsync(id, context.RequestAborted);
             var referee = referees.FirstOrDefault(r => r.InviteTokenHash == tokenHash);
@@ -86,7 +85,7 @@ public static class ScoreEndpoints
                 return Results.Unauthorized();
 
             var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-            var tokenHash = Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(token)));
+            var tokenHash = RefereeTokens.Hash(token);
 
             var referees = await refereeRepository.GetByGameIdAsync(id, context.RequestAborted);
             var referee = referees.FirstOrDefault(r => r.InviteTokenHash == tokenHash);

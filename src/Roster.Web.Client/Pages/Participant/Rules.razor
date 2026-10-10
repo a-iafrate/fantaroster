@@ -1,0 +1,82 @@
+@page "/games/{GameId:guid}/rules"
+@rendermode ClientRenderMode.Instance
+@implements IDisposable
+@inject ParticipantSession Session
+@inject IStringLocalizer<ParticipantResource> Loc
+
+<PageTitle>@Loc["TabRules"]</PageTitle>
+
+<ParticipantShell GameId="GameId" Tab="ParticipantTab.Rules">
+    @if (Session.Game is { } game && Session.Rules is { } rules)
+    {
+        var elementRules = rules.Where(r => !r.IsPersonal).OrderByDescending(r => r.Points).ToList();
+        var personalRules = rules.Where(r => r.IsPersonal).OrderByDescending(r => r.Points).ToList();
+
+        <div class="rules">
+            <p class="ds-muted rules__intro">@string.Format(Loc["RulesIntro"], game.LineupSize, game.Terms.ElementPlural.ToLower(System.Globalization.CultureInfo.CurrentCulture))</p>
+
+            @if (game.CaptainEnabled)
+            {
+                <div class="ds-card rules__captain">
+                    <span class="rules__captain-badge"><i class="icon-star" aria-hidden="true"></i>@ParticipantFormat.Multiplier(game.CaptainMultiplier)</span>
+                    <span>@string.Format(Loc["CaptainExplained"], ParticipantFormat.Multiplier(game.CaptainMultiplier))</span>
+                </div>
+            }
+
+            @if (elementRules.Count > 0)
+            {
+                <section aria-labelledby="rules-elements">
+                    <h2 class="rules__heading" id="rules-elements">@string.Format(Loc["RulesForElements"], game.Terms.ElementPlural)</h2>
+                    <ul class="rules__list">
+                        @foreach (var rule in elementRules)
+                        {
+                            <li class="rules__item">
+                                <span>@rule.Label</span>
+                                <span class="ds-points @(rule.Points < 0 ? "ds-points--penalty" : "")">@ParticipantFormat.Points(rule.Points)</span>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @if (personalRules.Count > 0)
+            {
+                <section aria-labelledby="rules-personal">
+                    <h2 class="rules__heading" id="rules-personal">@Loc["RulesPersonal"]</h2>
+                    <ul class="rules__list">
+                        @foreach (var rule in personalRules)
+                        {
+                            <li class="rules__item">
+                                <span>@rule.Label</span>
+                                <span class="ds-points @(rule.Points < 0 ? "ds-points--penalty" : "")">@ParticipantFormat.Points(rule.Points)</span>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @if (rules.Count == 0)
+            {
+                <p class="ds-muted">@Loc["NoRulesYet"]</p>
+            }
+        </div>
+    }
+</ParticipantShell>
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Session.Changed += OnSessionChanged;
+        if (await Session.EnsureLoadedAsync(GameId) == ParticipantSessionStatus.Ready)
+        {
+            await Session.LoadRulesAsync();
+        }
+    }
+
+    public void Dispose() => Session.Changed -= OnSessionChanged;
+
+    private void OnSessionChanged() => InvokeAsync(StateHasChanged);
+}

@@ -8,7 +8,9 @@ public sealed record GetActivityFeedQuery(Guid GameId);
 public sealed record ActivityFeedItemDto(
     Guid Id,
     DateTimeOffset CreatedAt,
+    Guid? ElementId,
     string? ElementName,
+    Guid? ParticipantId,
     string? ParticipantNickname,
     string RuleLabel,
     int Points,

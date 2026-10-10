@@ -35,6 +35,19 @@ public class OfflineScoreStore
         await SaveQueueAsync(queue);
     }
 
+    /// <summary>Drops a pending assignment, e.g. when the referee undoes it before it was sent.</summary>
+    /// <returns>True when the assignment was still pending.</returns>
+    public async Task<bool> RemoveAsync(string idempotencyKey)
+    {
+        var queue = await GetQueueAsync();
+        var removed = queue.RemoveAll(a => a.IdempotencyKey == idempotencyKey) > 0;
+        if (removed)
+        {
+            await SaveQueueAsync(queue);
+        }
+        return removed;
+    }
+
     public async Task<List<PendingScoreAssignment>> GetQueueAsync()
     {
         try
@@ -94,7 +107,7 @@ public class OfflineScoreStore
                     // Assuming 5xx or network exceptions will throw or return false.
                     // For simplicity, let's keep it if it's 5xx, otherwise drop.
                     var statusCode = (int)response.StatusCode;
-                    if (statusCode >= 500)
+                    if (statusCode >= 500 || statusCode == 401)
                     {
                         remaining.Add(assignment);
                     }

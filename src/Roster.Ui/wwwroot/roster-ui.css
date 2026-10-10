@@ -1,0 +1,487 @@
+/* Roster.Ui design system: brand-agnostic building blocks shared by every surface.
+   Colors, type, spacing, radius and motion come only from css/tokens.css (docs/design/tokens).
+   Component dimensions below are taken from the mockups in docs/design and kept in one place. */
+
+:root {
+    --ds-control-l: 56px;      /* primary actions */
+    --ds-control-m: 52px;      /* inputs, secondary actions */
+    --ds-control-s: var(--target-min);
+    --ds-avatar-s: 36px;
+    --ds-avatar-m: 48px;
+    --ds-avatar-l: 56px;
+    --ds-tabbar-height: 64px;
+    --ds-appbar-height: 60px;
+    --ds-content-max: 720px;
+}
+
+/* ---------- Text ---------- */
+.ds-title {
+    margin: 0;
+    font: var(--text-h2);
+    font-weight: 800;
+    letter-spacing: var(--tracking-h2);
+}
+
+.ds-heading {
+    margin: 0;
+    font: var(--text-h3);
+    letter-spacing: var(--tracking-h3);
+}
+
+.ds-muted {
+    color: var(--color-ink-2);
+}
+
+/* ---------- Buttons ---------- */
+.ds-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: var(--ds-control-s);
+    padding: 0 var(--space-4);
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-m);
+    background: transparent;
+    color: var(--color-ink);
+    font: var(--text-body);
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard);
+}
+
+.ds-btn:hover {
+    color: inherit;
+}
+
+.ds-btn:disabled,
+.ds-btn[aria-disabled="true"] {
+    cursor: not-allowed;
+}
+
+.ds-btn--l {
+    min-height: var(--ds-control-l);
+    border-radius: var(--radius-m);
+    font: var(--text-body-l);
+    font-weight: 800;
+}
+
+.ds-btn--block {
+    display: flex;
+    width: 100%;
+}
+
+.ds-btn--primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+.ds-btn--primary:hover {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    color: var(--color-on-primary);
+}
+
+.ds-btn--primary:disabled {
+    background: var(--color-line);
+    border-color: var(--color-line);
+    color: var(--color-ink-2);
+}
+
+.ds-btn--secondary {
+    border-color: var(--color-line-strong);
+    color: var(--color-ink);
+}
+
+.ds-btn--secondary:hover {
+    background: var(--color-surface-2);
+}
+
+.ds-btn--lime {
+    background: var(--color-lime);
+    color: var(--color-on-lime);
+}
+
+.ds-btn--danger {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.ds-btn--danger:hover {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.ds-btn--link {
+    min-height: var(--target-min);
+    padding: 0;
+    color: var(--color-link);
+}
+
+.ds-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--target-min);
+    height: var(--target-min);
+    flex: none;
+    border: 1.5px solid var(--color-line-strong);
+    border-radius: var(--radius-m);
+    background: transparent;
+    color: var(--color-ink);
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+/* ---------- Points pill ---------- */
+.ds-points {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--target-min);
+    height: 28px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-s);
+    background: var(--color-lime);
+    color: var(--color-on-lime);
+    font: var(--text-small);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.ds-points--penalty {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.ds-points--voided {
+    background: transparent;
+    border: 1px dashed var(--color-line-strong);
+    color: var(--color-ink-2);
+    text-decoration: line-through;
+}
+
+/* ---------- Badges (status) ---------- */
+.ds-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: fit-content;
+    min-height: 30px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-2);
+    color: var(--color-ink);
+    font: var(--text-small);
+    font-weight: 700;
+}
+
+.ds-badge--surface {
+    background: var(--color-surface);
+}
+
+.ds-badge--tint {
+    border-color: transparent;
+    background: var(--color-primary-tint);
+    color: var(--color-link);
+    font-weight: 800;
+}
+
+.ds-live-dot {
+    width: 10px;
+    height: 10px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--color-success);
+}
+
+.ds-you {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-s);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font: var(--text-micro);
+    font-weight: 800;
+}
+
+/* ---------- Chips (filters) ---------- */
+.ds-chips {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-block: 2px;
+}
+
+.ds-chips::-webkit-scrollbar {
+    display: none;
+}
+
+.ds-chip {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    min-height: var(--target-min);
+    padding: 0 var(--space-4);
+    border: 1.5px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    font: var(--text-small);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ds-chip[aria-pressed="true"] {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: 700;
+}
+
+/* ---------- Segmented control ---------- */
+.ds-segmented {
+    display: flex;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-m);
+    background: var(--color-surface-2);
+}
+
+.ds-segmented button {
+    flex: 1;
+    min-height: var(--target-min);
+    border: 1px solid transparent;
+    border-radius: var(--radius-s);
+    background: transparent;
+    color: var(--color-ink-2);
+    font: var(--text-small);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ds-segmented button[aria-pressed="true"] {
+    border-color: var(--color-line-strong);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-weight: 700;
+}
+
+/* ---------- Cards ---------- */
+.ds-card {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-l);
+    background: var(--color-surface);
+    color: var(--color-ink);
+}
+
+/* ---------- Inputs ---------- */
+.ds-label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font: var(--text-small);
+    font-weight: 700;
+}
+
+.ds-hint {
+    margin-top: var(--space-2);
+    color: var(--color-ink-2);
+    font: var(--text-small);
+}
+
+.ds-input {
+    display: block;
+    width: 100%;
+    min-height: var(--ds-control-m);
+    padding: 0 var(--space-4);
+    border: 1.5px solid var(--color-line-strong);
+    border-radius: var(--radius-m);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font: var(--text-body-l);
+    font-weight: 600;
+}
+
+.ds-input::placeholder {
+    color: var(--color-ink-2);
+    font-weight: 500;
+}
+
+.ds-input:focus {
+    border-color: var(--color-primary);
+    outline: 3px solid var(--color-focus);
+    outline-offset: 1px;
+}
+
+.ds-search {
+    position: relative;
+}
+
+.ds-search > i {
+    position: absolute;
+    top: 50%;
+    left: var(--space-4);
+    transform: translateY(-50%);
+    color: var(--color-ink-2);
+    font-size: 1.25rem;
+    pointer-events: none;
+}
+
+.ds-search > .ds-input {
+    min-height: var(--space-12);
+    padding-left: calc(var(--space-4) * 2 + 1.25rem);
+    font: var(--text-body);
+}
+
+/* ---------- Alerts ---------- */
+.ds-alert {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-m);
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    font: var(--text-small);
+    font-weight: 600;
+}
+
+.ds-alert--info {
+    background: var(--color-info-bg);
+    color: var(--color-info);
+}
+
+.ds-alert--success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+/* ---------- Sheet, dialog and scrim ---------- */
+.ds-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-sheet);
+    border: 0;
+    background: var(--color-scrim);
+    cursor: pointer;
+}
+
+.ds-sheet {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: var(--z-sheet);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 90dvh;
+    overflow-y: auto;
+    padding: var(--space-3) var(--space-4) max(var(--space-6), env(safe-area-inset-bottom));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-overlay);
+    animation: ds-sheet-in var(--dur-slow) var(--ease-standard);
+}
+
+.ds-sheet__grabber {
+    width: 40px;
+    height: 4px;
+    margin: 0 auto var(--space-3);
+    border-radius: 2px;
+    background: var(--color-line-strong);
+}
+
+.ds-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: var(--ds-control-m);
+    padding: 0 var(--space-3);
+    border: 0;
+    border-radius: var(--radius-m);
+    background: transparent;
+    color: var(--color-ink);
+    font: var(--text-body);
+    font-weight: 600;
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ds-menu-item:hover {
+    background: var(--color-surface-2);
+    color: var(--color-ink);
+}
+
+.ds-menu-item > i:first-child {
+    font-size: 1.25rem;
+}
+
+.ds-menu-item > span:first-of-type {
+    flex: 1;
+}
+
+.ds-menu-item__value {
+    color: var(--color-ink-2);
+    font: var(--text-small);
+}
+
+.ds-menu-item--danger,
+.ds-menu-item--danger:hover {
+    color: var(--color-danger);
+}
+
+.ds-menu-separator {
+    margin: var(--space-1) 0;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    opacity: 1;
+}
+
+.ds-dialog {
+    position: fixed;
+    inset-inline: var(--space-3);
+    bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    z-index: var(--z-dialog);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 480px;
+    margin-inline: auto;
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-overlay);
+    animation: ds-sheet-in var(--dur-slow) var(--ease-lift);
+}
+
+@media (min-width: 640px) {
+    .ds-dialog {
+        top: 50%;
+        bottom: auto;
+        transform: translateY(-50%);
+        animation: none;
+    }
+}
+
+@keyframes ds-sheet-in {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* ---------- Skeleton ---------- */
+.ds-skeleton {
+    border-radius: var(--radius-m);
+    background: var(--color-surface-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ds-sheet,
+    .ds-dialog {
+        animation: none;
+    }
+}

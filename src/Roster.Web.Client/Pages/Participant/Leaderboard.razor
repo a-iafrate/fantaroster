@@ -1,162 +1,178 @@
 @page "/games/{GameId:guid}/leaderboard"
 @rendermode ClientRenderMode.Instance
-@inject HttpClient Http
-@inject Roster.Web.Client.Services.ParticipantAuthState AuthState
-@inject NavigationManager Navigation
+@implements IDisposable
+@inject ParticipantSession Session
 @inject IStringLocalizer<ParticipantResource> Loc
 
-<PageTitle>@Loc["LeaderboardPageTitle"]</PageTitle>
+<PageTitle>@Loc["TabLeaderboard"]</PageTitle>
 
-@if (_isLoading)
-{
-    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">@Loc["Loading"]</span>
-        </div>
-    </div>
-}
-else if (_error != null)
-{
-    <div class="container mt-5">
-        <div class="alert alert-danger">@_error</div>
-        <a href="/games/@GameId" class="btn btn-outline-primary">@Loc["BackToDashboard"]</a>
-    </div>
-}
-else if (_leaderboard != null)
-{
-    <div class="container mt-4 pb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">@Loc["Leaderboard"]</h2>
-            <a href="/games/@GameId" class="btn btn-sm btn-outline-secondary">@Loc["Dashboard"]</a>
-        </div>
-
-        @if (_leaderboard.MyPosition != null)
+<ParticipantShell GameId="GameId" Tab="ParticipantTab.Leaderboard">
+    <HeaderExtra>
+        @if (Session.Game?.IsLive == true)
         {
-            <div class="card shadow-sm mb-4 border-primary">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">@Loc["MyPosition"]</h5>
-                    <span class="badge bg-light text-primary fs-6">@string.Format(Loc["RankValue"], _leaderboard.MyPosition.Rank)</span>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0">@_leaderboard.MyPosition.Nickname</h4>
-                        <h4 class="mb-0 fw-bold">@string.Format(Loc["PointsShort"], _leaderboard.MyPosition.TotalScore)</h4>
-                    </div>
-                    
-                    @if (_leaderboard.MyPosition.ElementScores.Any())
+            <span class="ds-badge ds-badge--surface"><span class="ds-live-dot" aria-hidden="true"></span>@Loc["LiveBadge"]</span>
+        }
+    </HeaderExtra>
+    <ChildContent>
+        @if (Session.Game is { } game && Session.Leaderboard is { } board)
+        {
+            var me = board.MyPosition;
+            var top = board.TopPositions.OrderBy(p => p.Rank).ToList();
+
+            @if (game.IsBeforeStart)
+            {
+                <p class="ds-alert ds-alert--info">@Loc["LeaderboardStartsLater"]</p>
+            }
+            else if (game.IsOver)
+            {
+                <div class="final">
+                    <span class="ds-badge"><i class="icon-flag" aria-hidden="true"></i>@Loc["GameOverBadge"]</span>
+                    <h2 class="final__title">
+                        @(me is null ? Loc["FinalLeaderboard"] : string.Format(Loc["FinishedRank"], me.Rank, board.TotalParticipants))
+                    </h2>
+
+                    @if (top.Count > 0)
                     {
-                        <div class="list-group list-group-flush border-top pt-2 mt-2">
-                            @foreach (var es in _leaderboard.MyPosition.ElementScores.OrderByDescending(x => x.Score))
+                        <ol class="podium" aria-label="@Loc["Podium"]">
+                            @foreach (var (entry, place) in Podium(top))
                             {
-                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <div>
-                                        @es.Name
-                                        @if (es.IsCaptain)
+                                <li class="podium__step podium__step--@place">
+                                    <Avatar Name="@entry.Nickname" Seed="@entry.ParticipantId.ToString()" Size="@(place == 1 ? AvatarSize.L : AvatarSize.M)" />
+                                    <span class="podium__name">@entry.Nickname</span>
+                                    <span class="podium__block">
+                                        @if (place == 1)
                                         {
-                                            <span class="badge bg-warning text-dark ms-1">@Loc["Captain"]</span>
+                                            <i class="icon-trophy" aria-hidden="true"></i>
                                         }
-                                    </div>
-                                    <span class="fw-bold">@es.Score</span>
-                                </div>
+                                        <span class="podium__rank">@entry.Rank</span>
+                                        <span class="podium__score">@string.Format(Loc["PointsShort"], entry.TotalScore)</span>
+                                    </span>
+                                </li>
                             }
+                        </ol>
+                    }
+
+                    @if (me is not null)
+                    {
+                        <div class="me-card me-card--final">
+                            <span class="me-card__rank">@string.Format(Loc["RankOrdinal"], me.Rank)</span>
+                            <div class="me-card__who">
+                                <div class="me-card__name">@string.Format(Loc["NicknameWithPoints"], me.Nickname, me.TotalScore)</div>
+                                @if (me.ElementScores.OrderByDescending(s => s.Score).FirstOrDefault() is { } mvp)
+                                {
+                                    <div class="me-card__line">
+                                        @string.Format(Loc[mvp.IsCaptain ? "MvpCaptain" : "Mvp"], mvp.Name, mvp.Score)
+                                    </div>
+                                }
+                            </div>
                         </div>
                     }
-                    else
+
+                    @if (top.Count > 3)
                     {
-                        <p class="text-muted mb-0">@Loc["NoLineupSaved"]</p>
+                        <ol class="board" aria-label="@Loc["FinalLeaderboard"]">
+                            @foreach (var entry in top.Skip(3))
+                            {
+                                <LeaderboardRow Entry="entry" IsMe="@(entry.ParticipantId == me?.ParticipantId)" />
+                            }
+                        </ol>
                     }
                 </div>
-            </div>
-        }
+            }
+            else
+            {
+                @if (me is not null)
+                {
+                    <section class="me-card" aria-label="@Loc["MyPosition"]">
+                        <div class="me-card__head">
+                            <span class="me-card__rank">@string.Format(Loc["RankOrdinal"], me.Rank)</span>
+                            <div class="me-card__who">
+                                <div class="me-card__name">@me.Nickname</div>
+                                <div class="me-card__line">@PodiumLine(me, top)</div>
+                            </div>
+                            <span class="me-card__score">@me.TotalScore</span>
+                        </div>
+                        @if (me.ElementScores.Count > 0)
+                        {
+                            <ul class="me-card__picks" aria-label="@Loc["PointsByPick"]">
+                                @foreach (var pick in me.ElementScores.OrderByDescending(s => s.IsCaptain))
+                                {
+                                    <li class="me-card__pick">
+                                        <span class="me-card__pick-name">
+                                            @if (pick.IsCaptain)
+                                            {
+                                                <i class="icon-star" aria-hidden="true"></i><span class="visually-hidden">@Loc["Captain"]: </span>
+                                            }
+                                            @pick.Name
+                                        </span>
+                                        <span class="me-card__pick-score">@pick.Score</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="me-card__line">@Loc["NoLineupSaved"]</p>
+                        }
+                    </section>
+                }
 
-        <h4 class="mb-3">@Loc["TopPositions"]</h4>
-        <div class="list-group shadow-sm">
-            @foreach (var pos in _leaderboard.TopPositions)
-            {
-                var isMe = _leaderboard.MyPosition != null && pos.ParticipantId == _leaderboard.MyPosition.ParticipantId;
-                <div class="list-group-item d-flex justify-content-between align-items-center @(isMe ? "bg-light border-primary" : "")">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3 fw-bold fs-5 text-muted" style="width: 30px; text-align: center;">@pos.Rank</div>
-                        <div class="fw-bold">@pos.Nickname</div>
-                    </div>
-                    <div class="fw-bold fs-5">@pos.TotalScore</div>
-                </div>
+                @if (top.Count == 0 || top.All(p => p.TotalScore == 0))
+                {
+                    <p class="ds-muted board__empty">@Loc["NoScoresYet"]</p>
+                }
+
+                @if (top.Count > 0)
+                {
+                    <h2 class="board__heading">@string.Format(Loc["TopN"], top.Count)</h2>
+                    <ol class="board">
+                        @foreach (var entry in top)
+                        {
+                            Session.RankChanges.TryGetValue(entry.ParticipantId, out var change);
+                            <LeaderboardRow Entry="entry" IsMe="@(entry.ParticipantId == me?.ParticipantId)" Change="change" />
+                        }
+                    </ol>
+                }
             }
-            @if (!_leaderboard.TopPositions.Any())
-            {
-                <div class="list-group-item text-center text-muted">@Loc["NoScoresYet"]</div>
-            }
-        </div>
-    </div>
-}
+        }
+        else
+        {
+            <div class="board__skeleton" role="status"><span class="visually-hidden">@Loc["Loading"]</span></div>
+        }
+    </ChildContent>
+</ParticipantShell>
 
 @code {
     [Parameter]
     public Guid GameId { get; set; }
 
-    private bool _isLoading = true;
-    private string? _error;
-    private LeaderboardResponseViewModel? _leaderboard;
+    protected override void OnInitialized() => Session.Changed += OnSessionChanged;
 
-    protected override async Task OnInitializedAsync()
+    public void Dispose() => Session.Changed -= OnSessionChanged;
+
+    private void OnSessionChanged() => InvokeAsync(StateHasChanged);
+
+    private string PodiumLine(LeaderboardEntry me, IReadOnlyList<LeaderboardEntry> top)
     {
-        var token = await AuthState.GetTokenAsync();
-        if (string.IsNullOrEmpty(token))
+        if (me.Rank <= 3)
         {
-            Navigation.NavigateTo($"/games/{GameId}/join");
-            return;
+            return Loc["OnThePodium"];
         }
-
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/participant/leaderboard");
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await Http.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                _leaderboard = await response.Content.ReadFromJsonAsync<LeaderboardResponseViewModel>();
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                await AuthState.ClearTokenAsync();
-                Navigation.NavigateTo($"/games/{GameId}/join");
-            }
-            else
-            {
-                _error = Loc["LeaderboardLoadFailed"];
-            }
-        }
-        catch (Exception)
-        {
-            _error = Loc["LeaderboardNetworkError"];
-        }
-        finally
-        {
-            _isLoading = false;
-        }
+        var third = top.Count >= 3 ? top[2].TotalScore : 0;
+        return string.Format(Loc["PointsFromPodium"], Math.Max(third - me.TotalScore, 0));
     }
 
-    public class LeaderboardResponseViewModel
+    /// <summary>Second, first, third: the classic podium order, left to right.</summary>
+    private static IEnumerable<(LeaderboardEntry Entry, int Place)> Podium(IReadOnlyList<LeaderboardEntry> top)
     {
-        public LeaderboardViewModel? MyPosition { get; set; }
-        public List<LeaderboardViewModel> TopPositions { get; set; } = new();
-    }
-
-    public class LeaderboardViewModel
-    {
-        public int Rank { get; set; }
-        public Guid ParticipantId { get; set; }
-        public string Nickname { get; set; } = string.Empty;
-        public int TotalScore { get; set; }
-        public List<ElementScoreViewModel> ElementScores { get; set; } = new();
-    }
-
-    public class ElementScoreViewModel
-    {
-        public Guid ElementId { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public int Score { get; set; }
-        public bool IsCaptain { get; set; }
+        if (top.Count > 1)
+        {
+            yield return (top[1], 2);
+        }
+        yield return (top[0], 1);
+        if (top.Count > 2)
+        {
+            yield return (top[2], 3);
+        }
     }
 }

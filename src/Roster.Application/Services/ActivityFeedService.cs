@@ -71,7 +71,9 @@ public sealed class ActivityFeedService
             result.Add(new ActivityFeedItemDto(
                 Id: entry.Id,
                 CreatedAt: entry.CreatedAt,
+                ElementId: entry.ElementId,
                 ElementName: elementName,
+                ParticipantId: entry.ParticipantId,
                 ParticipantNickname: participantNickname,
                 RuleLabel: ruleLabel,
                 Points: entry.PointsSnapshot,

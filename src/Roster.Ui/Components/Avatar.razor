@@ -1,0 +1,30 @@
+@namespace Roster.Ui.Components
+
+@* Square avatar with initials on one of the five avatar colors, or an image (photo, crest, artwork). *@
+<span class="avatar avatar--@Size.ToString().ToLowerInvariant() avatar--color-@ColorIndex @(IsOutlined ? "avatar--outlined" : "")" aria-hidden="true">
+    @if (!string.IsNullOrEmpty(ImageUrl))
+    {
+        <img src="@ImageUrl" alt="" loading="lazy" />
+    }
+    else
+    {
+        @AvatarText.Initials(Name)
+    }
+</span>
+
+@code {
+    /// <summary>Name used for the initials and, when <see cref="Seed"/> is empty, for the color.</summary>
+    [Parameter] public string Name { get; set; } = string.Empty;
+
+    /// <summary>Stable value (e.g. an ID) that picks the color, so it does not change when the name is edited.</summary>
+    [Parameter] public string? Seed { get; set; }
+
+    [Parameter] public string? ImageUrl { get; set; }
+
+    [Parameter] public AvatarSize Size { get; set; } = AvatarSize.M;
+
+    /// <summary>Dashed outline instead of a color, for elements that are not in play.</summary>
+    [Parameter] public bool IsOutlined { get; set; }
+
+    private int ColorIndex => AvatarText.ColorIndex(string.IsNullOrEmpty(Seed) ? Name : Seed);
+}

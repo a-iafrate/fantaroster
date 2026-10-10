@@ -43,14 +43,11 @@
     <data name="JoinPageTitle" xml:space="preserve">
     <value>Join Game</value>
   </data>
-  <data name="JoinTitle" xml:space="preserve">
-    <value>Join Game</value>
-  </data>
   <data name="Nickname" xml:space="preserve">
     <value>Nickname</value>
   </data>
   <data name="NicknamePlaceholder" xml:space="preserve">
-    <value>Choose a nickname...</value>
+    <value>e.g. FrontRow</value>
   </data>
   <data name="NicknameInvalid" xml:space="preserve">
     <value>Nickname must be between 2 and 50 characters.</value>
@@ -59,10 +56,7 @@
     <value>Joining...</value>
   </data>
   <data name="JoinButton" xml:space="preserve">
-    <value>Join Game</value>
-  </data>
-  <data name="JoinInvalidResponse" xml:space="preserve">
-    <value>Invalid response from server.</value>
+    <value>Join the game</value>
   </data>
   <data name="JoinFailed" xml:space="preserve">
     <value>An error occurred while joining the game.</value>
@@ -85,74 +79,20 @@
   <data name="Loading" xml:space="preserve">
     <value>Loading...</value>
   </data>
-  <data name="DashboardPageTitle" xml:space="preserve">
-    <value>Game Dashboard</value>
-  </data>
-  <data name="DashboardHello" xml:space="preserve">
-    <value>Hello, {0}!</value>
-  </data>
-  <data name="Connected" xml:space="preserve">
-    <value>Connected</value>
-  </data>
-  <data name="DashboardDeviceInfo" xml:space="preserve">
-    <value>This is your device. You are successfully joined to this game.</value>
-  </data>
-  <data name="Rank" xml:space="preserve">
-    <value>Rank</value>
-  </data>
-  <data name="Score" xml:space="preserve">
-    <value>Score</value>
-  </data>
-  <data name="BuildLineup" xml:space="preserve">
-    <value>Build Lineup</value>
-  </data>
-  <data name="Leaderboard" xml:space="preserve">
-    <value>Leaderboard</value>
-  </data>
-  <data name="ActivityFeed" xml:space="preserve">
-    <value>Activity Feed</value>
-  </data>
-  <data name="BackToDashboard" xml:space="preserve">
-    <value>Back to Dashboard</value>
-  </data>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
-  </data>
-  <data name="LineupPageTitle" xml:space="preserve">
-    <value>Build Lineup</value>
-  </data>
-  <data name="LineupTitle" xml:space="preserve">
-    <value>Build Your Lineup</value>
-  </data>
-  <data name="LineupLocked" xml:space="preserve">
-    <value>The game is live or ended. Your lineup is locked and cannot be modified.</value>
-  </data>
-  <data name="SearchPlaceholder" xml:space="preserve">
-    <value>Search elements...</value>
-  </data>
   <data name="AllGroups" xml:space="preserve">
-    <value>All Groups</value>
+    <value>All</value>
   </data>
   <data name="YourLineup" xml:space="preserve">
-    <value>Your Lineup</value>
-  </data>
-  <data name="NoElementsSelected" xml:space="preserve">
-    <value>No elements selected yet.</value>
+    <value>Your roster</value>
   </data>
   <data name="Captain" xml:space="preserve">
     <value>Captain</value>
-  </data>
-  <data name="Remove" xml:space="preserve">
-    <value>Remove</value>
-  </data>
-  <data name="SavedSuccessfully" xml:space="preserve">
-    <value>Saved successfully!</value>
   </data>
   <data name="Saving" xml:space="preserve">
     <value>Saving...</value>
   </data>
   <data name="SaveLineup" xml:space="preserve">
-    <value>Save Lineup</value>
+    <value>Save roster</value>
   </data>
   <data name="SaveFailed" xml:space="preserve">
     <value>Failed to save lineup.</value>
@@ -160,20 +100,8 @@
   <data name="SaveNetworkError" xml:space="preserve">
     <value>Network error while saving.</value>
   </data>
-  <data name="LeaderboardPageTitle" xml:space="preserve">
-    <value>Leaderboard</value>
-  </data>
-  <data name="LeaderboardLoadFailed" xml:space="preserve">
-    <value>Could not load the leaderboard.</value>
-  </data>
-  <data name="LeaderboardNetworkError" xml:space="preserve">
-    <value>Network error while loading leaderboard.</value>
-  </data>
   <data name="MyPosition" xml:space="preserve">
     <value>My Position</value>
-  </data>
-  <data name="RankValue" xml:space="preserve">
-    <value>Rank {0}</value>
   </data>
   <data name="PointsShort" xml:space="preserve">
     <value>{0} pts</value>
@@ -181,26 +109,11 @@
   <data name="NoLineupSaved" xml:space="preserve">
     <value>No lineup saved yet.</value>
   </data>
-  <data name="TopPositions" xml:space="preserve">
-    <value>Top Positions</value>
-  </data>
   <data name="NoScoresYet" xml:space="preserve">
     <value>No scores yet.</value>
   </data>
-  <data name="ActivityPageTitle" xml:space="preserve">
-    <value>Activity Feed</value>
-  </data>
-  <data name="ActivityLoadFailed" xml:space="preserve">
-    <value>Could not load the activity feed.</value>
-  </data>
-  <data name="ActivityNetworkError" xml:space="preserve">
-    <value>Network error while loading activity feed.</value>
-  </data>
   <data name="NoActivityYet" xml:space="preserve">
     <value>No activity yet.</value>
-  </data>
-  <data name="Voided" xml:space="preserve">
-    <value>Voided</value>
   </data>
   <data name="Unknown" xml:space="preserve">
     <value>Unknown</value>
@@ -214,14 +127,8 @@
   <data name="GameNotFoundHelp" xml:space="preserve">
     <value>This link does not point to an existing game. Check the link or enter the join code provided by the organizer.</value>
   </data>
-  <data name="GameNotOpenTitle" xml:space="preserve">
-    <value>Not open yet</value>
-  </data>
   <data name="GameNotOpenHelp" xml:space="preserve">
     <value>The organizer has not opened this game to participants yet. Try again later.</value>
-  </data>
-  <data name="GameClosedTitle" xml:space="preserve">
-    <value>Game closed</value>
   </data>
   <data name="GameClosedHelp" xml:space="preserve">
     <value>This game has ended and no longer accepts new participants.</value>
@@ -237,5 +144,266 @@
   </data>
   <data name="ErrorDismiss" xml:space="preserve">
     <value>Dismiss</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="ThemeToggleAria" xml:space="preserve">
+    <value>Theme: {0}. Change theme</value>
+  </data>
+  <data name="ThemeCaption" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="AllRules" xml:space="preserve">
+    <value>All {0} rules</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CaptainExplained" xml:space="preserve">
+    <value>Your captain scores {0}: every point of your captain counts that many times.</value>
+  </data>
+  <data name="CaptainIs" xml:space="preserve">
+    <value>Captain: {0}. Scores {1}.</value>
+  </data>
+  <data name="CaptainScoresMore" xml:space="preserve">
+    <value>Your captain scores {0}.</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="EditLineup" xml:space="preserve">
+    <value>Edit roster</value>
+  </data>
+  <data name="FeedAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="FeedFilter" xml:space="preserve">
+    <value>Show points</value>
+  </data>
+  <data name="FeedMine" xml:space="preserve">
+    <value>My picks</value>
+  </data>
+  <data name="FilterByGroup" xml:space="preserve">
+    <value>Filter by {0}</value>
+  </data>
+  <data name="FinalLeaderboard" xml:space="preserve">
+    <value>Final leaderboard</value>
+  </data>
+  <data name="FinishedRank" xml:space="preserve">
+    <value>You finished #{0} of {1}</value>
+  </data>
+  <data name="GameLiveTitle" xml:space="preserve">
+    <value>The game is on</value>
+  </data>
+  <data name="GameMenu" xml:space="preserve">
+    <value>Game menu</value>
+  </data>
+  <data name="GameOverBadge" xml:space="preserve">
+    <value>Game over</value>
+  </data>
+  <data name="GameOverTitle" xml:space="preserve">
+    <value>The game is over</value>
+  </data>
+  <data name="HowPointsWork" xml:space="preserve">
+    <value>How points are scored</value>
+  </data>
+  <data name="HowToPlay" xml:space="preserve">
+    <value>How to play</value>
+  </data>
+  <data name="InYourLineup" xml:space="preserve">
+    <value>In your roster</value>
+  </data>
+  <data name="JoinCodeLabel" xml:space="preserve">
+    <value>Game code</value>
+  </data>
+  <data name="JoinLegal" xml:space="preserve">
+    <value>By joining you accept the rules and the privacy policy.</value>
+  </data>
+  <data name="LeaderboardStartsLater" xml:space="preserve">
+    <value>The leaderboard starts with the game.</value>
+  </data>
+  <data name="LeaveGame" xml:space="preserve">
+    <value>Leave the game</value>
+  </data>
+  <data name="LeaveGameBody" xml:space="preserve">
+    <value>This device will no longer recognize you. To come back you will need a new nickname.</value>
+  </data>
+  <data name="LeaveGameConfirm" xml:space="preserve">
+    <value>Yes, leave</value>
+  </data>
+  <data name="LeaveGameTitle" xml:space="preserve">
+    <value>Leave the game?</value>
+  </data>
+  <data name="LineupComplete" xml:space="preserve">
+    <value>Roster complete.</value>
+  </data>
+  <data name="LineupCount" xml:space="preserve">
+    <value>{0}/{1}</value>
+  </data>
+  <data name="LineupLockedBadge" xml:space="preserve">
+    <value>Roster locked</value>
+  </data>
+  <data name="LineupLockedBody" xml:space="preserve">
+    <value>Follow the leaderboard and the points live.</value>
+  </data>
+  <data name="LineupProgress" xml:space="preserve">
+    <value>Roster: {0} of {1}</value>
+  </data>
+  <data name="LineupReadyBody" xml:space="preserve">
+    <value>You can change it until the game starts. We will let you know when the first point arrives.</value>
+  </data>
+  <data name="LineupReadyTitle" xml:space="preserve">
+    <value>Your roster is ready</value>
+  </data>
+  <data name="LineupSavedBadge" xml:space="preserve">
+    <value>Roster saved</value>
+  </data>
+  <data name="LiveBadge" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="LoadFailedTitle" xml:space="preserve">
+    <value>Something did not load</value>
+  </data>
+  <data name="MakeCaptain" xml:space="preserve">
+    <value>Make {0} captain</value>
+  </data>
+  <data name="Mvp" xml:space="preserve">
+    <value>MVP: {0}, {1} pts</value>
+  </data>
+  <data name="MvpCaptain" xml:space="preserve">
+    <value>MVP: {0} (captain), {1} pts</value>
+  </data>
+  <data name="NewPoints" xml:space="preserve">
+    <value>New points</value>
+  </data>
+  <data name="NicknameHint" xml:space="preserve">
+    <value>No account needed: just a name. This device will remember you.</value>
+  </data>
+  <data name="NicknameTaken" xml:space="preserve">
+    <value>This nickname is already taken in this game. Try another one.</value>
+  </data>
+  <data name="NicknameWithPoints" xml:space="preserve">
+    <value>{0}, {1} points</value>
+  </data>
+  <data name="NoActivityForMe" xml:space="preserve">
+    <value>No points for your roster yet.</value>
+  </data>
+  <data name="NoElementsFound" xml:space="preserve">
+    <value>No {0} found.</value>
+  </data>
+  <data name="NoLineupInTimeBody" xml:space="preserve">
+    <value>You can still follow the leaderboard and the points.</value>
+  </data>
+  <data name="NoLineupInTimeTitle" xml:space="preserve">
+    <value>No roster saved before the start</value>
+  </data>
+  <data name="NoRulesYet" xml:space="preserve">
+    <value>The organizer has not added any rules yet.</value>
+  </data>
+  <data name="OnThePodium" xml:space="preserve">
+    <value>You are on the podium</value>
+  </data>
+  <data name="PickMore" xml:space="preserve">
+    <value>Pick {0} more.</value>
+  </data>
+  <data name="PickN" xml:space="preserve">
+    <value>Pick {0} {1}.</value>
+  </data>
+  <data name="PickNOfTotal" xml:space="preserve">
+    <value>Pick {0} {1} out of {2}.</value>
+  </data>
+  <data name="PickOneMore" xml:space="preserve">
+    <value>Pick 1 more.</value>
+  </data>
+  <data name="Podium" xml:space="preserve">
+    <value>Podium</value>
+  </data>
+  <data name="PointForElement" xml:space="preserve">
+    <value>+{0} to {1}!</value>
+  </data>
+  <data name="PointForYou" xml:space="preserve">
+    <value>+{0} for you!</value>
+  </data>
+  <data name="PointsByPick" xml:space="preserve">
+    <value>Your points by pick</value>
+  </data>
+  <data name="PointsFromPodium" xml:space="preserve">
+    <value>{0} points from the podium</value>
+  </data>
+  <data name="RankDown" xml:space="preserve">
+    <value>Down {0}</value>
+  </data>
+  <data name="RankOfTotalWithPoints" xml:space="preserve">
+    <value>#{0} of {1}, {2} points</value>
+  </data>
+  <data name="RankOrdinal" xml:space="preserve">
+    <value>#{0}</value>
+  </data>
+  <data name="RankSame" xml:space="preserve">
+    <value>No change</value>
+  </data>
+  <data name="RankUp" xml:space="preserve">
+    <value>Up {0}</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="RulesForElements" xml:space="preserve">
+    <value>Points for {0}</value>
+  </data>
+  <data name="RulesIntro" xml:space="preserve">
+    <value>Pick {0} {1}. A referee assigns points when something happens; your score is the sum of your picks.</value>
+  </data>
+  <data name="RulesPersonal" xml:space="preserve">
+    <value>Personal bonuses</value>
+  </data>
+  <data name="SearchElements" xml:space="preserve">
+    <value>Search {0}</value>
+  </data>
+  <data name="SeeLeaderboard" xml:space="preserve">
+    <value>See the leaderboard</value>
+  </data>
+  <data name="TabFeed" xml:space="preserve">
+    <value>Points</value>
+  </data>
+  <data name="TabLeaderboard" xml:space="preserve">
+    <value>Leaderboard</value>
+  </data>
+  <data name="TabLineup" xml:space="preserve">
+    <value>Roster</value>
+  </data>
+  <data name="TabRules" xml:space="preserve">
+    <value>Rules</value>
+  </data>
+  <data name="TabsLabel" xml:space="preserve">
+    <value>Game sections</value>
+  </data>
+  <data name="TimeHours" xml:space="preserve">
+    <value>{0} h</value>
+  </data>
+  <data name="TimeMinutes" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="TimeNow" xml:space="preserve">
+    <value>now</value>
+  </data>
+  <data name="TopN" xml:space="preserve">
+    <value>Top {0}</value>
+  </data>
+  <data name="VoidedRule" xml:space="preserve">
+    <value>{0} (voided)</value>
+  </data>
+  <data name="You" xml:space="preserve">
+    <value>You</value>
+  </data>
+  <data name="YouAreRank" xml:space="preserve">
+    <value>You are #{0}.</value>
   </data>
 </root>

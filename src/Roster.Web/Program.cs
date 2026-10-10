@@ -127,6 +127,7 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(Roster.Web.Client._Imports).Assembly);
 
 app.MapAuthEndpoints();
+app.MapRefereeEndpoints();
 app.MapParticipantEndpoints();
 app.MapGameEndpoints();
 app.MapPwaEndpoints();

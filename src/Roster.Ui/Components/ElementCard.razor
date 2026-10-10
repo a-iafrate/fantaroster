@@ -1,50 +1,76 @@
 @namespace Roster.Ui.Components
 
-<div class="element-card @(IsSelected ? "selected" : "")" @onclick="OnClick" role="button" aria-pressed="@IsSelected">
-    <div class="element-avatar">
-        @if (!string.IsNullOrEmpty(PhotoUrl))
-        {
-            <img src="@PhotoUrl" alt="@Name" class="avatar-img" />
-        }
-        else if (!string.IsNullOrEmpty(FallbackCrestUrl))
-        {
-            <img src="@FallbackCrestUrl" alt="@Name crest" class="avatar-img avatar-crest" />
-        }
-        else
-        {
-            <div class="avatar-initials">@GetInitials(Name)</div>
-        }
-    </div>
-    <div class="element-info">
-        <div class="element-name">@Name</div>
-        @if (!string.IsNullOrEmpty(Subtitle))
-        {
-            <div class="element-subtitle">@Subtitle</div>
-        }
-    </div>
-    @if (IsSelectable && ShowCheckbox)
+@* One pickable element in a lineup: free (+), picked (✓, can become captain) or captain (★ ×N).
+   The whole card toggles the pick; the star button is the only nested action. *@
+<div class="pick pick--@State.ToString().ToLowerInvariant() @(IsDisabled ? "pick--disabled" : "")">
+    @if (State == ElementPickState.Captain)
     {
-        <div class="element-action">
-            <input type="checkbox" checked="@IsSelected" tabindex="-1" readonly aria-label="Select @Name" />
-        </div>
+        <span class="pick__backdrop" aria-hidden="true"></span>
     }
+    <div class="pick__card">
+        <button type="button"
+                class="pick__main"
+                aria-pressed="@(State != ElementPickState.Free ? "true" : "false")"
+                aria-disabled="@(IsDisabled ? "true" : null)"
+                @onclick="ToggleAsync">
+            <Avatar Name="@Name" Seed="@Seed" ImageUrl="@ImageUrl" />
+            <span class="pick__text">
+                <span class="pick__name">@Name</span>
+                @if (!string.IsNullOrEmpty(Subtitle))
+                {
+                    <span class="pick__sub">@Subtitle</span>
+                }
+            </span>
+        </button>
+
+        @if (State == ElementPickState.Picked && CaptainEnabled)
+        {
+            <button type="button" class="pick__star" aria-label="@MakeCaptainLabel" title="@MakeCaptainLabel" @onclick="OnMakeCaptain">
+                <i class="icon-star" aria-hidden="true"></i>
+            </button>
+        }
+
+        @switch (State)
+        {
+            case ElementPickState.Captain:
+                <span class="pick__captain"><i class="icon-star" aria-hidden="true"></i>@CaptainLabel</span>
+                break;
+            case ElementPickState.Picked:
+                <span class="pick__state pick__state--on" aria-hidden="true"><i class="icon-check"></i></span>
+                break;
+            default:
+                <span class="pick__state" aria-hidden="true"><i class="icon-plus"></i></span>
+                break;
+        }
+    </div>
 </div>
 
 @code {
     [Parameter] public string Name { get; set; } = string.Empty;
-    [Parameter] public string? Subtitle { get; set; }
-    [Parameter] public string? PhotoUrl { get; set; }
-    [Parameter] public string? FallbackCrestUrl { get; set; }
-    [Parameter] public bool IsSelected { get; set; }
-    [Parameter] public bool IsSelectable { get; set; } = true;
-    [Parameter] public bool ShowCheckbox { get; set; } = true;
-    [Parameter] public EventCallback OnClick { get; set; }
 
-    private string GetInitials(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name)) return "?";
-        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length == 1) return parts[0][..1].ToUpperInvariant();
-        return (parts[0][..1] + parts[^1][..1]).ToUpperInvariant();
-    }
+    [Parameter] public string? Subtitle { get; set; }
+
+    [Parameter] public string? ImageUrl { get; set; }
+
+    /// <summary>Stable value (e.g. the element ID) for the avatar color.</summary>
+    [Parameter] public string? Seed { get; set; }
+
+    [Parameter] public ElementPickState State { get; set; }
+
+    [Parameter] public bool CaptainEnabled { get; set; }
+
+    /// <summary>Text of the captain badge, e.g. the multiplier ("×2").</summary>
+    [Parameter] public string CaptainLabel { get; set; } = string.Empty;
+
+    /// <summary>Accessible name of the star button.</summary>
+    [Parameter] public string MakeCaptainLabel { get; set; } = string.Empty;
+
+    /// <summary>The lineup is full: a free element cannot be added until another one is removed.</summary>
+    [Parameter] public bool IsDisabled { get; set; }
+
+    [Parameter] public EventCallback OnToggle { get; set; }
+
+    [Parameter] public EventCallback OnMakeCaptain { get; set; }
+
+    private Task ToggleAsync() => IsDisabled ? Task.CompletedTask : OnToggle.InvokeAsync();
 }

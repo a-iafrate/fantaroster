@@ -74,5 +74,6 @@ public class LeaderboardServiceTests
         result.MyPosition.Nickname.ShouldBe("Me");
         result.MyPosition.TotalScore.ShouldBe(10);
         result.TopPositions.Count.ShouldBe(1);
+        result.TotalParticipants.ShouldBe(1);
     }
 }

@@ -1,0 +1,121 @@
+@using Roster.Ui.Components
+@using Roster.Web.Client.Services
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject TimeProvider Time
+@inject IStringLocalizer<ParticipantResource> Loc
+
+@* Mockup 02, screen 06: a bonus opens a sheet; a penalty is only a banner for 4 seconds,
+   no sound and no jokes about the element. *@
+<div class="visually-hidden" role="status" aria-live="polite">@_announcement</div>
+
+@if (Notification is { } notice)
+{
+    var item = notice.Item;
+    var who = item.ElementName ?? item.ParticipantNickname ?? string.Empty;
+    if (item.Points > 0)
+    {
+        <button type="button" class="ds-scrim" tabindex="-1" aria-label="@Loc["Close"]" @onclick="DismissAsync"></button>
+        <div class="ds-dialog notice" role="dialog" aria-modal="true" aria-labelledby="notice-title" @onkeydown="OnKeyDown">
+            <div class="notice__art" aria-hidden="true">
+                <span class="notice__backdrop"></span>
+                <span class="notice__card">
+                    <Avatar Name="@who" Seed="@(item.ElementId?.ToString() ?? item.ParticipantId?.ToString())" Size="AvatarSize.L" />
+                    <span class="notice__card-name">@who</span>
+                </span>
+                <span class="notice__points">+@item.Points</span>
+            </div>
+            <h2 class="ds-title notice__title" id="notice-title" tabindex="-1" @ref="_title">
+                @(item.ElementId is null ? string.Format(Loc["PointForYou"], item.Points) : string.Format(Loc["PointForElement"], item.Points, who))
+            </h2>
+            <p class="ds-muted notice__body">@item.RuleLabel@RankSentence(notice)</p>
+            <button type="button" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" @onclick="OpenLeaderboardAsync">@Loc["SeeLeaderboard"]</button>
+        </div>
+    }
+    else
+    {
+        <div class="notice-banner">
+            <span class="ds-points ds-points--penalty">@item.Points.ToString("+#;−#;0", System.Globalization.CultureInfo.InvariantCulture)</span>
+            <div class="notice-banner__text">
+                <div class="notice-banner__title">@who</div>
+                <div class="ds-muted notice-banner__sub">@item.RuleLabel@RankSentence(notice)</div>
+            </div>
+            <button type="button" class="ds-icon-btn notice-banner__close" aria-label="@Loc["Close"]" @onclick="DismissAsync">
+                <i class="icon-x" aria-hidden="true"></i>
+            </button>
+        </div>
+    }
+}
+
+@code {
+    private static readonly TimeSpan PenaltyDuration = TimeSpan.FromSeconds(4);
+
+    [Parameter] public PointNotification? Notification { get; set; }
+
+    [Parameter] public Guid GameId { get; set; }
+
+    [Parameter] public EventCallback OnDismiss { get; set; }
+
+    private PointNotification? _shown;
+    private string _announcement = string.Empty;
+    private ElementReference _title;
+    private bool _focusTitle;
+    private ITimer? _timer;
+
+    protected override void OnParametersSet()
+    {
+        if (Notification is null || ReferenceEquals(Notification, _shown))
+        {
+            return;
+        }
+
+        _shown = Notification;
+        var item = Notification.Item;
+        _announcement = $"{item.Points.ToString("+#;−#;0", System.Globalization.CultureInfo.InvariantCulture)} {item.ElementName ?? item.ParticipantNickname}: {item.RuleLabel}";
+
+        _timer?.Dispose();
+        if (item.Points < 0)
+        {
+            _timer = Time.CreateTimer(_ => InvokeAsync(DismissAsync), null, PenaltyDuration, Timeout.InfiniteTimeSpan);
+        }
+        else
+        {
+            _focusTitle = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusTitle && Notification?.Item.Points > 0)
+        {
+            _focusTitle = false;
+            await _title.FocusAsync();
+        }
+    }
+
+    public void Dispose() => _timer?.Dispose();
+
+    private string RankSentence(PointNotification notice) =>
+        notice.Rank is { } rank ? " " + string.Format(Loc["YouAreRank"], rank) : string.Empty;
+
+    private async Task DismissAsync()
+    {
+        _timer?.Dispose();
+        _timer = null;
+        await OnDismiss.InvokeAsync();
+    }
+
+    private async Task OpenLeaderboardAsync()
+    {
+        await DismissAsync();
+        Navigation.NavigateTo(ParticipantRoutes.For(GameId, ParticipantTab.Leaderboard));
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            await DismissAsync();
+        }
+    }
+}

@@ -7,7 +7,9 @@ public sealed record GetLeaderboardQuery(Guid GameId, Guid CallerParticipantId);
 
 public sealed record LeaderboardResponseDto(
     LeaderboardDto? MyPosition,
-    IReadOnlyList<LeaderboardDto> TopPositions
+    IReadOnlyList<LeaderboardDto> TopPositions,
+    int TotalParticipants,
+    long Version
 );
 
 public sealed record LeaderboardDto(

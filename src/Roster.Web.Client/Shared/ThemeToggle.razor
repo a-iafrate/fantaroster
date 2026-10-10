@@ -1,0 +1,32 @@
+@inject IStringLocalizer<ParticipantResource> Loc
+
+@* Static markup driven by wwwroot/js/theme.js: works in every render mode, including static SSR.
+   With a caption it renders as a menu row: "Theme ........ System". *@
+<button type="button"
+        class="@CssClass"
+        data-theme-cycle
+        data-label-system="@Loc["ThemeSystem"]"
+        data-label-light="@Loc["ThemeLight"]"
+        data-label-dark="@Loc["ThemeDark"]"
+        data-aria-template="@Loc["ThemeToggleAria"].Value"
+        aria-label="@Loc["ThemeToggleAria", Loc["ThemeSystem"]]">
+    <i class="icon-monitor" data-theme-icon aria-hidden="true"></i>
+    @if (ShowCaption)
+    {
+        <span>@Loc["ThemeCaption"]</span>
+        <span class="ds-menu-item__value" data-theme-label>@Loc["ThemeSystem"]</span>
+    }
+    else
+    {
+        <span data-theme-label>@Loc["ThemeSystem"]</span>
+    }
+</button>
+
+@code {
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    /// <summary>Shows the word "Theme" before the current value, for menus.</summary>
+    [Parameter]
+    public bool ShowCaption { get; set; }
+}

@@ -1,0 +1,39 @@
+@inject IStringLocalizer<ParticipantResource> Loc
+
+<li class="row @(Change is null ? "row--plain" : "") @(IsMe ? "row--me" : "") @(Change > 0 ? "row--lifted" : "")">
+    <span class="row__rank">@Entry.Rank</span>
+    @if (Change is { } change)
+    {
+        <span class="row__change @(change > 0 ? "row__change--up" : change < 0 ? "row__change--down" : "")">
+            <i class="@(change > 0 ? "icon-arrow-up" : change < 0 ? "icon-arrow-down" : "icon-minus")" aria-hidden="true"></i>
+            @if (change != 0)
+            {
+                @Math.Abs(change)
+            }
+            <span class="visually-hidden">@ChangeText(change)</span>
+        </span>
+    }
+    <Avatar Name="@Entry.Nickname" Seed="@Entry.ParticipantId.ToString()" Size="AvatarSize.S" />
+    <span class="row__name">
+        <span class="row__nickname">@Entry.Nickname</span>
+        @if (IsMe)
+        {
+            <span class="ds-you">@Loc["You"]</span>
+        }
+    </span>
+    <span class="row__score">@Entry.TotalScore</span>
+</li>
+
+@code {
+    [Parameter, EditorRequired] public LeaderboardEntry Entry { get; set; } = null!;
+
+    [Parameter] public bool IsMe { get; set; }
+
+    /// <summary>Places gained (positive) or lost (negative) since the previous update; null hides the column.</summary>
+    [Parameter] public int? Change { get; set; }
+
+    private string ChangeText(int change) =>
+        change > 0 ? string.Format(Loc["RankUp"], change)
+        : change < 0 ? string.Format(Loc["RankDown"], -change)
+        : Loc["RankSame"];
+}

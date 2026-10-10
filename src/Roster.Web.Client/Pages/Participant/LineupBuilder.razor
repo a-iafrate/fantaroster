@@ -1,343 +1,242 @@
 @page "/games/{GameId:guid}/lineup"
 @rendermode ClientRenderMode.Instance
-@inject HttpClient Http
-@inject Roster.Web.Client.Services.ParticipantAuthState AuthState
+@implements IDisposable
+@inject ParticipantSession Session
 @inject NavigationManager Navigation
 @inject IStringLocalizer<ParticipantResource> Loc
 
-<PageTitle>@Loc["LineupPageTitle"]</PageTitle>
+<PageTitle>@Loc["TabLineup"]</PageTitle>
 
-@if (_isLoading)
-{
-    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">@Loc["Loading"]</span>
-        </div>
-    </div>
-}
-else
-{
-    <div class="container mt-4 mb-5">
-        <h2 class="mb-4">@Loc["LineupTitle"]</h2>
-
-        @if (_isLiveOrEnded)
+<ParticipantShell GameId="GameId" Tab="ParticipantTab.Lineup">
+    <HeaderExtra>
+        @if (_editing && Session.Game is { } game)
         {
-            <div class="alert alert-info">
-                @Loc["LineupLocked"]
+            <span class="ds-badge ds-badge--tint"><i class="icon-layers" aria-hidden="true"></i>@string.Format(Loc["LineupCount"], _picked.Count, game.LineupSize)</span>
+        }
+    </HeaderExtra>
+    <ChildContent>
+        @if (Session.Game is not { } game || Session.Elements is null)
+        {
+            <div class="lineup__skeleton" role="status">
+                <span class="visually-hidden">@Loc["Loading"]</span>
             </div>
         }
+        else if (_editing)
+        {
+            <div class="lineup">
+                <div class="lineup__filters">
+                    <label class="ds-search">
+                        <span class="visually-hidden">@string.Format(Loc["SearchElements"], game.Terms.ElementPlural.ToLower(System.Globalization.CultureInfo.CurrentCulture))</span>
+                        <i class="icon-search" aria-hidden="true"></i>
+                        <input type="search" class="ds-input" autocomplete="off"
+                               placeholder="@string.Format(Loc["SearchElements"], game.Terms.ElementPlural.ToLower(System.Globalization.CultureInfo.CurrentCulture))"
+                               @bind="_search" @bind:event="oninput" />
+                    </label>
 
-        <div class="row">
-            <div class="col-md-8">
-                <!-- Search & Filters -->
-                <div class="mb-3 d-flex gap-2">
-                    <input type="text" class="form-control" placeholder="@Loc["SearchPlaceholder"]" @bind="_searchText" @bind:event="oninput" />
-                    <select class="form-select" style="max-width: 200px;" @bind="_selectedGroup">
-                        <option value="">@Loc["AllGroups"]</option>
-                        @foreach (var group in _availableGroups)
-                        {
-                            <option value="@group">@group</option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Elements Grid -->
-                <div class="row g-3">
-                    @foreach (var element in FilteredElements)
+                    @if (_groups.Count > 1)
                     {
-                        var isSelected = _selectedElementIds.Contains(element.Id);
-                        <div class="col-sm-6 col-md-4">
-                            <Roster.Ui.Components.ElementCard
-                                Name="@element.Name"
-                                Subtitle="@element.Subtitle"
-                                PhotoUrl="@element.ImageUrl"
-                                IsSelected="@isSelected"
-                                IsSelectable="!_isLiveOrEnded"
-                                ShowCheckbox="true"
-                                OnClick="() => ToggleElement(element.Id)" />
+                        <div class="ds-chips" role="group" aria-label="@string.Format(Loc["FilterByGroup"], game.Terms.GroupLabel)">
+                            <button type="button" class="ds-chip" aria-pressed="@(_group is null ? "true" : "false")" @onclick="() => _group = null">@Loc["AllGroups"]</button>
+                            @foreach (var group in _groups)
+                            {
+                                <button type="button" class="ds-chip" aria-pressed="@(_group == group ? "true" : "false")" @onclick="() => _group = group">@group</button>
+                            }
                         </div>
                     }
                 </div>
-            </div>
 
-            <div class="col-md-4 mt-4 mt-md-0">
-                <!-- Cart / Selection -->
-                <div class="card shadow-sm sticky-top" style="top: 20px;">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">@Loc["YourLineup"]</h5>
-                        <span class="badge bg-light text-primary">@_selectedElementIds.Count / @_lineupSize</span>
-                    </div>
-                    <div class="card-body p-0">
-                        @if (_selectedElementIds.Count == 0)
-                        {
-                            <div class="p-4 text-center text-muted">
-                                @Loc["NoElementsSelected"]
-                            </div>
-                        }
-                        else
-                        {
-                            <ul class="list-group list-group-flush">
-                                @foreach (var id in _selectedElementIds)
-                                {
-                                    var el = _elements.FirstOrDefault(e => e.Id == id);
-                                    if (el != null)
-                                    {
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <div class="fw-bold">@el.Name</div>
-                                                @if (_captainEnabled)
-                                                {
-                                                    <div class="form-check form-check-inline mt-1">
-                                                        <input class="form-check-input" type="radio" name="captainRadio" id="cap_@el.Id" checked="@(_captainElementId == el.Id)" @onchange="() => SetCaptain(el.Id)" disabled="@_isLiveOrEnded">
-                                                        <label class="form-check-label small" for="cap_@el.Id">@Loc["Captain"]</label>
-                                                    </div>
-                                                }
-                                            </div>
-                                            @if (!_isLiveOrEnded)
-                                            {
-                                                <button type="button" class="btn-close" aria-label="@Loc["Remove"]" @onclick="() => ToggleElement(el.Id)"></button>
-                                            }
-                                        </li>
-                                    }
-                                }
-                            </ul>
-                        }
-                    </div>
-                    <div class="card-footer">
-                        @if (_saveError != null)
-                        {
-                            <div class="alert alert-danger py-2 mb-2">@_saveError</div>
-                        }
-                        @if (_saveSuccess)
-                        {
-                            <div class="alert alert-success py-2 mb-2">@Loc["SavedSuccessfully"]</div>
-                        }
-                        @if (!_isLiveOrEnded)
-                        {
-                            <button class="btn btn-primary w-100" @onclick="SaveLineup" disabled="@_isSaving">
-                                @if (_isSaving)
-                                {
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span> @Loc["Saving"]</span>
-                                }
-                                else
-                                {
-                                    <span>@Loc["SaveLineup"]</span>
-                                }
-                            </button>
-                        }
-                    </div>
+                <ul class="lineup__list" aria-label="@game.Terms.ElementPlural">
+                    @foreach (var element in FilteredElements)
+                    {
+                        var state = StateOf(element.Id);
+                        <li>
+                            <ElementCard Name="@element.Name"
+                                         Subtitle="@Subtitle(element)"
+                                         ImageUrl="@element.ImageUrl"
+                                         Seed="@element.Id.ToString()"
+                                         State="state"
+                                         CaptainEnabled="game.CaptainEnabled"
+                                         CaptainLabel="@ParticipantFormat.Multiplier(game.CaptainMultiplier)"
+                                         MakeCaptainLabel="@string.Format(Loc["MakeCaptain"], element.Name)"
+                                         IsDisabled="@(state == ElementPickState.Free && _picked.Count >= game.LineupSize)"
+                                         OnToggle="() => Toggle(element.Id, game)"
+                                         OnMakeCaptain="() => _captain = element.Id" />
+                        </li>
+                    }
+                </ul>
+
+                @if (!FilteredElements.Any())
+                {
+                    <p class="ds-muted lineup__empty">@string.Format(Loc["NoElementsFound"], game.Terms.ElementPlural.ToLower(System.Globalization.CultureInfo.CurrentCulture))</p>
+                }
+
+                <div class="lineup__savebar">
+                    <p class="lineup__hint" aria-live="polite"><i class="icon-star" aria-hidden="true"></i>@Hint(game)</p>
+                    @if (_saveError is not null)
+                    {
+                        <p class="ds-alert" role="alert">@_saveError</p>
+                    }
+                    <button type="button" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" disabled="@(!CanSave(game) || _saving)" @onclick="SaveAsync">
+                        @(_saving ? Loc["Saving"] : Loc["SaveLineup"])
+                    </button>
                 </div>
             </div>
-        </div>
-    </div>
-}
+        }
+        else
+        {
+            <LineupSummary Game="game" Picks="Picks().ToList()" Rules="Session.Rules" JustSaved="_justSaved" OnEdit="Edit" GameId="GameId" />
+        }
+    </ChildContent>
+</ParticipantShell>
 
 @code {
     [Parameter]
     public Guid GameId { get; set; }
 
-    private bool _isLoading = true;
-    private bool _isSaving = false;
-    private bool _isLiveOrEnded = false;
+    private bool _editing;
+    private bool _justSaved;
+    private bool _saving;
     private string? _saveError;
-    private bool _saveSuccess = false;
+    private string _search = string.Empty;
+    private string? _group;
+    private List<string> _groups = [];
+    private List<Guid> _picked = [];
+    private Guid? _captain;
 
-    private int _lineupSize;
-    private bool _captainEnabled;
-
-    private List<AvailableElementViewModel> _elements = new();
-    private List<string> _availableGroups = new();
-    
-    private string _searchText = string.Empty;
-    private string _selectedGroup = string.Empty;
-
-    private List<Guid> _selectedElementIds = new();
-    private Guid? _captainElementId;
-
-    private IEnumerable<AvailableElementViewModel> FilteredElements =>
-        _elements.Where(e => 
-            (string.IsNullOrEmpty(_selectedGroup) || e.Group == _selectedGroup) &&
-            (string.IsNullOrEmpty(_searchText) || 
-             e.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) || 
-             (e.Subtitle != null && e.Subtitle.Contains(_searchText, StringComparison.OrdinalIgnoreCase)))
-        );
+    private IEnumerable<AvailableElement> FilteredElements =>
+        (Session.Elements ?? []).Where(e =>
+            (_group is null || e.Group == _group) &&
+            (string.IsNullOrWhiteSpace(_search)
+                || e.Name.Contains(_search, StringComparison.CurrentCultureIgnoreCase)
+                || (e.Subtitle?.Contains(_search, StringComparison.CurrentCultureIgnoreCase) ?? false)
+                || (e.Group?.Contains(_search, StringComparison.CurrentCultureIgnoreCase) ?? false)));
 
     protected override async Task OnInitializedAsync()
     {
-        var token = await AuthState.GetTokenAsync();
-        if (string.IsNullOrEmpty(token))
+        Session.Changed += OnSessionChanged;
+        if (await Session.EnsureLoadedAsync(GameId) != ParticipantSessionStatus.Ready)
         {
-            Navigation.NavigateTo($"/games/{GameId}/join");
             return;
         }
 
-        try
-        {
-            var game = await Http.GetFromJsonAsync<GameInfoViewModel>($"/api/games/{GameId}");
-            if (game != null)
-            {
-                _lineupSize = game.LineupSize;
-                _captainEnabled = game.CaptainEnabled;
-            }
-
-            var requestElements = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/elements");
-            var resElements = await Http.SendAsync(requestElements);
-            if (resElements.IsSuccessStatusCode)
-            {
-                var elements = await resElements.Content.ReadFromJsonAsync<List<AvailableElementViewModel>>();
-                if (elements != null)
-                {
-                    _elements = elements;
-                    _availableGroups = _elements.Where(e => !string.IsNullOrEmpty(e.Group)).Select(e => e.Group!).Distinct().OrderBy(g => g).ToList();
-                }
-            }
-
-            var requestLineup = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/participant/lineup");
-            requestLineup.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var resLineup = await Http.SendAsync(requestLineup);
-            
-            if (resLineup.IsSuccessStatusCode)
-            {
-                var lineup = await resLineup.Content.ReadFromJsonAsync<ParticipantLineupViewModel>();
-                if (lineup != null)
-                {
-                    _selectedElementIds = lineup.PickedElementIds.ToList();
-                    _captainElementId = lineup.CaptainElementId;
-                    _isLiveOrEnded = lineup.IsLocked;
-                }
-            }
-            else if (resLineup.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                // No lineup yet
-            }
-            else
-            {
-                // Invalid token?
-                await AuthState.ClearTokenAsync();
-                Navigation.NavigateTo($"/games/{GameId}/join");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-        finally
-        {
-            _isLoading = false;
-        }
+        await Task.WhenAll(Session.LoadElementsAsync(), Session.LoadRulesAsync());
+        _groups = (Session.Elements ?? []).Select(e => e.Group).OfType<string>().Where(g => g.Length > 0)
+            .Distinct().Order(StringComparer.CurrentCulture).ToList();
+        ResetFromSession();
     }
 
-    private void ToggleElement(Guid id)
-    {
-        if (_isLiveOrEnded) return;
+    public void Dispose() => Session.Changed -= OnSessionChanged;
 
-        _saveSuccess = false;
+    private void OnSessionChanged() => InvokeAsync(() =>
+    {
+        // The game went live while the participant was looking at the lineup: it is now read-only.
+        if (_editing && Session.Game?.IsBeforeStart == false)
+        {
+            ResetFromSession();
+        }
+        StateHasChanged();
+    });
+
+    private void ResetFromSession()
+    {
+        var lineup = Session.Lineup;
+        _picked = lineup?.PickedElementIds.ToList() ?? [];
+        _captain = lineup?.CaptainElementId;
+        var canEdit = Session.Game?.IsBeforeStart == true && lineup?.IsLocked != true;
+        _editing = canEdit && (lineup is null || lineup.PickedElementIds.Count == 0);
+    }
+
+    private ElementPickState StateOf(Guid id) =>
+        !_picked.Contains(id) ? ElementPickState.Free
+        : _captain == id && Session.Game?.CaptainEnabled == true ? ElementPickState.Captain
+        : ElementPickState.Picked;
+
+    private static string? Subtitle(AvailableElement element) =>
+        string.Join(", ", new[] { element.Group, element.Subtitle }.Where(s => !string.IsNullOrWhiteSpace(s))) is { Length: > 0 } text ? text : null;
+
+    private void Toggle(Guid id, GameInfo game)
+    {
         _saveError = null;
-
-        if (_selectedElementIds.Contains(id))
+        if (_picked.Remove(id))
         {
-            _selectedElementIds.Remove(id);
-            if (_captainElementId == id) _captainElementId = null;
-        }
-        else
-        {
-            if (_selectedElementIds.Count < _lineupSize)
+            if (_captain == id)
             {
-                _selectedElementIds.Add(id);
+                _captain = game.CaptainEnabled && _picked.Count > 0 ? _picked[0] : null;
+            }
+            return;
+        }
+
+        if (_picked.Count < game.LineupSize)
+        {
+            _picked.Add(id);
+            if (game.CaptainEnabled && _captain is null)
+            {
+                _captain = id;
             }
         }
     }
 
-    private void SetCaptain(Guid id)
-    {
-        if (_isLiveOrEnded) return;
+    private bool CanSave(GameInfo game) =>
+        _picked.Count == game.LineupSize && (!game.CaptainEnabled || (_captain is { } captain && _picked.Contains(captain)));
 
-        _saveSuccess = false;
+    private string Hint(GameInfo game)
+    {
+        var missing = game.LineupSize - _picked.Count;
+        var multiplier = ParticipantFormat.Multiplier(game.CaptainMultiplier);
+        if (missing > 0)
+        {
+            var pick = string.Format(Loc[missing == 1 ? "PickOneMore" : "PickMore"], missing);
+            return game.CaptainEnabled ? $"{pick} {string.Format(Loc["CaptainScoresMore"], multiplier)}" : pick;
+        }
+        if (game.CaptainEnabled && Session.Elements?.FirstOrDefault(e => e.Id == _captain) is { } captain)
+        {
+            return string.Format(Loc["CaptainIs"], captain.Name, multiplier);
+        }
+        return Loc["LineupComplete"];
+    }
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
         _saveError = null;
+        var outcome = await Session.SaveLineupAsync(_picked, Session.Game?.CaptainEnabled == true ? _captain : null);
+        _saving = false;
 
-        if (_selectedElementIds.Contains(id))
+        switch (outcome)
         {
-            _captainElementId = id;
+            case SaveLineupOutcome.Saved:
+                _editing = false;
+                _justSaved = true;
+                break;
+            case SaveLineupOutcome.Rejected:
+                _saveError = Loc["SaveFailed"];
+                break;
+            default:
+                _saveError = Loc["SaveNetworkError"];
+                break;
         }
     }
 
-    private async Task SaveLineup()
+    private void Edit()
     {
-        if (_isLiveOrEnded) return;
+        _justSaved = false;
+        _editing = true;
+    }
 
-        _isSaving = true;
-        _saveError = null;
-        _saveSuccess = false;
-
-        var token = await AuthState.GetTokenAsync();
-
-        var requestBody = new SaveLineupRequestViewModel
+    private IEnumerable<LineupPick> Picks()
+    {
+        var lineup = Session.Lineup;
+        if (lineup is null)
         {
-            PickedElementIds = _selectedElementIds.ToArray(),
-            CaptainElementId = _captainElementId
-        };
-
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Put, $"/api/games/{GameId}/participant/lineup");
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            request.Content = System.Net.Http.Json.JsonContent.Create(requestBody);
-
-            var response = await Http.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                _saveSuccess = true;
-            }
-            else
-            {
-                var err = await response.Content.ReadFromJsonAsync<ErrorResponse>();
-                _saveError = err?.Error ?? Loc["SaveFailed"];
-            }
+            yield break;
         }
-        catch (Exception)
+
+        var scores = Session.Leaderboard?.MyPosition?.ElementScores ?? [];
+        foreach (var id in lineup.PickedElementIds)
         {
-            _saveError = Loc["SaveNetworkError"];
+            var element = Session.Elements?.FirstOrDefault(e => e.Id == id);
+            var name = element?.Name ?? scores.FirstOrDefault(s => s.ElementId == id)?.Name ?? string.Empty;
+            yield return new LineupPick(id, name, element?.ImageUrl, id == lineup.CaptainElementId && Session.Game?.CaptainEnabled == true);
         }
-        finally
-        {
-            _isSaving = false;
-        }
-    }
-
-    public class GameInfoViewModel
-    {
-        public string Name { get; set; } = string.Empty;
-        public int LineupSize { get; set; }
-        public bool CaptainEnabled { get; set; }
-    }
-
-    public class AvailableElementViewModel
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string? Subtitle { get; set; }
-        public string? Group { get; set; }
-        public string? ImageUrl { get; set; }
-    }
-
-    public class ParticipantLineupViewModel
-    {
-        public Guid ParticipantId { get; set; }
-        public Guid[] PickedElementIds { get; set; } = Array.Empty<Guid>();
-        public Guid? CaptainElementId { get; set; }
-        public bool IsLocked { get; set; }
-    }
-
-    public class SaveLineupRequestViewModel
-    {
-        public Guid[] PickedElementIds { get; set; } = Array.Empty<Guid>();
-        public Guid? CaptainElementId { get; set; }
-    }
-
-    public class ErrorResponse
-    {
-        public string? Error { get; set; }
     }
 }

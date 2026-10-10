@@ -1,0 +1,241 @@
+@using Roster.Ui.Components
+@using Roster.Web.Client.Services
+@implements IDisposable
+@inject ParticipantSession Session
+@inject NavigationManager Navigation
+@inject IStringLocalizer<ParticipantResource> Loc
+
+@switch (Session.Status)
+{
+    case ParticipantSessionStatus.Ready when Session.Game is { } game:
+        <div class="pshell">
+            <header class="pshell__bar">
+                <div class="pshell__titles">
+                    <span class="pshell__game">@game.Name</span>
+                    <div class="pshell__title-row">
+                        <h1 class="pshell__title" tabindex="-1">@TabLabel(Tab)</h1>
+                        @HeaderExtra
+                    </div>
+                </div>
+
+                <nav class="pshell__tabs" aria-label="@Loc["TabsLabel"]">
+                    @foreach (var tab in VisibleTabs(game))
+                    {
+                        <a href="@ParticipantRoutes.For(GameId, tab)"
+                           class="pshell__tab"
+                           aria-current="@(tab == Tab ? "page" : null)">
+                            <span class="pshell__tab-icon">
+                                <i class="@TabIcon(tab)" aria-hidden="true"></i>
+                                @if (tab == ParticipantTab.Feed && Session.HasUnseenPoints && Tab != ParticipantTab.Feed)
+                                {
+                                    <span class="pshell__dot"><span class="visually-hidden">@Loc["NewPoints"]</span></span>
+                                }
+                            </span>
+                            <span>@TabLabel(tab)</span>
+                        </a>
+                    }
+                </nav>
+
+                <button type="button"
+                        class="pshell__avatar"
+                        aria-label="@Loc["GameMenu"]"
+                        aria-haspopup="dialog"
+                        aria-expanded="@(_menuOpen ? "true" : "false")"
+                        @ref="_avatarButton"
+                        @onclick="OpenMenu">
+                    <span class="pshell__nickname">@Session.Profile?.Nickname</span>
+                    <Avatar Name="@(Session.Profile?.Nickname ?? string.Empty)" Seed="@Session.Profile?.Id.ToString()" Size="AvatarSize.S" />
+                </button>
+            </header>
+
+            <main class="pshell__content">
+                @ChildContent
+            </main>
+
+            @if (_menuOpen)
+            {
+                <button type="button" class="ds-scrim" tabindex="-1" aria-label="@Loc["Close"]" @onclick="CloseMenuAsync"></button>
+                <div class="ds-sheet pshell__menu" role="dialog" aria-modal="true" aria-labelledby="pshell-menu-title" @onkeydown="OnMenuKeyDown">
+                    <div class="ds-sheet__grabber" aria-hidden="true"></div>
+                    <div class="pshell__menu-head">
+                        <Avatar Name="@(Session.Profile?.Nickname ?? string.Empty)" Seed="@Session.Profile?.Id.ToString()" />
+                        <div>
+                            <div class="pshell__menu-name" id="pshell-menu-title">@Session.Profile?.Nickname</div>
+                            <div class="ds-muted pshell__menu-sub">@MenuSubtitle(game)</div>
+                        </div>
+                    </div>
+                    <a class="ds-menu-item" href="@ParticipantRoutes.For(GameId, ParticipantTab.Rules)" @ref="_firstMenuItem" @onclick="CloseMenuAsync">
+                        <i class="icon-circle-help" aria-hidden="true"></i><span>@Loc["HowToPlay"]</span>
+                    </a>
+                    <ThemeToggle CssClass="ds-menu-item" ShowCaption="true" />
+                    <hr class="ds-menu-separator" />
+                    <button type="button" class="ds-menu-item ds-menu-item--danger" @onclick="AskLeave">
+                        <i class="icon-log-out" aria-hidden="true"></i><span>@Loc["LeaveGame"]</span>
+                    </button>
+                </div>
+            }
+
+            @if (_confirmLeave)
+            {
+                <button type="button" class="ds-scrim" tabindex="-1" aria-label="@Loc["Cancel"]" @onclick="() => _confirmLeave = false"></button>
+                <div class="ds-dialog" role="alertdialog" aria-modal="true" aria-labelledby="pshell-leave-title" aria-describedby="pshell-leave-body">
+                    <h2 class="ds-heading" id="pshell-leave-title">@Loc["LeaveGameTitle"]</h2>
+                    <p class="ds-muted" id="pshell-leave-body">@Loc["LeaveGameBody"]</p>
+                    <button type="button" class="ds-btn ds-btn--l ds-btn--block ds-btn--danger" @onclick="LeaveAsync">@Loc["LeaveGameConfirm"]</button>
+                    <button type="button" class="ds-btn ds-btn--l ds-btn--block ds-btn--secondary" @onclick="() => _confirmLeave = false">@Loc["Cancel"]</button>
+                </div>
+            }
+
+            <PointNotice Notification="_notice" GameId="GameId" OnDismiss="() => _notice = null" />
+        </div>
+        break;
+
+    case ParticipantSessionStatus.NotFound:
+        <div class="pshell__message">
+            <h1 class="ds-title">@Loc["GameNotFoundTitle"]</h1>
+            <p class="ds-muted">@Loc["GameNotFoundHelp"]</p>
+            <a href="/j" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary">@Loc["EnterCodeTitle"]</a>
+        </div>
+        break;
+
+    case ParticipantSessionStatus.Error:
+        <div class="pshell__message">
+            <h1 class="ds-title">@Loc["LoadFailedTitle"]</h1>
+            <p class="ds-muted">@Loc["NetworkErrorTryAgain"]</p>
+            <button type="button" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" @onclick="RetryAsync">@Loc["Retry"]</button>
+        </div>
+        break;
+
+    default:
+        <div class="pshell__loading" role="status">
+            <span class="visually-hidden">@Loc["Loading"]</span>
+            @for (var i = 0; i < 6; i++)
+            {
+                <div class="ds-skeleton pshell__skeleton-row" aria-hidden="true"></div>
+            }
+        </div>
+        break;
+}
+
+@code {
+    [Parameter, EditorRequired] public Guid GameId { get; set; }
+
+    [Parameter, EditorRequired] public ParticipantTab Tab { get; set; }
+
+    /// <summary>Shown next to the page title (e.g. the lineup counter or the live badge).</summary>
+    [Parameter] public RenderFragment? HeaderExtra { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _menuOpen;
+    private bool _confirmLeave;
+    private PointNotification? _notice;
+    private ElementReference _avatarButton;
+    private ElementReference _firstMenuItem;
+    private bool _focusMenu;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Session.Changed += OnSessionChanged;
+        Session.PointReceived += OnPointReceived;
+        await LoadAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusMenu && _menuOpen)
+        {
+            _focusMenu = false;
+            await _firstMenuItem.FocusAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        Session.Changed -= OnSessionChanged;
+        Session.PointReceived -= OnPointReceived;
+    }
+
+    private async Task LoadAsync()
+    {
+        var status = await Session.EnsureLoadedAsync(GameId);
+        if (status == ParticipantSessionStatus.NeedsJoin)
+        {
+            Navigation.NavigateTo(ParticipantRoutes.Join(GameId), replace: true);
+        }
+    }
+
+    private Task RetryAsync() => LoadAsync();
+
+    private void OnSessionChanged() => InvokeAsync(StateHasChanged);
+
+    private void OnPointReceived(PointNotification notification) => InvokeAsync(() =>
+    {
+        _notice = notification;
+        StateHasChanged();
+    });
+
+    private IEnumerable<ParticipantTab> VisibleTabs(GameInfo game) => game.IsBeforeStart
+        ? [ParticipantTab.Lineup, ParticipantTab.Rules]
+        : [ParticipantTab.Leaderboard, ParticipantTab.Lineup, ParticipantTab.Feed, ParticipantTab.Rules];
+
+    private string TabLabel(ParticipantTab tab) => tab switch
+    {
+        ParticipantTab.Leaderboard => Loc["TabLeaderboard"],
+        ParticipantTab.Lineup => Loc["TabLineup"],
+        ParticipantTab.Feed => Loc["TabFeed"],
+        _ => Loc["TabRules"],
+    };
+
+    private static string TabIcon(ParticipantTab tab) => tab switch
+    {
+        ParticipantTab.Leaderboard => "icon-trophy",
+        ParticipantTab.Lineup => "icon-layers",
+        ParticipantTab.Feed => "icon-activity",
+        _ => "icon-book-open",
+    };
+
+    private string MenuSubtitle(GameInfo game)
+    {
+        if (!game.IsBeforeStart && Session.MyRank is { } rank && Session.Leaderboard is { } board)
+        {
+            return string.Format(Loc["RankOfTotalWithPoints"], rank, board.TotalParticipants, Session.MyScore);
+        }
+        var picked = Session.Lineup?.PickedElementIds.Count ?? 0;
+        return string.Format(Loc["LineupProgress"], picked, game.LineupSize);
+    }
+
+    private void OpenMenu()
+    {
+        _menuOpen = true;
+        _focusMenu = true;
+    }
+
+    private async Task CloseMenuAsync()
+    {
+        _menuOpen = false;
+        await Task.Yield();
+        await _avatarButton.FocusAsync();
+    }
+
+    private async Task OnMenuKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            await CloseMenuAsync();
+        }
+    }
+
+    private void AskLeave()
+    {
+        _menuOpen = false;
+        _confirmLeave = true;
+    }
+
+    private async Task LeaveAsync()
+    {
+        _confirmLeave = false;
+        await Session.LeaveAsync();
+        Navigation.NavigateTo("/j");
+    }
+}

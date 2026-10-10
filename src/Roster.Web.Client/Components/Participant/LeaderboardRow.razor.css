@@ -1,0 +1,83 @@
+.row {
+    display: grid;
+    grid-template-columns: 30px auto var(--ds-avatar-s) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 54px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-m);
+    background: var(--color-surface);
+    color: var(--color-ink);
+}
+
+.row--plain {
+    grid-template-columns: 30px var(--ds-avatar-s) minmax(0, 1fr) auto;
+}
+
+.row--me {
+    border: 2px solid var(--color-primary);
+    background: var(--color-primary-tint);
+}
+
+.row__rank,
+.row__score {
+    font: var(--text-h3);
+    font-weight: 800;
+}
+
+.row__change {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 30px;
+    height: 24px;
+    padding: 0 var(--space-1);
+    border-radius: 6px;
+    color: var(--color-ink-2);
+    font: var(--text-micro);
+    font-weight: 800;
+}
+
+.row__change--up {
+    background: var(--color-lime);
+    color: var(--color-on-lime);
+}
+
+.row__change--down {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.row__name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.row__nickname {
+    overflow: hidden;
+    font: var(--text-body);
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Mockup 04: a participant who climbs lifts for a moment (single animation, skipped with reduced motion). */
+.row--lifted {
+    animation: row-lift var(--dur-shuffle) var(--ease-lift);
+}
+
+@keyframes row-lift {
+    0% { transform: none; box-shadow: none; }
+    40% { transform: translateX(-6px) scale(1.03) rotate(-1deg); box-shadow: var(--shadow-lift); }
+    100% { transform: none; box-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .row--lifted {
+        animation: none;
+    }
+}

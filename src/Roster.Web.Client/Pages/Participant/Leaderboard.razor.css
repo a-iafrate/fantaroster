@@ -1,0 +1,196 @@
+/* Pinned card with my position (mockup 02, screen 04). */
+.me-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    padding: var(--space-4);
+    border-radius: var(--radius-l);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+.me-card--final {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: 0;
+}
+
+.me-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.me-card__rank {
+    font: var(--text-h1);
+    font-weight: 800;
+    letter-spacing: var(--tracking-h1);
+    line-height: 1;
+}
+
+.me-card__who {
+    flex: 1;
+    min-width: 0;
+}
+
+.me-card__name {
+    overflow: hidden;
+    font: var(--text-body);
+    font-weight: 800;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.me-card__line {
+    margin: 0;
+    font: var(--text-small);
+}
+
+.me-card__score {
+    font: var(--text-h2);
+    font-weight: 800;
+}
+
+.me-card__picks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.me-card__pick {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-s);
+    background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.me-card__pick-name {
+    overflow: hidden;
+    font: var(--text-micro);
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.me-card__pick-score {
+    font: var(--text-body-l);
+    font-weight: 800;
+}
+
+.board__heading {
+    margin: 0 0 var(--space-3);
+    font: var(--text-body);
+    font-weight: 700;
+}
+
+.board {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.board__empty {
+    margin: 0 0 var(--space-4);
+}
+
+.board__skeleton {
+    height: 50dvh;
+    border-radius: var(--radius-l);
+    background: var(--color-surface-2);
+}
+
+/* Final results (mockup 02, screen 07). */
+.final {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.final__title {
+    margin: 0;
+    font: var(--text-h2);
+    font-weight: 800;
+    letter-spacing: var(--tracking-h2);
+}
+
+.podium {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: var(--space-2);
+    min-height: 200px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.podium__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.podium__name {
+    max-width: 100%;
+    overflow: hidden;
+    font: var(--text-small);
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.podium__block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: 1px solid var(--color-line);
+    border-bottom: 0;
+    border-radius: var(--radius-m) var(--radius-m) 0 0;
+    background: var(--color-surface);
+    font-weight: 800;
+}
+
+.podium__step--1 .podium__block {
+    height: 124px;
+    border-color: var(--color-lime);
+    background: var(--color-lime);
+    color: var(--color-on-lime);
+}
+
+.podium__step--2 .podium__block {
+    height: 90px;
+}
+
+.podium__step--3 .podium__block {
+    height: 70px;
+}
+
+.podium__rank {
+    font: var(--text-h3);
+    font-weight: 800;
+}
+
+.podium__score {
+    font: var(--text-micro);
+    font-weight: 700;
+}
+
+.podium__step--2 .podium__score,
+.podium__step--3 .podium__score {
+    color: var(--color-ink-2);
+}

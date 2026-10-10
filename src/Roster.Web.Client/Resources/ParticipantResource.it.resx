@@ -43,14 +43,11 @@
     <data name="JoinPageTitle" xml:space="preserve">
     <value>Entra nel gioco</value>
   </data>
-  <data name="JoinTitle" xml:space="preserve">
-    <value>Entra nel gioco</value>
-  </data>
   <data name="Nickname" xml:space="preserve">
     <value>Nickname</value>
   </data>
   <data name="NicknamePlaceholder" xml:space="preserve">
-    <value>Scegli un nickname...</value>
+    <value>es. LaPrimaFila</value>
   </data>
   <data name="NicknameInvalid" xml:space="preserve">
     <value>Il nickname deve avere tra 2 e 50 caratteri.</value>
@@ -60,9 +57,6 @@
   </data>
   <data name="JoinButton" xml:space="preserve">
     <value>Entra nel gioco</value>
-  </data>
-  <data name="JoinInvalidResponse" xml:space="preserve">
-    <value>Risposta non valida dal server.</value>
   </data>
   <data name="JoinFailed" xml:space="preserve">
     <value>Si è verificato un errore durante l'accesso al gioco.</value>
@@ -85,68 +79,14 @@
   <data name="Loading" xml:space="preserve">
     <value>Caricamento...</value>
   </data>
-  <data name="DashboardPageTitle" xml:space="preserve">
-    <value>Dashboard del gioco</value>
-  </data>
-  <data name="DashboardHello" xml:space="preserve">
-    <value>Ciao, {0}!</value>
-  </data>
-  <data name="Connected" xml:space="preserve">
-    <value>Connesso</value>
-  </data>
-  <data name="DashboardDeviceInfo" xml:space="preserve">
-    <value>Questo è il tuo dispositivo. Hai effettuato l'accesso a questo gioco.</value>
-  </data>
-  <data name="Rank" xml:space="preserve">
-    <value>Posizione</value>
-  </data>
-  <data name="Score" xml:space="preserve">
-    <value>Punteggio</value>
-  </data>
-  <data name="BuildLineup" xml:space="preserve">
-    <value>Componi la rosa</value>
-  </data>
-  <data name="Leaderboard" xml:space="preserve">
-    <value>Classifica</value>
-  </data>
-  <data name="ActivityFeed" xml:space="preserve">
-    <value>Attività</value>
-  </data>
-  <data name="BackToDashboard" xml:space="preserve">
-    <value>Torna alla dashboard</value>
-  </data>
-  <data name="Dashboard" xml:space="preserve">
-    <value>Dashboard</value>
-  </data>
-  <data name="LineupPageTitle" xml:space="preserve">
-    <value>Componi la rosa</value>
-  </data>
-  <data name="LineupTitle" xml:space="preserve">
-    <value>Componi la tua rosa</value>
-  </data>
-  <data name="LineupLocked" xml:space="preserve">
-    <value>Il gioco è in corso o terminato. La tua rosa è bloccata e non può essere modificata.</value>
-  </data>
-  <data name="SearchPlaceholder" xml:space="preserve">
-    <value>Cerca elementi...</value>
-  </data>
   <data name="AllGroups" xml:space="preserve">
-    <value>Tutti i gruppi</value>
+    <value>Tutti</value>
   </data>
   <data name="YourLineup" xml:space="preserve">
     <value>La tua rosa</value>
   </data>
-  <data name="NoElementsSelected" xml:space="preserve">
-    <value>Nessun elemento selezionato.</value>
-  </data>
   <data name="Captain" xml:space="preserve">
     <value>Capitano</value>
-  </data>
-  <data name="Remove" xml:space="preserve">
-    <value>Rimuovi</value>
-  </data>
-  <data name="SavedSuccessfully" xml:space="preserve">
-    <value>Salvato con successo!</value>
   </data>
   <data name="Saving" xml:space="preserve">
     <value>Salvataggio...</value>
@@ -160,20 +100,8 @@
   <data name="SaveNetworkError" xml:space="preserve">
     <value>Errore di rete durante il salvataggio.</value>
   </data>
-  <data name="LeaderboardPageTitle" xml:space="preserve">
-    <value>Classifica</value>
-  </data>
-  <data name="LeaderboardLoadFailed" xml:space="preserve">
-    <value>Impossibile caricare la classifica.</value>
-  </data>
-  <data name="LeaderboardNetworkError" xml:space="preserve">
-    <value>Errore di rete durante il caricamento della classifica.</value>
-  </data>
   <data name="MyPosition" xml:space="preserve">
     <value>La mia posizione</value>
-  </data>
-  <data name="RankValue" xml:space="preserve">
-    <value>Posizione {0}</value>
   </data>
   <data name="PointsShort" xml:space="preserve">
     <value>{0} pt</value>
@@ -181,26 +109,11 @@
   <data name="NoLineupSaved" xml:space="preserve">
     <value>Nessuna rosa salvata.</value>
   </data>
-  <data name="TopPositions" xml:space="preserve">
-    <value>Prime posizioni</value>
-  </data>
   <data name="NoScoresYet" xml:space="preserve">
     <value>Ancora nessun punteggio.</value>
   </data>
-  <data name="ActivityPageTitle" xml:space="preserve">
-    <value>Attività</value>
-  </data>
-  <data name="ActivityLoadFailed" xml:space="preserve">
-    <value>Impossibile caricare le attività.</value>
-  </data>
-  <data name="ActivityNetworkError" xml:space="preserve">
-    <value>Errore di rete durante il caricamento delle attività.</value>
-  </data>
   <data name="NoActivityYet" xml:space="preserve">
     <value>Ancora nessuna attività.</value>
-  </data>
-  <data name="Voided" xml:space="preserve">
-    <value>Annullato</value>
   </data>
   <data name="Unknown" xml:space="preserve">
     <value>Sconosciuto</value>
@@ -214,14 +127,8 @@
   <data name="GameNotFoundHelp" xml:space="preserve">
     <value>Questo link non corrisponde a nessun gioco. Controlla il link oppure inserisci il codice fornito dall&apos;organizzatore.</value>
   </data>
-  <data name="GameNotOpenTitle" xml:space="preserve">
-    <value>Non ancora aperto</value>
-  </data>
   <data name="GameNotOpenHelp" xml:space="preserve">
     <value>L&apos;organizzatore non ha ancora aperto questo gioco ai partecipanti. Riprova più tardi.</value>
-  </data>
-  <data name="GameClosedTitle" xml:space="preserve">
-    <value>Gioco chiuso</value>
   </data>
   <data name="GameClosedHelp" xml:space="preserve">
     <value>Questo gioco è terminato e non accetta più nuovi partecipanti.</value>
@@ -237,5 +144,266 @@
   </data>
   <data name="ErrorDismiss" xml:space="preserve">
     <value>Chiudi</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>Sistema</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Chiaro</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Scuro</value>
+  </data>
+  <data name="ThemeToggleAria" xml:space="preserve">
+    <value>Tema: {0}. Cambia tema</value>
+  </data>
+  <data name="ThemeCaption" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="AllRules" xml:space="preserve">
+    <value>Tutte le {0} regole</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="CaptainExplained" xml:space="preserve">
+    <value>Il capitano vale {0}: ogni suo punto conta tante volte.</value>
+  </data>
+  <data name="CaptainIs" xml:space="preserve">
+    <value>Capitano: {0}. Vale {1}.</value>
+  </data>
+  <data name="CaptainScoresMore" xml:space="preserve">
+    <value>Il capitano vale {0}.</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="EditLineup" xml:space="preserve">
+    <value>Modifica la rosa</value>
+  </data>
+  <data name="FeedAll" xml:space="preserve">
+    <value>Tutti</value>
+  </data>
+  <data name="FeedFilter" xml:space="preserve">
+    <value>Mostra punti</value>
+  </data>
+  <data name="FeedMine" xml:space="preserve">
+    <value>I miei pick</value>
+  </data>
+  <data name="FilterByGroup" xml:space="preserve">
+    <value>Filtra per {0}</value>
+  </data>
+  <data name="FinalLeaderboard" xml:space="preserve">
+    <value>Classifica finale</value>
+  </data>
+  <data name="FinishedRank" xml:space="preserve">
+    <value>Hai chiuso {0}° su {1}</value>
+  </data>
+  <data name="GameLiveTitle" xml:space="preserve">
+    <value>La partita è in corso</value>
+  </data>
+  <data name="GameMenu" xml:space="preserve">
+    <value>Menu partita</value>
+  </data>
+  <data name="GameOverBadge" xml:space="preserve">
+    <value>Partita finita</value>
+  </data>
+  <data name="GameOverTitle" xml:space="preserve">
+    <value>La partita è finita</value>
+  </data>
+  <data name="HowPointsWork" xml:space="preserve">
+    <value>Come si fanno punti</value>
+  </data>
+  <data name="HowToPlay" xml:space="preserve">
+    <value>Come si gioca</value>
+  </data>
+  <data name="InYourLineup" xml:space="preserve">
+    <value>Nella tua rosa</value>
+  </data>
+  <data name="JoinCodeLabel" xml:space="preserve">
+    <value>Codice partita</value>
+  </data>
+  <data name="JoinLegal" xml:space="preserve">
+    <value>Entrando accetti regolamento e privacy.</value>
+  </data>
+  <data name="LeaderboardStartsLater" xml:space="preserve">
+    <value>La classifica parte con la partita.</value>
+  </data>
+  <data name="LeaveGame" xml:space="preserve">
+    <value>Esci dalla partita</value>
+  </data>
+  <data name="LeaveGameBody" xml:space="preserve">
+    <value>Questo dispositivo non ti riconoscerà più. Per rientrare dovrai scegliere un nuovo nickname.</value>
+  </data>
+  <data name="LeaveGameConfirm" xml:space="preserve">
+    <value>Sì, esci</value>
+  </data>
+  <data name="LeaveGameTitle" xml:space="preserve">
+    <value>Uscire dalla partita?</value>
+  </data>
+  <data name="LineupComplete" xml:space="preserve">
+    <value>Rosa completa.</value>
+  </data>
+  <data name="LineupCount" xml:space="preserve">
+    <value>{0}/{1}</value>
+  </data>
+  <data name="LineupLockedBadge" xml:space="preserve">
+    <value>Rosa bloccata</value>
+  </data>
+  <data name="LineupLockedBody" xml:space="preserve">
+    <value>Segui la classifica e i punti in tempo reale.</value>
+  </data>
+  <data name="LineupProgress" xml:space="preserve">
+    <value>Rosa: {0} su {1}</value>
+  </data>
+  <data name="LineupReadyBody" xml:space="preserve">
+    <value>Puoi cambiarla fino all'inizio della partita. Ti avvisiamo quando arriva il primo punto.</value>
+  </data>
+  <data name="LineupReadyTitle" xml:space="preserve">
+    <value>La tua rosa è pronta</value>
+  </data>
+  <data name="LineupSavedBadge" xml:space="preserve">
+    <value>Rosa salvata</value>
+  </data>
+  <data name="LiveBadge" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="LoadFailedTitle" xml:space="preserve">
+    <value>Qualcosa non si è caricato</value>
+  </data>
+  <data name="MakeCaptain" xml:space="preserve">
+    <value>Fai capitano {0}</value>
+  </data>
+  <data name="Mvp" xml:space="preserve">
+    <value>MVP: {0}, {1} pt</value>
+  </data>
+  <data name="MvpCaptain" xml:space="preserve">
+    <value>MVP: {0} (capitano), {1} pt</value>
+  </data>
+  <data name="NewPoints" xml:space="preserve">
+    <value>Punti nuovi</value>
+  </data>
+  <data name="NicknameHint" xml:space="preserve">
+    <value>Niente account: basta un nome. Ti riconosciamo su questo dispositivo.</value>
+  </data>
+  <data name="NicknameTaken" xml:space="preserve">
+    <value>Questo nickname è già in uso in questa partita. Provane un altro.</value>
+  </data>
+  <data name="NicknameWithPoints" xml:space="preserve">
+    <value>{0}, {1} punti</value>
+  </data>
+  <data name="NoActivityForMe" xml:space="preserve">
+    <value>Ancora nessun punto per la tua rosa.</value>
+  </data>
+  <data name="NoElementsFound" xml:space="preserve">
+    <value>Nessun risultato tra {0}.</value>
+  </data>
+  <data name="NoLineupInTimeBody" xml:space="preserve">
+    <value>Puoi comunque seguire la classifica e i punti.</value>
+  </data>
+  <data name="NoLineupInTimeTitle" xml:space="preserve">
+    <value>Nessuna rosa salvata prima dell'inizio</value>
+  </data>
+  <data name="NoRulesYet" xml:space="preserve">
+    <value>L'organizzatore non ha ancora aggiunto regole.</value>
+  </data>
+  <data name="OnThePodium" xml:space="preserve">
+    <value>Sei sul podio</value>
+  </data>
+  <data name="PickMore" xml:space="preserve">
+    <value>Scegline ancora {0}.</value>
+  </data>
+  <data name="PickN" xml:space="preserve">
+    <value>Scegli {0} {1}.</value>
+  </data>
+  <data name="PickNOfTotal" xml:space="preserve">
+    <value>Scegli {0} {1} su {2}.</value>
+  </data>
+  <data name="PickOneMore" xml:space="preserve">
+    <value>Scegline ancora 1.</value>
+  </data>
+  <data name="Podium" xml:space="preserve">
+    <value>Podio</value>
+  </data>
+  <data name="PointForElement" xml:space="preserve">
+    <value>+{0} a {1}!</value>
+  </data>
+  <data name="PointForYou" xml:space="preserve">
+    <value>+{0} per te!</value>
+  </data>
+  <data name="PointsByPick" xml:space="preserve">
+    <value>I tuoi punti per pick</value>
+  </data>
+  <data name="PointsFromPodium" xml:space="preserve">
+    <value>A {0} punti dal podio</value>
+  </data>
+  <data name="RankDown" xml:space="preserve">
+    <value>Scende di {0}</value>
+  </data>
+  <data name="RankOfTotalWithPoints" xml:space="preserve">
+    <value>{0}° su {1}, {2} punti</value>
+  </data>
+  <data name="RankOrdinal" xml:space="preserve">
+    <value>{0}°</value>
+  </data>
+  <data name="RankSame" xml:space="preserve">
+    <value>Stabile</value>
+  </data>
+  <data name="RankUp" xml:space="preserve">
+    <value>Sale di {0}</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Riprova</value>
+  </data>
+  <data name="RulesForElements" xml:space="preserve">
+    <value>Punti per {0}</value>
+  </data>
+  <data name="RulesIntro" xml:space="preserve">
+    <value>Scegli {0} {1}. Un arbitro assegna i punti quando succede qualcosa: il tuo punteggio è la somma dei tuoi pick.</value>
+  </data>
+  <data name="RulesPersonal" xml:space="preserve">
+    <value>Bonus personali</value>
+  </data>
+  <data name="SearchElements" xml:space="preserve">
+    <value>Cerca {0}</value>
+  </data>
+  <data name="SeeLeaderboard" xml:space="preserve">
+    <value>Vedi la classifica</value>
+  </data>
+  <data name="TabFeed" xml:space="preserve">
+    <value>Punti</value>
+  </data>
+  <data name="TabLeaderboard" xml:space="preserve">
+    <value>Classifica</value>
+  </data>
+  <data name="TabLineup" xml:space="preserve">
+    <value>Rosa</value>
+  </data>
+  <data name="TabRules" xml:space="preserve">
+    <value>Regole</value>
+  </data>
+  <data name="TabsLabel" xml:space="preserve">
+    <value>Sezioni della partita</value>
+  </data>
+  <data name="TimeHours" xml:space="preserve">
+    <value>{0} h</value>
+  </data>
+  <data name="TimeMinutes" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="TimeNow" xml:space="preserve">
+    <value>ora</value>
+  </data>
+  <data name="TopN" xml:space="preserve">
+    <value>Primi {0}</value>
+  </data>
+  <data name="VoidedRule" xml:space="preserve">
+    <value>{0} (annullato)</value>
+  </data>
+  <data name="You" xml:space="preserve">
+    <value>Tu</value>
+  </data>
+  <data name="YouAreRank" xml:space="preserve">
+    <value>Sei {0}°.</value>
   </data>
 </root>

@@ -1,0 +1,95 @@
+.join {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: 440px;
+    min-height: 100dvh;
+    margin-inline: auto;
+    padding: max(var(--space-6), env(safe-area-inset-top)) var(--space-6) max(var(--space-6), env(safe-area-inset-bottom));
+}
+
+.join__logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+/* Three fanned cards with the first elements in play (decorative). */
+.join__fan {
+    position: relative;
+    height: 160px;
+}
+
+.join__fan-card {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    display: flex;
+    align-items: flex-end;
+    width: 96px;
+    height: 128px;
+    padding: var(--space-3);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-m);
+    background: var(--color-surface);
+}
+
+.join__fan-card:nth-child(1) {
+    margin-left: -124px;
+    transform: rotate(-12deg);
+}
+
+.join__fan-card:nth-child(2) {
+    top: 0;
+    z-index: 1;
+    width: 104px;
+    height: 140px;
+    margin-left: -52px;
+    border: 2px solid var(--color-primary);
+    box-shadow: var(--shadow-lift);
+}
+
+.join__fan-card:nth-child(3) {
+    margin-left: 28px;
+    transform: rotate(12deg);
+}
+
+.join__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.join__game {
+    margin: 0;
+    font: var(--text-h1);
+    font-weight: 800;
+    letter-spacing: var(--tracking-h1);
+    text-wrap: balance;
+}
+
+.join__desc {
+    margin: 0;
+    font: var(--text-body);
+}
+
+.join__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: auto;
+}
+
+.join__legal {
+    margin: 0;
+    color: var(--color-ink-2);
+    font: var(--text-micro);
+    text-align: center;
+}
+
+.join__skeleton {
+    height: 320px;
+    border-radius: var(--radius-l);
+    background: var(--color-surface-2);
+}

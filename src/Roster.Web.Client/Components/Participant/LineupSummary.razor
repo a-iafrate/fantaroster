@@ -1,0 +1,110 @@
+@inject IStringLocalizer<ParticipantResource> Loc
+
+@* Mockup 02, screen 03: the saved lineup as a hand of cards, the state of the game and how points are scored. *@
+<div class="summary">
+    @if (Picks.Count == 0)
+    {
+        <span class="ds-badge"><i class="icon-lock" aria-hidden="true"></i>@Loc["LineupLockedBadge"]</span>
+        <h2 class="ds-title">@Loc["NoLineupInTimeTitle"]</h2>
+        <p class="ds-muted summary__body">@Loc["NoLineupInTimeBody"]</p>
+    }
+    else
+    {
+        <div class="summary__hand" aria-hidden="true">
+            @foreach (var pick in HandOrder())
+            {
+                <span class="summary__card @(pick.IsCaptain ? "summary__card--captain" : "")">
+                    <Avatar Name="@pick.Name" Seed="@pick.ElementId.ToString()" ImageUrl="@pick.ImageUrl" />
+                    <span class="summary__card-name">@pick.Name</span>
+                </span>
+            }
+        </div>
+
+        <div class="summary__status">
+            @if (Game.IsBeforeStart)
+            {
+                <span class="ds-badge @(JustSaved ? "summary__saved" : "")"><i class="icon-check" aria-hidden="true"></i>@Loc["LineupSavedBadge"]</span>
+                <h2 class="ds-title">@Loc["LineupReadyTitle"]</h2>
+                <p class="ds-muted summary__body">@Loc["LineupReadyBody"]</p>
+            }
+            else
+            {
+                <span class="ds-badge"><i class="icon-lock" aria-hidden="true"></i>@Loc["LineupLockedBadge"]</span>
+                <h2 class="ds-title">@(Game.IsLive ? Loc["GameLiveTitle"] : Loc["GameOverTitle"])</h2>
+                <p class="ds-muted summary__body">@Loc["LineupLockedBody"]</p>
+            }
+        </div>
+
+        <ul class="summary__picks" aria-label="@Loc["YourLineup"]">
+            @foreach (var pick in Picks)
+            {
+                <li>
+                    <span>@pick.Name</span>
+                    @if (pick.IsCaptain)
+                    {
+                        <span class="summary__captain"><i class="icon-star" aria-hidden="true"></i>@Loc["Captain"]</span>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
+    @if (Rules is { Count: > 0 })
+    {
+        <section class="ds-card summary__rules" aria-labelledby="summary-rules-title">
+            <h3 class="summary__rules-title" id="summary-rules-title">@Loc["HowPointsWork"]</h3>
+            @foreach (var rule in PreviewRules())
+            {
+                <div class="summary__rule">
+                    <span>@rule.Label</span>
+                    <span class="ds-points @(rule.Points < 0 ? "ds-points--penalty" : "")">@ParticipantFormat.Points(rule.Points)</span>
+                </div>
+            }
+            <a class="ds-btn ds-btn--link" href="@ParticipantRoutes.For(GameId, ParticipantTab.Rules)">@string.Format(Loc["AllRules"], Rules.Count)</a>
+        </section>
+    }
+
+    <div class="summary__actions">
+        @if (Game.IsBeforeStart)
+        {
+            <button type="button" class="ds-btn ds-btn--l ds-btn--block ds-btn--secondary" @onclick="OnEdit">
+                <i class="icon-pencil-line" aria-hidden="true"></i>@Loc["EditLineup"]
+            </button>
+        }
+        else
+        {
+            <a class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" href="@ParticipantRoutes.For(GameId, ParticipantTab.Leaderboard)">@Loc["SeeLeaderboard"]</a>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public GameInfo Game { get; set; } = null!;
+
+    [Parameter, EditorRequired] public Guid GameId { get; set; }
+
+    [Parameter] public IReadOnlyList<LineupPick> Picks { get; set; } = [];
+
+    [Parameter] public IReadOnlyList<GameRule>? Rules { get; set; }
+
+    [Parameter] public bool JustSaved { get; set; }
+
+    [Parameter] public EventCallback OnEdit { get; set; }
+
+    /// <summary>Up to three cards, the captain in the middle (first, second, captain in DOM order; CSS fans them out).</summary>
+    private IEnumerable<LineupPick> HandOrder()
+    {
+        var captain = Picks.FirstOrDefault(p => p.IsCaptain) ?? Picks[0];
+        var others = Picks.Where(p => p != captain).Take(2);
+        return others.Append(captain);
+    }
+
+    /// <summary>The two biggest bonuses and the biggest penalty, like the mockup.</summary>
+    private IEnumerable<GameRule> PreviewRules()
+    {
+        var elementRules = Rules!.Where(r => !r.IsPersonal).ToList();
+        var bonuses = elementRules.Where(r => r.Points > 0).OrderByDescending(r => r.Points).Take(2);
+        var penalty = elementRules.Where(r => r.Points < 0).OrderBy(r => r.Points).Take(1);
+        return bonuses.Concat(penalty);
+    }
+}

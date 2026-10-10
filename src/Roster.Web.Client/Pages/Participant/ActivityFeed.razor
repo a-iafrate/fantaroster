@@ -1,142 +1,83 @@
 @page "/games/{GameId:guid}/activity"
 @rendermode ClientRenderMode.Instance
-@inject HttpClient Http
-@inject Roster.Web.Client.Services.ParticipantAuthState AuthState
-@inject NavigationManager Navigation
+@implements IDisposable
+@inject ParticipantSession Session
+@inject TimeProvider Time
 @inject IStringLocalizer<ParticipantResource> Loc
 
-<PageTitle>@Loc["ActivityPageTitle"]</PageTitle>
+<PageTitle>@Loc["TabFeed"]</PageTitle>
 
-@if (_isLoading)
-{
-    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">@Loc["Loading"]</span>
-        </div>
-    </div>
-}
-else if (_error != null)
-{
-    <div class="container mt-5">
-        <div class="alert alert-danger">@_error</div>
-        <a href="/games/@GameId" class="btn btn-outline-primary">@Loc["BackToDashboard"]</a>
-    </div>
-}
-else
-{
-    <div class="container mt-4 pb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">@Loc["ActivityFeed"]</h2>
-            <a href="/games/@GameId" class="btn btn-sm btn-outline-secondary">@Loc["Dashboard"]</a>
-        </div>
-
-        @if (_feed.Count == 0)
-        {
-            <div class="text-center text-muted mt-5">
-                <p>@Loc["NoActivityYet"]</p>
-            </div>
-        }
-        else
-        {
-            <div class="list-group shadow-sm">
-                @foreach (var item in _feed)
-                {
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-muted small">@item.CreatedAt.ToLocalTime().ToString("g")</span>
-                            @if (item.Status == "Voided")
-                            {
-                                <span class="badge bg-danger">@Loc["Voided"]</span>
-                            }
-                            else
-                            {
-                                <span class="badge @(item.Points > 0 ? "bg-success" : "bg-warning text-dark")">
-                                    @(item.Points > 0 ? "+" : "")@string.Format(Loc["PointsShort"], item.Points)
-                                </span>
-                            }
-                        </div>
-                        <h5 class="mb-1">
-                            @if (!string.IsNullOrEmpty(item.ElementName))
-                            {
-                                @item.ElementName
-                            }
-                            else if (!string.IsNullOrEmpty(item.ParticipantNickname))
-                            {
-                                @item.ParticipantNickname
-                            }
-                            else
-                            {
-                                <span>@Loc["Unknown"]</span>
-                            }
-                        </h5>
-                        <p class="mb-0 text-muted">@item.RuleLabel</p>
-                    </div>
-                }
-            </div>
-        }
-    </div>
-}
-
-@code {
-    [Parameter]
-    public Guid GameId { get; set; }
-
-    private bool _isLoading = true;
-    private string? _error;
-    private List<ActivityFeedItemViewModel> _feed = new();
-
-    protected override async Task OnInitializedAsync()
+<ParticipantShell GameId="GameId" Tab="ParticipantTab.Feed">
+    @if (Session.Status == ParticipantSessionStatus.Ready)
     {
-        var token = await AuthState.GetTokenAsync();
-        if (string.IsNullOrEmpty(token))
-        {
-            Navigation.NavigateTo($"/games/{GameId}/join");
-            return;
-        }
+        var now = Time.GetUtcNow();
+        var items = _mineOnly ? Session.Feed.Where(IsMine).ToList() : Session.Feed.ToList();
 
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/games/{GameId}/participant/activity");
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await Http.SendAsync(request);
+        <div class="feed">
+            <div class="ds-segmented" role="group" aria-label="@Loc["FeedFilter"]">
+                <button type="button" aria-pressed="@(!_mineOnly ? "true" : "false")" @onclick="() => _mineOnly = false">@Loc["FeedAll"]</button>
+                <button type="button" aria-pressed="@(_mineOnly ? "true" : "false")" @onclick="() => _mineOnly = true">@Loc["FeedMine"]</button>
+            </div>
 
-            if (response.IsSuccessStatusCode)
+            @if (items.Count == 0)
             {
-                var feed = await response.Content.ReadFromJsonAsync<List<ActivityFeedItemViewModel>>();
-                if (feed != null)
-                {
-                    _feed = feed;
-                }
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                await AuthState.ClearTokenAsync();
-                Navigation.NavigateTo($"/games/{GameId}/join");
+                <p class="ds-muted feed__empty">@(_mineOnly ? Loc["NoActivityForMe"] : Loc["NoActivityYet"])</p>
             }
             else
             {
-                _error = Loc["ActivityLoadFailed"];
+                <ul class="feed__list">
+                    @foreach (var item in items)
+                    {
+                        <li class="feed__item @(item.IsVoided ? "feed__item--voided" : "")">
+                            <span class="ds-points @(item.IsVoided ? "ds-points--voided" : item.Points < 0 ? "ds-points--penalty" : "")">@ParticipantFormat.Points(item.Points)</span>
+                            <div class="feed__text">
+                                <div class="feed__who">
+                                    @(item.ElementName ?? item.ParticipantNickname ?? Loc["Unknown"])
+                                    @if (IsMine(item))
+                                    {
+                                        <i class="icon-layers feed__mine" aria-hidden="true" title="@Loc["InYourLineup"]"></i>
+                                        <span class="visually-hidden">@Loc["InYourLineup"]</span>
+                                    }
+                                </div>
+                                <div class="feed__rule">@(item.IsVoided ? string.Format(Loc["VoidedRule"], item.RuleLabel) : item.RuleLabel)</div>
+                            </div>
+                            <time class="feed__time" datetime="@item.CreatedAt.ToString("O")">@ParticipantFormat.Ago(item.CreatedAt, now, Loc)</time>
+                        </li>
+                    }
+                </ul>
             }
-        }
-        catch (Exception)
-        {
-            _error = Loc["ActivityNetworkError"];
-        }
-        finally
-        {
-            _isLoading = false;
-        }
+        </div>
+    }
+</ParticipantShell>
+
+@code {
+    private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(30);
+
+    [Parameter]
+    public Guid GameId { get; set; }
+
+    private bool _mineOnly;
+    private ITimer? _clock;
+
+    protected override void OnInitialized()
+    {
+        Session.Changed += OnSessionChanged;
+        // Keeps "4 min" current without refetching.
+        _clock = Time.CreateTimer(_ => InvokeAsync(StateHasChanged), null, RefreshInterval, RefreshInterval);
     }
 
-    public class ActivityFeedItemViewModel
+    protected override void OnAfterRender(bool firstRender) => Session.MarkPointsSeen();
+
+    public void Dispose()
     {
-        public Guid Id { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public string? ElementName { get; set; }
-        public string? ParticipantNickname { get; set; }
-        public string RuleLabel { get; set; } = string.Empty;
-        public int Points { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public string CreatedBy { get; set; } = string.Empty;
+        Session.Changed -= OnSessionChanged;
+        _clock?.Dispose();
     }
+
+    private void OnSessionChanged() => InvokeAsync(StateHasChanged);
+
+    private bool IsMine(FeedItem item) =>
+        item.ParticipantId is { } participantId
+            ? participantId == Session.Profile?.Id
+            : item.ElementId is { } elementId && Session.Lineup?.PickedElementIds.Contains(elementId) == true;
 }

@@ -1,15 +1,19 @@
 using System;
+using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Roster.Application.Elements.Queries;
 using Roster.Application.Services;
+using Roster.DomainPacks;
 
 namespace Roster.Web.Endpoints;
 
 public static class GameEndpoints
 {
+    private const string GenericDomainPackId = "generic";
+
     public static IEndpointRouteBuilder MapGameEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/games/{gameId}").WithTags("Games");
@@ -17,12 +21,29 @@ public static class GameEndpoints
         group.MapGet("/", async (
             [FromRoute] Guid gameId,
             Roster.Application.Ports.Data.IGameRepository repository,
+            IDomainPackLoader domainPacks,
             CancellationToken cancellationToken) =>
         {
             var game = await repository.GetByIdAsync(gameId, cancellationToken);
-            return game is null
-                ? Results.NotFound()
-                : Results.Ok(new GameInfoResponse(game.Name, game.LineupSize, game.CaptainEnabled, game.State.ToString()));
+            if (game is null)
+            {
+                return Results.NotFound();
+            }
+
+            // Context-specific words (what elements and groups are called) come from the game's domain pack.
+            var pack = domainPacks.GetPack(game.DomainPackId) ?? domainPacks.GetPack(GenericDomainPackId);
+            var terms = pack?.GetTerminology(CultureInfo.CurrentUICulture);
+
+            return Results.Ok(new GameInfoResponse(
+                game.Name,
+                game.LineupSize,
+                game.CaptainEnabled,
+                game.CaptainMultiplier,
+                game.State.ToString(),
+                new GameTermsResponse(
+                    terms?.ElementSingular ?? string.Empty,
+                    terms?.ElementPlural ?? string.Empty,
+                    terms?.GroupLabel ?? string.Empty)));
         })
         .WithName("GetGameInfo")
         .AllowAnonymous();
@@ -84,4 +105,13 @@ public static class GameEndpoints
 
 public sealed record JoinCodeResponse(Guid GameId);
 
-public sealed record GameInfoResponse(string Name, int LineupSize, bool CaptainEnabled, string State);
+public sealed record GameInfoResponse(
+    string Name,
+    int LineupSize,
+    bool CaptainEnabled,
+    decimal CaptainMultiplier,
+    string State,
+    GameTermsResponse Terms);
+
+/// <summary>Words defined by the game's domain pack for the request culture: what elements and their groups are called.</summary>
+public sealed record GameTermsResponse(string ElementSingular, string ElementPlural, string GroupLabel);

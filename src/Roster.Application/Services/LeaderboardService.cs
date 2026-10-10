@@ -49,7 +49,7 @@ public sealed class LeaderboardService
         var topPositions = cached.OrderBy(d => d.Rank).Take(10).ToList();
         var myPosition = cached.FirstOrDefault(d => d.ParticipantId == query.CallerParticipantId);
 
-        return new LeaderboardResponseDto(myPosition, topPositions);
+        return new LeaderboardResponseDto(myPosition, topPositions, cached.Count, state.Version);
     }
 
     public async Task RecomputeAndBroadcastAsync(Guid gameId, CancellationToken cancellationToken = default)

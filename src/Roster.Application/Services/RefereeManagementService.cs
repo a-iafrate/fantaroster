@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Roster.Application.Ports.Data;
@@ -27,8 +25,8 @@ public sealed class RefereeManagementService
 
     public async Task<string> CreateRefereeAsync(Guid gameId, string displayName, CancellationToken cancellationToken = default)
     {
-        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
-        var hash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+        var token = RefereeTokens.Create();
+        var hash = RefereeTokens.Hash(token);
 
         var referee = new Referee(Guid.NewGuid(), gameId, displayName, hash, Array.Empty<string>());
         _refereeRepository.Add(referee);
