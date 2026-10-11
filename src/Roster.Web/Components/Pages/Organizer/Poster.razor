@@ -3,8 +3,10 @@
 @using Microsoft.Extensions.Localization
 @using Roster.Application.Ports.Data
 @using Roster.Domain.Games
+@using Roster.Web.Security
 @attribute [Authorize]
 @inject IGameRepository GameRepository
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthState
 @inject IStringLocalizer<SharedResource> Loc
 @inject IBrandAccessor Brands
 @inject NavigationManager Navigation
@@ -163,7 +165,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Game = await GameRepository.GetByIdAsync(Id);
+        var game = await GameRepository.GetByIdAsync(Id);
+        Game = game is not null && game.IsOwnedBy(await AuthState.GetIdAsync()) ? game : null;
     }
 
     private string GetJoinUrl()

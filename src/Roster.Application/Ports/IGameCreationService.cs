@@ -14,7 +14,8 @@ public sealed record CreateGameCommand(
     bool CaptainEnabled,
     decimal CaptainMultiplier,
     string? PluginId,
-    Dictionary<string, string>? PluginConfig
+    Dictionary<string, string>? PluginConfig,
+    string? OrganizerId = null
 );
 
 public interface IGameCreationService

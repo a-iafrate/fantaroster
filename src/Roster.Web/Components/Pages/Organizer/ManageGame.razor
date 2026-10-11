@@ -4,8 +4,10 @@
 @using Roster.Application.Ports.Data
 @using Roster.Domain.Games
 @using Roster.Web.Components.Layout
+@using Roster.Web.Security
 @attribute [Authorize]
 @inject IGameRepository GameRepository
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthState
 @inject IStringLocalizer<SharedResource> Loc
 @inject NavigationManager Navigation
 @inject OrganizerContext Context
@@ -90,7 +92,9 @@ else
 
     private async Task LoadGame()
     {
-        Game = await GameRepository.GetByIdAsync(Id);
+        var game = await GameRepository.GetByIdAsync(Id);
+        // A game that is not yours looks exactly like a game that does not exist.
+        Game = game is not null && game.IsOwnedBy(await AuthState.GetIdAsync()) ? game : null;
         Context.SetGame(Game is null ? null : new OrganizerGameInfo(Game.Id, Game.Name, Game.State));
     }
 

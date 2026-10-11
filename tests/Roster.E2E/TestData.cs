@@ -153,6 +153,35 @@ public static class TestData
         response.EnsureSuccessStatusCode();
     }
 
+    /// <summary>Makes the organizer with this email the owner of the given games.</summary>
+    public static async Task AssignOwnerAsync(string connectionString, string email, params Guid[] gameIds)
+    {
+        await using var db = CreateContext(connectionString);
+        var organizerId = await db.Database
+            .SqlQuery<string>($"SELECT [Id] AS [Value] FROM [AspNetUsers] WHERE [NormalizedEmail] = {email.ToUpperInvariant()}")
+            .SingleAsync();
+        foreach (var gameId in gameIds)
+        {
+            var game = await db.Games.SingleAsync(g => g.Id == gameId);
+            game.AssignToOrganizer(organizerId);
+        }
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task<bool> GameExistsAsync(string connectionString, Guid gameId)
+    {
+        await using var db = CreateContext(connectionString);
+        return await db.Games.AnyAsync(g => g.Id == gameId);
+    }
+
+    public static async Task<string> GetOrganizerEmailAsync(string connectionString, Guid gameId)
+    {
+        await using var db = CreateContext(connectionString);
+        return await db.Database
+            .SqlQuery<string>($"SELECT u.[Email] AS [Value] FROM [AspNetUsers] u JOIN [Games] g ON g.[OrganizerId] = u.[Id] WHERE g.[Id] = {gameId}")
+            .SingleAsync();
+    }
+
     public static RosterDbContext CreateContext(string connectionString) =>
         new(new DbContextOptionsBuilder<RosterDbContext>().UseSqlServer(connectionString).Options);
 }

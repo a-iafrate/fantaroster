@@ -74,3 +74,19 @@ Decisions taken while implementing the mockups. When a mockup and the documentat
 - Language: the person's choice (cookie, set through `/culture/set`, local redirects only) wins, otherwise the default language of the brand. Accept-Language is deliberately not used, so a brand always opens in its own language. The page language is written in `<html lang>` and the WebAssembly client reads it.
 - Theme tokens: both brand layers in `docs/design/tokens` have the same colors, so there is no extra CSS yet; `<html data-brand>` is the hook for a future brand layer. Logo, icons and social image exist once; per-brand assets wait for the design deliverables.
 - Local testing of the second brand: open `http://imagiroster.localhost:5038` (browsers resolve every `*.localhost` name to the loopback address).
+
+## Security (October 2026)
+
+- Games belong to the organizer who created them; a game of someone else looks like a missing game (no information leak). Games created before ownership existed were assigned to the first organizer by the `AddGameOrganizer` migration. There is no hand-over between organizers yet.
+- Secrets (SQL password, Azure SignalR key) are still in `appsettings.json` for development: move them to user secrets / Key Vault and rotate them before the Azure deployment task.
+- Data Protection keys: local default is per machine; set `Security:DataProtection:KeysPath` to a persistent shared folder until the Azure key ring (Blob Storage + Key Vault) is in place.
+
+## Privacy and accessibility (October 2026)
+
+- The text of the terms and the privacy notice is a plain-language draft: it names no legal entity and gives no contact address. It needs a legal review and the operator details before the public launch (open question "privacy notice for photos and sponsor contacts" in the project description).
+- Photo retention (30 days after the end of a game) is stated in the notice but not implemented: there is no photo storage until the reports with photos (P1). The job ships with that feature.
+- Organizer data export is JSON and excludes token hashes; the account deletion removes the user and the games it owns (not reversible, confirmed by typing the email address).
+- Design token change for contrast: `--color-avatar-2` light is `#0062CC` (was `#007BFF`) and `--color-on-avatar-2` dark is `#1A0033` (was white), to reach 4.5:1 for the initials. `prefers-reduced-motion` now also switches off transitions and animations everywhere.
+- The organizer account menu is a group of links and buttons, not an ARIA `menu` (a menu would require every child to be a menu item, including the language and theme toggles).
+- Manual accessibility pass (screen reader, keyboard-only walkthrough) is still to do; axe covers what can be automated.
+

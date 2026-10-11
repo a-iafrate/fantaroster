@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Roster.Domain.Games;
 using Roster.Infrastructure.Data;
 using Roster.Infrastructure.Data.Repositories;
-using Testcontainers.MsSql;
 using Xunit;
 using Shouldly;
 
@@ -12,24 +11,13 @@ namespace Roster.IntegrationTests;
 
 public sealed class GameRepositoryTests : IAsyncLifetime
 {
-    private MsSqlContainer _msSqlContainer = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-        .Build();
-
     private RosterDbContext _dbContext = null!;
     private GameRepository _repository = null!;
     private UnitOfWork _unitOfWork = null!;
 
     public async Task InitializeAsync()
     {
-        await _msSqlContainer.StartAsync();
-
-        var options = new DbContextOptionsBuilder<RosterDbContext>()
-            .UseSqlServer(_msSqlContainer.GetConnectionString())
-            .Options;
-
-        _dbContext = new RosterDbContext(options);
-        await _dbContext.Database.MigrateAsync();
+        _dbContext = IntegrationDatabase.CreateContext();
 
         _repository = new GameRepository(_dbContext);
         _unitOfWork = new UnitOfWork(_dbContext);
@@ -38,7 +26,6 @@ public sealed class GameRepositoryTests : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _dbContext.DisposeAsync();
-        await _msSqlContainer.DisposeAsync();
     }
 
     [Fact]
@@ -46,7 +33,7 @@ public sealed class GameRepositoryTests : IAsyncLifetime
     {
         // Arrange
         var id = Guid.NewGuid();
-        var game = new Game(id, "test-game", "Test Game", "generic", "brand", "en-US", 5, true, 1.5m, "JOIN", DateTimeOffset.UtcNow);
+        var game = new Game(id, $"test-game-{id:N}", "Test Game", "generic", "brand", "en-US", 5, true, 1.5m, id.ToString("N")[..8].ToUpperInvariant(), DateTimeOffset.UtcNow);
 
         // Act
         _repository.Add(game);
@@ -57,7 +44,7 @@ public sealed class GameRepositoryTests : IAsyncLifetime
         // Assert
         retrieved.ShouldNotBeNull();
         retrieved.Id.ShouldBe(id);
-        retrieved.Slug.ShouldBe("test-game");
+        retrieved.Slug.ShouldBe($"test-game-{id:N}");
         retrieved.Name.ShouldBe("Test Game");
     }
 }

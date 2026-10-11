@@ -89,7 +89,7 @@
     }
 
     <div class="org-account">
-        <button type="button" class="org-account-btn" aria-haspopup="menu" aria-expanded="@(_account ? "true" : "false")" @onclick="ToggleAccount">
+        <button type="button" class="org-account-btn" aria-expanded="@(_account ? "true" : "false")" @onclick="ToggleAccount">
             <span class="org-avatar" aria-hidden="true">@_initials</span>
             <span class="org-account-info">
                 <span class="org-account-name">@_displayName</span>
@@ -100,12 +100,15 @@
         </button>
         @if (_account)
         {
-            <div class="org-menu" role="menu">
+            <div class="org-menu" role="group" aria-label="@Loc["AccountMenu"]">
                 <LanguageToggle CssClass="org-menu-item" ShowCaption="true" />
                 <ThemeToggle CssClass="org-menu-item" ShowCaption="true" />
                 <hr class="ds-menu-separator" />
+                <a href="/organizer/account" class="org-menu-item" @onclick="CloseAccount">
+                    <i class="icon-shield" aria-hidden="true"></i><span>@Loc["AccountMenuPrivacy"]</span>
+                </a>
                 <form method="post" action="/auth/logout">
-                    <button type="submit" class="org-menu-item org-menu-item--danger" role="menuitem">
+                    <button type="submit" class="org-menu-item org-menu-item--danger">
                         <i class="icon-log-out" aria-hidden="true"></i><span>@Loc["SignOut"]</span>
                     </button>
                 </form>
@@ -232,6 +235,8 @@
     }
 
     private void ToggleAccount() => _account = !_account;
+
+    private void CloseAccount() => _account = false;
 
     private void OnKeyDown(KeyboardEventArgs e)
     {

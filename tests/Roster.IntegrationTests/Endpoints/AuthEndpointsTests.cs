@@ -7,11 +7,11 @@ using Xunit;
 
 namespace Roster.IntegrationTests.Endpoints;
 
-public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
+public class AuthEndpointsTests : IClassFixture<RosterWebFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly RosterWebFactory _factory;
 
-    public AuthEndpointsTests(WebApplicationFactory<Program> factory)
+    public AuthEndpointsTests(RosterWebFactory factory)
     {
         _factory = factory;
     }

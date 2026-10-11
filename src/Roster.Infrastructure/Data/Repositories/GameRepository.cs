@@ -44,6 +44,17 @@ internal sealed class GameRepository : IGameRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<Game>> GetByOrganizerAsync(string organizerId, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(organizerId);
+
+        return await _context.Games
+            .AsNoTracking()
+            .Where(g => g.OrganizerId == organizerId)
+            .OrderByDescending(g => g.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         // Children are removed explicitly, in dependency order, so the result does not depend on cascade rules.

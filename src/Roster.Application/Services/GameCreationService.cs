@@ -64,6 +64,11 @@ public sealed class GameCreationService : IGameCreationService
             _timeProvider.GetUtcNow()
         );
 
+        if (!string.IsNullOrWhiteSpace(command.OrganizerId))
+        {
+            game.AssignToOrganizer(command.OrganizerId);
+        }
+
         _gameRepository.Add(game);
 
         // Add rules from domain pack

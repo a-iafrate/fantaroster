@@ -33,4 +33,51 @@ public class GameTests
 
         Should.Throw<InvalidOperationException>(() => game.Open());
     }
+
+    [Fact]
+    public void IsOwnedBy_GameWithoutOwner_BelongsToNobody()
+    {
+        var game = CreateTestGame();
+
+        game.IsOwnedBy("organizer-1").ShouldBeFalse();
+        game.IsOwnedBy(null).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void AssignToOrganizer_SetsTheOwner()
+    {
+        var game = CreateTestGame();
+
+        game.AssignToOrganizer("organizer-1");
+
+        game.IsOwnedBy("organizer-1").ShouldBeTrue();
+        game.IsOwnedBy("organizer-2").ShouldBeFalse();
+        game.IsOwnedBy(string.Empty).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void AssignToOrganizer_SameOrganizerTwice_IsAllowed()
+    {
+        var game = CreateTestGame();
+        game.AssignToOrganizer("organizer-1");
+
+        Should.NotThrow(() => game.AssignToOrganizer("organizer-1"));
+    }
+
+    [Fact]
+    public void AssignToOrganizer_AnotherOrganizer_ShouldThrow()
+    {
+        var game = CreateTestGame();
+        game.AssignToOrganizer("organizer-1");
+
+        Should.Throw<InvalidOperationException>(() => game.AssignToOrganizer("organizer-2"));
+    }
+
+    [Fact]
+    public void AssignToOrganizer_BlankId_ShouldThrow()
+    {
+        var game = CreateTestGame();
+
+        Should.Throw<ArgumentException>(() => game.AssignToOrganizer(" "));
+    }
 }

@@ -931,6 +931,135 @@
   <data name="ConsentRulesExamples" xml:space="preserve">
     <value>Examples of rules in this game</value>
   </data>
+  <data name="AccountTitle" xml:space="preserve">
+    <value>Account and privacy</value>
+  </data>
+  <data name="AccountDesc" xml:space="preserve">
+    <value>Your data, in your hands: download a copy or delete everything.</value>
+  </data>
+  <data name="AccountMenuPrivacy" xml:space="preserve">
+    <value>Account and privacy</value>
+  </data>
+  <data name="AccountExportTitle" xml:space="preserve">
+    <value>Download your data</value>
+  </data>
+  <data name="AccountExportDesc" xml:space="preserve">
+    <value>A JSON file with your account, your games, their elements, rules, players and points. Secrets and access tokens are never included.</value>
+  </data>
+  <data name="AccountExportButton" xml:space="preserve">
+    <value>Download my data</value>
+  </data>
+  <data name="AccountDeleteTitle" xml:space="preserve">
+    <value>Delete account</value>
+  </data>
+  <data name="AccountDeleteDesc" xml:space="preserve">
+    <value>Deletes your account and every game you created, with their players, lineups and points. This cannot be undone.</value>
+  </data>
+  <data name="AccountDeleteConfirmLabel" xml:space="preserve">
+    <value>Type your email address to confirm</value>
+  </data>
+  <data name="AccountDeleteButton" xml:space="preserve">
+    <value>Delete my account and games</value>
+  </data>
+  <data name="AccountDeleteMismatch" xml:space="preserve">
+    <value>The address does not match your account. Nothing was deleted.</value>
+  </data>
+  <data name="AccountDeleteFailed" xml:space="preserve">
+    <value>The account could not be deleted. Try again.</value>
+  </data>
+  <data name="AccountDeletedNotice" xml:space="preserve">
+    <value>Your account and games were deleted.</value>
+  </data>
+  <data name="LegalTerms" xml:space="preserve">
+    <value>Terms of use</value>
+  </data>
+  <data name="LegalPrivacy" xml:space="preserve">
+    <value>Privacy notice</value>
+  </data>
+  <data name="PubFooterLegal" xml:space="preserve">
+    <value>Legal</value>
+  </data>
+  <data name="LegalLoginNotice" xml:space="preserve">
+    <value>By signing in you accept the terms of use and the privacy notice.</value>
+  </data>
+  <data name="PrivacyTitle" xml:space="preserve">
+    <value>Privacy notice</value>
+  </data>
+  <data name="PrivacyIntro" xml:space="preserve">
+    <value>How {0} handles personal data, in plain words.</value>
+  </data>
+  <data name="PrivacyS1Title" xml:space="preserve">
+    <value>What we collect</value>
+  </data>
+  <data name="PrivacyS1Body" xml:space="preserve">
+    <value>Organizers: email address, display name, preferred language and the games they create. Players: only a nickname they choose, plus the lineup and points of that nickname; no account and no email. Elements in play: the name and details the organizer enters and, optionally, an email address used only to send the consent request. Referees: a display name and an access link.</value>
+  </data>
+  <data name="PrivacyS2Title" xml:space="preserve">
+    <value>Why we use it</value>
+  </data>
+  <data name="PrivacyS2Body" xml:space="preserve">
+    <value>To run the game you take part in, to send sign-in links and consent requests, and to protect the service from abuse (for example by limiting how often an address can try to sign in). We do not sell data and we do not use it for advertising.</value>
+  </data>
+  <data name="PrivacyS3Title" xml:space="preserve">
+    <value>Cookies and local storage</value>
+  </data>
+  <data name="PrivacyS3Body" xml:space="preserve">
+    <value>Only what the service needs to work: the sign-in cookie of organizers, your language and theme choices, and the access token of a player or referee on their own device. There are no advertising or tracking cookies.</value>
+  </data>
+  <data name="PrivacyS4Title" xml:space="preserve">
+    <value>How long we keep it</value>
+  </data>
+  <data name="PrivacyS4Body" xml:space="preserve">
+    <value>A game and its data stay until the organizer deletes them or deletes their account. Photos are not available yet; when they are, they will be removed 30 days after the game ends. Sign-in links expire shortly after they are sent.</value>
+  </data>
+  <data name="PrivacyS5Title" xml:space="preserve">
+    <value>Your rights</value>
+  </data>
+  <data name="PrivacyS5Body" xml:space="preserve">
+    <value>Organizers can download a copy of their data and delete their account and games at any time from the account page. Players and people in play can ask the organizer of the game to access, correct or delete their data, or to leave the game, and can object to the processing. You can also complain to your data protection authority.</value>
+  </data>
+  <data name="PrivacyS6Title" xml:space="preserve">
+    <value>Sponsors</value>
+  </data>
+  <data name="PrivacyS6Body" xml:space="preserve">
+    <value>Contact details are never passed to a sponsor without a separate, explicit consent from the person concerned.</value>
+  </data>
+  <data name="TermsTitle" xml:space="preserve">
+    <value>Terms of use</value>
+  </data>
+  <data name="TermsIntro" xml:space="preserve">
+    <value>The few rules that keep {0} fun and fair for everyone.</value>
+  </data>
+  <data name="TermsS1Title" xml:space="preserve">
+    <value>Using the service</value>
+  </data>
+  <data name="TermsS1Body" xml:space="preserve">
+    <value>Organizers create games, choose what is in play and set the rules; players join with a nickname and follow the leaderboard. You use the service at your own responsibility and in line with the law.</value>
+  </data>
+  <data name="TermsS2Title" xml:space="preserve">
+    <value>What organizers must respect</value>
+  </data>
+  <data name="TermsS2Body" xml:space="preserve">
+    <value>Put people in play only with their consent, and let them leave when they ask. Rules are about light-hearted, observable moments, never about the quality, performance or evaluation of people. Do not collect personal data of minors through the service. Games must not involve money, paid entries tied to prizes or betting.</value>
+  </data>
+  <data name="TermsS3Title" xml:space="preserve">
+    <value>Fair play</value>
+  </data>
+  <data name="TermsS3Body" xml:space="preserve">
+    <value>Choose a nickname that is not offensive or misleading. Do not try to disturb the service, guess access links or play on behalf of others.</value>
+  </data>
+  <data name="TermsS4Title" xml:space="preserve">
+    <value>Availability</value>
+  </data>
+  <data name="TermsS4Body" xml:space="preserve">
+    <value>The service is provided as it is. We work to keep it available during your event but cannot guarantee uninterrupted operation, so keep a fallback for important events.</value>
+  </data>
+  <data name="TermsS5Title" xml:space="preserve">
+    <value>Changes</value>
+  </data>
+  <data name="TermsS5Body" xml:space="preserve">
+    <value>We may update these terms; the current version is always on this page.</value>
+  </data>
 </root>
 
 

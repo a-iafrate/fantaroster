@@ -60,4 +60,4 @@ public static class AuthEndpoints
     }
 }
 
-public sealed record LoginRequest([Required][EmailAddress] string Email);
+public sealed record LoginRequest([Required][EmailAddress][StringLength(254)] string Email);

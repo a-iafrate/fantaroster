@@ -10,36 +10,38 @@
     <script src="@Assets["js/theme.js"]"></script>
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/lucide-static@0.460.0/font/lucide.css">
+    <link rel="stylesheet" href="@Assets["fonts/plus-jakarta-sans.css"]" />
+    <link rel="stylesheet" href="@Assets["fonts/lucide.css"]" />
     <link rel="stylesheet" href="@Assets["css/tokens.css"]" />
     <link rel="stylesheet" href="@Assets["_content/Roster.Ui/roster-ui.css"]" />
     <link rel="stylesheet" href="@Assets["_content/Roster.Ui/roster-ui-app.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["Roster.Web.styles.css"]" />
     <link rel="stylesheet" href="@Assets["Roster.Web.Client.styles.css"]" />
-    <ImportMap />
+    <ImportMap nonce="@Nonce" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <HeadOutlet />
+    <HeadOutlet @rendermode="HeadRenderMode" />
 </head>
 
 <body>
     <Routes />
     <ReconnectModal />
-    <script>
-        window.rosterGetBrowserLanguage = () => document.documentElement.lang || navigator.language || 'en';
-    </script>
+    <script src="@Assets["js/boot.js"]"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, function (error) {
-                console.log('ServiceWorker registration failed: ', error);
-            });
-        }
-    </script>
 </body>
 
 </html>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    // A page title set by an interactive page (PageTitle) only reaches the document when the head outlet is interactive too,
+    // so it takes the render mode the routed page asked for; static pages keep a static head.
+    private IComponentRenderMode? HeadRenderMode =>
+        HttpContext?.GetEndpoint()?.Metadata.GetMetadata<RenderModeAttribute>()?.Mode;
+
+    // The one inline script Blazor writes (the import map) is allowed by this per-response nonce.
+    private string? Nonce => HttpContext?.Items[Roster.Web.Security.SecurityHeadersMiddleware.NonceKey] as string;
+}

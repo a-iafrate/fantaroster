@@ -25,7 +25,7 @@ public sealed class OrganizerTests(RosterAppFixture app)
     {
         var scenario = scenarioName == "conference" ? TestScenario.Conference : TestScenario.Tournament;
         var game = await TestData.SeedGameAsync(app.ConnectionString, scenario, TestGameState.Open);
-        var page = await app.NewOrganizerPageAsync(width, height);
+        var page = await app.NewOrganizerPageAsync(width, height, ownedGames: game.Id);
         var tag = $"organizer-{scenarioName}-{width}";
 
         await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Le mie partite" })).ToBeVisibleAsync();
@@ -51,7 +51,7 @@ public sealed class OrganizerTests(RosterAppFixture app)
     public async Task Drawer_opens_navigates_and_closes_on_a_phone()
     {
         var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
-        var page = await app.NewOrganizerPageAsync(390, 844, ColorScheme.Dark);
+        var page = await app.NewOrganizerPageAsync(390, 844, ColorScheme.Dark, game.Id);
         await page.GotoAsync($"/organizer/games/{game.Id}");
         await WaitForInteractiveAsync(page);
 
@@ -77,13 +77,13 @@ public sealed class OrganizerTests(RosterAppFixture app)
         var page = await app.NewOrganizerPageAsync(1280, 800);
         await WaitForInteractiveAsync(page);
 
-        await ClickUntilVisibleAsync(page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Menu account") }), page.GetByRole(AriaRole.Menu));
+        await ClickUntilVisibleAsync(page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Menu account") }), page.GetByRole(AriaRole.Group, new() { Name = "Menu account" }));
         var theme = page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Tema") });
         await theme.ClickAsync();
         await Expect(page.Locator("html")).ToHaveAttributeAsync("data-theme-preference", "light");
         await app.ScreenshotAsync(page, "organizer-account-menu");
 
-        await page.GetByRole(AriaRole.Menuitem, new() { Name = "Esci" }).ClickAsync();
+        await page.GetByRole(AriaRole.Button, new() { Name = "Esci" }).ClickAsync();
         await Expect(page).ToHaveURLAsync(new Regex("/$"));
         await page.GotoAsync("/organizer");
         await Expect(page).ToHaveURLAsync(new Regex("/login"));
@@ -93,7 +93,7 @@ public sealed class OrganizerTests(RosterAppFixture app)
     public async Task Rules_are_edited_in_a_dialog_with_bonus_malus_and_a_stepper()
     {
         var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Tournament, TestGameState.Open);
-        var page = await app.NewOrganizerPageAsync(390, 844);
+        var page = await app.NewOrganizerPageAsync(390, 844, ownedGames: game.Id);
         await page.GotoAsync($"/organizer/games/{game.Id}/rules");
         await WaitForInteractiveAsync(page);
 
@@ -196,5 +196,21 @@ public sealed class OrganizerTests(RosterAppFixture app)
                 """);
             overflow.ShouldBe(0, $"{where} overflows horizontally: {culprits}");
         }
+    }
+
+    [Fact]
+    public async Task An_organizer_neither_sees_nor_opens_the_game_of_another_organizer()
+    {
+        var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
+        var owner = await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
+        await Expect(owner.GetByText(TestScenario.Conference.GameName).First).ToBeVisibleAsync();
+        var other = await app.NewOrganizerPageAsync(1280, 800);
+        await WaitForInteractiveAsync(other);
+
+        await Expect(other.GetByText(TestScenario.Conference.GameName)).ToHaveCountAsync(0);
+
+        await other.GotoAsync($"/organizer/games/{game.Id}");
+        await WaitForInteractiveAsync(other);
+        await Expect(other.GetByText("Partita non trovata.")).ToBeVisibleAsync();
     }
 }

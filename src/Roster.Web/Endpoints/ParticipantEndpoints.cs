@@ -192,5 +192,5 @@ public static class ParticipantEndpoints
     }
 }
 
-public sealed record JoinGameRequest([Required] string Nickname);
-public sealed record SaveLineupRequest([Required] Guid[] PickedElementIds, Guid? CaptainElementId);
+public sealed record JoinGameRequest([Required][StringLength(50, MinimumLength = 2)] string Nickname);
+public sealed record SaveLineupRequest([Required][MaxLength(100)] Guid[] PickedElementIds, Guid? CaptainElementId);

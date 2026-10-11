@@ -91,7 +91,7 @@ public sealed class RosterAppFixture : IAsyncLifetime
     /// Signs an organizer in through the real magic-link flow: asks for a link on the login page, reads it
     /// from the server log (development email sender) and opens it. Only works when the fixture started the app.
     /// </summary>
-    public async Task<IPage> NewOrganizerPageAsync(int width = 390, int height = 844, ColorScheme colorScheme = ColorScheme.Light)
+    public async Task<IPage> NewOrganizerPageAsync(int width = 390, int height = 844, ColorScheme colorScheme = ColorScheme.Light, params Guid[] ownedGames)
     {
         if (_server is null)
         {
@@ -107,6 +107,14 @@ public sealed class RosterAppFixture : IAsyncLifetime
         var link = await WaitForMagicLinkAsync(email);
         await page.GotoAsync(link);
         await page.WaitForURLAsync("**/organizer");
+
+        if (ownedGames.Length > 0)
+        {
+            // The games are seeded without an owner; hand them to the organizer who just signed in, then reload the list.
+            await TestData.AssignOwnerAsync(ConnectionString, email, ownedGames);
+            await page.ReloadAsync();
+        }
+
         return page;
     }
 
@@ -183,6 +191,9 @@ public sealed class RosterAppFixture : IAsyncLifetime
         startInfo.Environment["AzureCommunicationServices__ConnectionString"] = string.Empty;
         // Local SignalR: tests must never talk to the Azure SignalR Service configured in appsettings.
         startInfo.Environment["Azure__SignalR__ConnectionString"] = string.Empty;
+        // Every test signs in from the same address: the production limit on sign-in would stop the suite.
+        startInfo.Environment["Security__RateLimits__LoginPer10Minutes"] = "10000";
+        startInfo.Environment["Security__RateLimits__MagicLinkVerifyPer5Minutes"] = "10000";
 
         _server = Process.Start(startInfo) ?? throw new InvalidOperationException("Could not start Roster.Web.");
         _server.OutputDataReceived += (_, e) => AppendOutput(e.Data);

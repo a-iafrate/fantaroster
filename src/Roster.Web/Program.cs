@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Roster.Application.Ports;
@@ -60,6 +61,18 @@ builder.Services.AddScoped<Roster.Application.Ports.Notifications.IGameNotificat
 
 // Infrastructure
 builder.Services.AddInfrastructure();
+
+// Built-in minimal API validation: the data annotations on the request records are enforced at the edge (400 with details).
+builder.Services.AddValidation();
+
+// Participant tokens and organizer cookies are protected with keys that rotate on their own (every 90 days; old keys still
+// unprotect). The key ring must survive a restart and be shared by every replica, otherwise everyone is signed out:
+// point Security:DataProtection:KeysPath at a persistent shared folder; Azure will use Blob Storage + Key Vault (Phase 7 deployment).
+var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Roster");
+if (builder.Configuration["Security:DataProtection:KeysPath"] is { Length: > 0 } keysPath)
+{
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+}
 builder.Services.AddSingleton<Microsoft.AspNetCore.Identity.IEmailSender<OrganizerUser>, Roster.Infrastructure.Email.IdentityEmailSender>();
 
 // Authentication & Identity
@@ -80,13 +93,30 @@ builder.Services.AddIdentityCore<OrganizerUser>(options =>
 builder.Services.AddScoped<Microsoft.AspNetCore.Identity.SignInManager<OrganizerUser>>();
 builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IUserClaimsPrincipalFactory<OrganizerUser>, Roster.Infrastructure.Security.OrganizerClaimsPrincipalFactory>();
 
+// Behind a reverse proxy (Container Apps ingress) the client address and the scheme arrive in X-Forwarded-* headers.
+// Only trust them when the deployment says it sits behind such a proxy: otherwise anyone could spoof their address.
+if (builder.Configuration.GetValue<bool>("Security:TrustForwardedHeaders"))
+{
+    builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+            | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+            | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedHost;
+        options.KnownIPNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+}
+
+var rateLimits = builder.Configuration.GetSection(Roster.Web.Security.RateLimitOptions.SectionName).Get<Roster.Web.Security.RateLimitOptions>() ?? new();
 builder.Services.AddRateLimiter(options =>
 {
-    options.AddPolicy("magic-link", context => System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter("magic-link", _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.GlobalLimiter = Roster.Web.Security.RateLimiting.Create(rateLimits);
+    options.OnRejected = (context, _) =>
     {
-        PermitLimit = 3,
-        Window = TimeSpan.FromMinutes(1)
-    }));
+        context.HttpContext.Response.Headers.RetryAfter = "60";
+        return ValueTask.CompletedTask;
+    };
 });
 
 // Plugins
@@ -117,6 +147,13 @@ builder.Services.AddScoped(sp =>
 var app = builder.Build();
 
 // Brand first (from the host), then the language: the person's choice (cookie) wins, otherwise the brand's default.
+if (app.Configuration.GetValue<bool>("Security:TrustForwardedHeaders"))
+{
+    app.UseForwardedHeaders();
+}
+
+app.UseMiddleware<Roster.Web.Security.SecurityHeadersMiddleware>(
+    (IReadOnlyCollection<string>)Roster.Web.Security.ContentSecurityPolicy.ConnectSourcesFor(app.Configuration["Azure:SignalR:ConnectionString"]).ToList());
 app.UseMiddleware<BrandMiddleware>();
 
 var localizationOptions = new RequestLocalizationOptions
@@ -138,7 +175,12 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+// Friendly pages for browsers only: an API answer (401, 404, 409...) must reach the client as it is. Re-executing a POST
+// against a page would turn it into a misleading 400.
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments("/hubs")
+        && !context.Request.Path.StartsWithSegments("/culture"),
+    branch => branch.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true));
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -154,6 +196,7 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(Roster.Web.Client._Imports).Assembly);
 
 app.MapAuthEndpoints();
+app.MapAccountEndpoints();
 app.MapRefereeEndpoints();
 app.MapParticipantEndpoints();
 

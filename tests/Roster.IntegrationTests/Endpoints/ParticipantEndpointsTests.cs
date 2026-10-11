@@ -13,13 +13,20 @@ using Roster.Web.Endpoints;
 
 namespace Roster.IntegrationTests.Endpoints;
 
-public class ParticipantEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
+public class ParticipantEndpointsTests : IClassFixture<RosterWebFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly RosterWebFactory _factory;
 
-    public ParticipantEndpointsTests(WebApplicationFactory<Program> factory)
+    public ParticipantEndpointsTests(RosterWebFactory factory)
     {
         _factory = factory;
+    }
+
+    /// <summary>A game with a slug and a join code of its own: all tests share one database.</summary>
+    private static Game NewGame()
+    {
+        var id = Guid.NewGuid();
+        return new Game(id, $"slug-{id:N}", "My Game", "pack", "brand", "en", 5, true, 1.5m, id.ToString("N")[..8].ToUpperInvariant(), DateTimeOffset.UtcNow);
     }
 
     [Fact]
@@ -47,7 +54,7 @@ public class ParticipantEndpointsTests : IClassFixture<WebApplicationFactory<Pro
         using var scope = _factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<RosterDbContext>();
 
-        var game = new Game(Guid.NewGuid(), "slug", "My Game", "pack", "brand", "en", 5, true, 1.5m, "CODE", DateTimeOffset.UtcNow);
+        var game = NewGame();
         game.Open();
         dbContext.Games.Add(game);
         await dbContext.SaveChangesAsync();
@@ -74,7 +81,7 @@ public class ParticipantEndpointsTests : IClassFixture<WebApplicationFactory<Pro
         var dbContext = scope.ServiceProvider.GetRequiredService<RosterDbContext>();
         var tokenService = scope.ServiceProvider.GetRequiredService<IParticipantTokenService>();
 
-        var game = new Game(Guid.NewGuid(), "slug", "My Game", "pack", "brand", "en", 5, true, 1.5m, "CODE", DateTimeOffset.UtcNow);
+        var game = NewGame();
         game.Open();
         dbContext.Games.Add(game);
 

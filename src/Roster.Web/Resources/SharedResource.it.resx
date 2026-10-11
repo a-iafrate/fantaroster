@@ -931,6 +931,135 @@
   <data name="ConsentRulesExamples" xml:space="preserve">
     <value>Esempi di regole di questa partita</value>
   </data>
+  <data name="AccountTitle" xml:space="preserve">
+    <value>Account e privacy</value>
+  </data>
+  <data name="AccountDesc" xml:space="preserve">
+    <value>I tuoi dati nelle tue mani: scarica una copia o cancella tutto.</value>
+  </data>
+  <data name="AccountMenuPrivacy" xml:space="preserve">
+    <value>Account e privacy</value>
+  </data>
+  <data name="AccountExportTitle" xml:space="preserve">
+    <value>Scarica i tuoi dati</value>
+  </data>
+  <data name="AccountExportDesc" xml:space="preserve">
+    <value>Un file JSON con il tuo account, le tue partite, i relativi elementi, regole, giocatori e punti. Segreti e token di accesso non sono mai inclusi.</value>
+  </data>
+  <data name="AccountExportButton" xml:space="preserve">
+    <value>Scarica i miei dati</value>
+  </data>
+  <data name="AccountDeleteTitle" xml:space="preserve">
+    <value>Elimina account</value>
+  </data>
+  <data name="AccountDeleteDesc" xml:space="preserve">
+    <value>Elimina il tuo account e tutte le partite che hai creato, con i relativi giocatori, rose e punti. L'operazione non si può annullare.</value>
+  </data>
+  <data name="AccountDeleteConfirmLabel" xml:space="preserve">
+    <value>Scrivi il tuo indirizzo email per confermare</value>
+  </data>
+  <data name="AccountDeleteButton" xml:space="preserve">
+    <value>Elimina il mio account e le partite</value>
+  </data>
+  <data name="AccountDeleteMismatch" xml:space="preserve">
+    <value>L'indirizzo non corrisponde al tuo account. Non è stato eliminato nulla.</value>
+  </data>
+  <data name="AccountDeleteFailed" xml:space="preserve">
+    <value>Non è stato possibile eliminare l'account. Riprova.</value>
+  </data>
+  <data name="AccountDeletedNotice" xml:space="preserve">
+    <value>Il tuo account e le tue partite sono stati eliminati.</value>
+  </data>
+  <data name="LegalTerms" xml:space="preserve">
+    <value>Condizioni d'uso</value>
+  </data>
+  <data name="LegalPrivacy" xml:space="preserve">
+    <value>Informativa sulla privacy</value>
+  </data>
+  <data name="PubFooterLegal" xml:space="preserve">
+    <value>Note legali</value>
+  </data>
+  <data name="LegalLoginNotice" xml:space="preserve">
+    <value>Accedendo accetti le condizioni d'uso e l'informativa sulla privacy.</value>
+  </data>
+  <data name="PrivacyTitle" xml:space="preserve">
+    <value>Informativa sulla privacy</value>
+  </data>
+  <data name="PrivacyIntro" xml:space="preserve">
+    <value>Come {0} tratta i dati personali, in parole semplici.</value>
+  </data>
+  <data name="PrivacyS1Title" xml:space="preserve">
+    <value>Cosa raccogliamo</value>
+  </data>
+  <data name="PrivacyS1Body" xml:space="preserve">
+    <value>Organizzatori: indirizzo email, nome visualizzato, lingua preferita e partite create. Giocatori: solo un soprannome scelto da loro, con la rosa e i punti di quel soprannome; nessun account e nessuna email. Elementi in gioco: il nome e i dettagli inseriti dall'organizzatore e, facoltativamente, un indirizzo email usato solo per inviare la richiesta di consenso. Arbitri: un nome visualizzato e un link di accesso.</value>
+  </data>
+  <data name="PrivacyS2Title" xml:space="preserve">
+    <value>Perché li usiamo</value>
+  </data>
+  <data name="PrivacyS2Body" xml:space="preserve">
+    <value>Per far funzionare la partita a cui partecipi, inviare link di accesso e richieste di consenso, e proteggere il servizio dagli abusi (ad esempio limitando quante volte un indirizzo può provare ad accedere). Non vendiamo i dati e non li usiamo per la pubblicità.</value>
+  </data>
+  <data name="PrivacyS3Title" xml:space="preserve">
+    <value>Cookie e archiviazione locale</value>
+  </data>
+  <data name="PrivacyS3Body" xml:space="preserve">
+    <value>Solo ciò che serve al funzionamento: il cookie di accesso degli organizzatori, le scelte di lingua e tema, e il token di accesso di un giocatore o di un arbitro sul proprio dispositivo. Non ci sono cookie pubblicitari o di tracciamento.</value>
+  </data>
+  <data name="PrivacyS4Title" xml:space="preserve">
+    <value>Per quanto tempo li conserviamo</value>
+  </data>
+  <data name="PrivacyS4Body" xml:space="preserve">
+    <value>Una partita e i suoi dati restano finché l'organizzatore non li elimina o non elimina il proprio account. Le foto non sono ancora disponibili; quando lo saranno, verranno rimosse 30 giorni dopo la fine della partita. I link di accesso scadono poco dopo l'invio.</value>
+  </data>
+  <data name="PrivacyS5Title" xml:space="preserve">
+    <value>I tuoi diritti</value>
+  </data>
+  <data name="PrivacyS5Body" xml:space="preserve">
+    <value>Gli organizzatori possono scaricare una copia dei propri dati ed eliminare account e partite in qualsiasi momento dalla pagina dell'account. I giocatori e le persone in gioco possono chiedere all'organizzatore della partita di accedere ai propri dati, correggerli o cancellarli, o di uscire dalla partita, e possono opporsi al trattamento. Puoi anche presentare reclamo all'autorità per la protezione dei dati.</value>
+  </data>
+  <data name="PrivacyS6Title" xml:space="preserve">
+    <value>Sponsor</value>
+  </data>
+  <data name="PrivacyS6Body" xml:space="preserve">
+    <value>I dati di contatto non vengono mai trasmessi a uno sponsor senza un consenso separato ed esplicito della persona interessata.</value>
+  </data>
+  <data name="TermsTitle" xml:space="preserve">
+    <value>Condizioni d'uso</value>
+  </data>
+  <data name="TermsIntro" xml:space="preserve">
+    <value>Le poche regole che rendono {0} divertente e corretto per tutti.</value>
+  </data>
+  <data name="TermsS1Title" xml:space="preserve">
+    <value>Uso del servizio</value>
+  </data>
+  <data name="TermsS1Body" xml:space="preserve">
+    <value>Gli organizzatori creano le partite, scelgono cosa è in gioco e fissano le regole; i giocatori partecipano con un soprannome e seguono la classifica. Usi il servizio sotto la tua responsabilità e nel rispetto della legge.</value>
+  </data>
+  <data name="TermsS2Title" xml:space="preserve">
+    <value>Cosa devono rispettare gli organizzatori</value>
+  </data>
+  <data name="TermsS2Body" xml:space="preserve">
+    <value>Metti in gioco le persone solo con il loro consenso e lasciale uscire quando lo chiedono. Le regole riguardano momenti leggeri e osservabili, mai la qualità, la prestazione o la valutazione delle persone. Non raccogliere tramite il servizio dati personali di minori. Le partite non devono prevedere denaro, iscrizioni a pagamento legate a premi o scommesse.</value>
+  </data>
+  <data name="TermsS3Title" xml:space="preserve">
+    <value>Correttezza</value>
+  </data>
+  <data name="TermsS3Body" xml:space="preserve">
+    <value>Scegli un soprannome non offensivo né ingannevole. Non cercare di disturbare il servizio, indovinare link di accesso o giocare al posto di altri.</value>
+  </data>
+  <data name="TermsS4Title" xml:space="preserve">
+    <value>Disponibilità</value>
+  </data>
+  <data name="TermsS4Body" xml:space="preserve">
+    <value>Il servizio è fornito così com'è. Lavoriamo per mantenerlo disponibile durante il tuo evento ma non possiamo garantire un funzionamento ininterrotto: per gli eventi importanti tieni una soluzione di riserva.</value>
+  </data>
+  <data name="TermsS5Title" xml:space="preserve">
+    <value>Modifiche</value>
+  </data>
+  <data name="TermsS5Body" xml:space="preserve">
+    <value>Possiamo aggiornare queste condizioni; la versione in vigore è sempre in questa pagina.</value>
+  </data>
 </root>
 
 

@@ -8,6 +8,11 @@
 <PageTitle>@Brand.Current.Name - @Loc["HeroTitle"]</PageTitle>
 
 @* Landing (mockup 04, screen 17). Everything about a use case comes from the domain packs, never from this page. *@
+@if (Deleted == "1")
+{
+    <p class="ds-alert ds-alert--success home-notice" role="status">@Loc["AccountDeletedNotice"]</p>
+}
+
 <section class="hero">
     <div class="hero__text">
         <h1 class="hero__title">@Loc["HeroTitle"]</h1>
@@ -52,6 +57,9 @@
 </section>
 
 @code {
+    [SupplyParameterFromQuery(Name = "deleted")]
+    public string? Deleted { get; set; }
+
     private static string Localized(IReadOnlyDictionary<string, string> values, string fallback) =>
         values.TryGetValue(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, out var value) || values.TryGetValue("en", out value) ? value : fallback;
 }

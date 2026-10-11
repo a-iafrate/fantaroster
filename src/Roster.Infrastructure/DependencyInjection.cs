@@ -20,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IConsentInvitationRepository, ConsentInvitationRepository>();
         services.AddScoped<IRefereeRepository, RefereeRepository>();
 
+        services.AddScoped<Roster.Infrastructure.Security.OrganizerAccountService>();
+
         services.AddSingleton<IPluginRegistry, PluginRegistry>();
         services.AddSingleton<Roster.Application.Ports.Security.IParticipantTokenService, Roster.Infrastructure.Security.DataProtectionParticipantTokenService>();
         services.AddSingleton<Roster.Application.Ports.Security.IProfanityFilter, Roster.Infrastructure.Security.BasicProfanityFilter>();

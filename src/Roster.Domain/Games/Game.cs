@@ -20,6 +20,9 @@ public sealed class Game
     public DateTimeOffset? EndedAt { get; private set; }
     public byte[] RowVersion { get; private set; }
 
+    /// <summary>The organizer (identity user id) who owns the game; only that person can see and manage it.</summary>
+    public string? OrganizerId { get; private set; }
+
     private Game()
     {
         Slug = string.Empty;
@@ -51,6 +54,20 @@ public sealed class Game
         CreatedAt = createdAt;
         RowVersion = Array.Empty<byte>();
     }
+
+    public void AssignToOrganizer(string organizerId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(organizerId);
+        if (OrganizerId is not null && OrganizerId != organizerId)
+        {
+            throw new InvalidOperationException("A game belongs to one organizer and cannot be handed over by accident.");
+        }
+        OrganizerId = organizerId;
+    }
+
+    /// <summary>Whether the given organizer owns the game. A game without an owner belongs to nobody.</summary>
+    public bool IsOwnedBy(string? organizerId) =>
+        !string.IsNullOrEmpty(organizerId) && OrganizerId is not null && string.Equals(OrganizerId, organizerId, StringComparison.Ordinal);
 
     public void Rename(string name)
     {

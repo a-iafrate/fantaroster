@@ -291,3 +291,8 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
+
+.home-notice {
+    margin: var(--space-4) var(--space-4) 0;
+    text-align: center;
+}

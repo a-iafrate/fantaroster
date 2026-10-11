@@ -92,7 +92,7 @@ public sealed class PublicSiteTests(RosterAppFixture app)
     public async Task An_element_answers_the_consent_request_the_organizer_sent()
     {
         var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open, consentPending: true);
-        var organizer = await app.NewOrganizerPageAsync(1280, 800);
+        var organizer = await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
 
         // The organizer generates the link from the elements section.
         await organizer.GotoAsync($"/organizer/games/{game.Id}/elements");

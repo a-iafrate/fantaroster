@@ -6,9 +6,11 @@
 @using Roster.Plugins.Abstractions
 @using Roster.Web.Client.Components.Participant
 @using Roster.Web.Components.Pages.Organizer
+@using Roster.Web.Security
 @attribute [Authorize]
 @inject IDomainPackLoader DomainPackLoader
 @inject IGameCreationService GameCreationService
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthState
 @inject IPluginRegistry PluginRegistry
 @inject NavigationManager Navigation
 @inject IStringLocalizer<SharedResource> Loc
@@ -428,7 +430,8 @@
                 CaptainEnabled: _state.CaptainEnabled,
                 CaptainMultiplier: _state.CaptainMultiplier,
                 PluginId: pluginId,
-                PluginConfig: pluginConfig
+                PluginConfig: pluginConfig,
+                OrganizerId: await AuthState.GetIdAsync()
             );
 
             var newGameId = await GameCreationService.CreateGameAsync(cmd, default);

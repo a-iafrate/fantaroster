@@ -6,8 +6,10 @@
 @using Roster.Domain.Games
 @using Roster.DomainPacks
 @using Roster.Ui.Components
+@using Roster.Web.Security
 @attribute [Authorize]
 @inject IGameRepository GameRepository
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthState
 @inject Roster.Application.Services.GameLifecycleService LifecycleService
 @inject IDomainPackLoader DomainPacks
 @inject IStringLocalizer<SharedResource> Loc
@@ -112,7 +114,17 @@
     private bool _isDeleting;
     private string? _deleteError;
 
-    protected override async Task OnInitializedAsync() => Games = await GameRepository.GetAllAsync();
+    private string? _organizerId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _organizerId = await AuthState.GetIdAsync();
+        await LoadGamesAsync();
+    }
+
+    /// <summary>Only the games of the signed-in organizer.</summary>
+    private async Task LoadGamesAsync() =>
+        Games = _organizerId is null ? [] : await GameRepository.GetByOrganizerAsync(_organizerId);
 
     private IEnumerable<Game> Filtered() => (Games ?? []).Where(g => Matches(g, _filter));
 
@@ -176,7 +188,7 @@
         try
         {
             await LifecycleService.DeleteGameAsync(_gameToDelete.Id);
-            Games = await GameRepository.GetAllAsync();
+            await LoadGamesAsync();
             _gameToDelete = null;
         }
         catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)

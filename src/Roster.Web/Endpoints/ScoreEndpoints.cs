@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +12,9 @@ namespace Roster.Web.Endpoints;
 
 public static class ScoreEndpoints
 {
+    private const int DefaultRecentCount = 20;
+    private const int MaxRecentCount = 100;
+
     public static void MapScoreEndpoints(this IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("/api/games/{id:guid}/score-entries")
@@ -26,8 +30,8 @@ public static class ScoreEndpoints
             Roster.Application.Ports.Data.IRefereeRepository refereeRepository,
             HttpContext context) =>
         {
-            if (string.IsNullOrWhiteSpace(idempotencyKey))
-                return Results.BadRequest("Idempotency-Key header is required.");
+            if (string.IsNullOrWhiteSpace(idempotencyKey) || idempotencyKey.Length > 100)
+                return Results.BadRequest("Idempotency-Key header is required and at most 100 characters.");
 
             if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                 return Results.Unauthorized();
@@ -118,11 +122,11 @@ public static class ScoreEndpoints
 
         group.MapGet("/", async (
             Guid id,
-            [FromQuery] int count,
+            [FromQuery] int? count,
             ScoreManagementService scoreManagementService,
             HttpContext context) =>
         {
-            var limit = count > 0 ? count : 20;
+            var limit = count is > 0 and <= MaxRecentCount ? count.Value : DefaultRecentCount;
             var query = new GetRecentScoresQuery(id, limit);
             var results = await scoreManagementService.GetRecentScoresAsync(query, context.RequestAborted);
             return Results.Ok(results);
@@ -131,4 +135,4 @@ public static class ScoreEndpoints
 }
 
 public sealed record AssignScoreRequest(Guid? ElementId, Guid? ParticipantId, Guid RuleId);
-public sealed record VoidScoreRequest(string? Note);
+public sealed record VoidScoreRequest([StringLength(500)] string? Note);
