@@ -35,6 +35,18 @@ builder.Services.AddScoped<RuleManagementService>();
 builder.Services.AddScoped<ConsentManagementService>();
 builder.Services.AddScoped<RefereeManagementService>();
 builder.Services.AddScoped<ParticipantManagementService>();
+builder.Services.AddSingleton(new Roster.Application.Plans.PlanLimits(
+    builder.Configuration.GetValue("Plans:FreeParticipantLimit", 50),
+    builder.Configuration.GetValue("Plans:CommunityParticipantLimit", 300)));
+builder.Services.AddScoped<PlanService>();
+builder.Services.AddScoped<CommunityRequestService>();
+builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<Roster.Application.Ports.ICommunityNotifier, Roster.Web.Services.CommunityDecisionNotifier>();
+builder.Services.Configure<Roster.Web.Security.AdminOptions>(builder.Configuration.GetSection(Roster.Web.Security.AdminOptions.SectionName));
+builder.Services.AddSingleton<Roster.Web.Security.AdminAccess>();
+builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Roster.Web.Security.AdminHandler>();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Roster.Web.Security.AdminAccess.PolicyName, policy => policy.RequireAuthenticatedUser().AddRequirements(new Roster.Web.Security.AdminRequirement()));
 builder.Services.AddScoped<LeaderboardService>();
 builder.Services.AddScoped<ActivityFeedService>();
 builder.Services.AddScoped<GameOverviewService>();
@@ -87,6 +99,8 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Identity.IdentityConstan
     .AddCookie(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, options =>
     {
         options.LoginPath = "/login";
+        // Pages for administrators only look like pages that do not exist to everybody else.
+        options.AccessDeniedPath = "/not-found";
     });
 
 builder.Services.AddIdentityCore<OrganizerUser>(options =>
@@ -204,6 +218,7 @@ app.MapRazorComponents<App>()
 app.MapAuthEndpoints();
 app.MapAccountEndpoints();
 app.MapGameActionEndpoints();
+app.MapCommunityAndAdminEndpoints();
 app.MapRefereeEndpoints();
 app.MapParticipantEndpoints();
 

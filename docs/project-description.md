@@ -365,7 +365,7 @@ The same entities (`Game`, `Element`, `Rule`, `Lineup`, `ScoreEntry`), the same 
 | Sponsor bonus | Sponsor QR with a personal bonus, once per participant. |
 | Duplicate edition | Elements, rules and plugin bindings are copied; lineups and scores start from zero. |
 | Second domain | One more domain pack (Amateur sports or Events and parties). |
-| Payments | Paid plans (Premium per game, Pro per event) through a payment provider. |
+| Payments | Paid plans (Community, Premium per game, Pro per event) through a payment provider. |
 | Passkeys for organizers | Organizers can add a passkey in addition to magic links. |
 
 ### P2 — to be anticipated in the architecture, not built now
@@ -399,10 +399,27 @@ These apply to every domain, with extra rules where needed.
 
 | Plan | For whom | Price hypothesis |
 |---|---|---|
-| **Free** | Small groups, community events | Free up to 150 participants per game, with a "powered by" mark |
+| **Free** | Small groups, community events | Free up to 50 participants per game, with a "powered by" mark |
+| **Community** | User groups, clubs and non-profit event series, validated by us | ~€10 per year (an annual subscription), up to 300 participants per game. **Not open to everybody**: only organizers we have authorized can buy it. The organizer asks from the account page; an administrator approves or rejects (the organizer is told by email) |
 | **Premium game** | Parties, weddings, tournaments, groups of friends | €3–9 per game, depending on participants |
 | **Pro event** | Commercial conferences, corporate events | €99–299 per event |
 | **Sponsor** | Event sponsors | Bonus and report package, sold through the organizer |
+
+**Limits are per game.** A game accepts 50 participants on the Free plan and 300 for an approved community (both set in configuration: `Plans:FreeParticipantLimit`, `Plans:CommunityParticipantLimit`). An administrator can raise the limit of a single game (for instance a launch event) with a label; that limit wins over the plan. This stays true once payments exist: an administrator can always unlock a single game, whatever plan the organizer has and whether or not they have paid, because launch events, partners and sponsors must not depend on a purchase. Payments never remove or override an administrator limit, and the administration area always shows which games run on a custom limit. When a game is full, nobody else can join and the player sees a clear message; players already in are never removed. Until payments exist (P1) the community approval itself switches the community limit on.
+
+**The Community plan can only be bought after our authorization.** The plan costs about €10 a year, but it is not available to everybody: an organizer first asks (description and a link to the community or event), an administrator checks that it is a real user group, club or non-profit series, and only an authorized organizer can then activate and pay for the plan. This keeps the low price for the people it is meant for and stops the Free and Premium plans from being bypassed.
+
+*How it works today (before payments exist):* the approval itself switches the community limit on for all the games of that organizer, and the organizer is told by email. There is no purchase step yet.
+
+*Planned (not built yet): authorization by unlock code, then purchase.* Approving a request sends the organizer a single-use **unlock code** by email. The code does not give the plan: it makes the organizer **eligible to buy** it. They enter it on their account page, and the "Activate the Community plan (~€10 a year)" purchase then appears; without the code the purchase is not shown and the endpoint refuses it. The same code can be issued by an administrator without a request, for partners, sponsors and launch events, and for those cases the administrator may also grant the first year for free. A code carries: the plan it makes available, its scope (the whole account or one game), an expiry date for redeeming it (for instance 30 days) and the address it is tied to, if any. Codes are stored hashed, can be revoked, and every redemption is recorded. After the purchase the community limit lasts for the paid year; at the end it must be renewed (the authorization stays, so renewing is one click).
+
+*Other ideas considered:*
+- **Proof of ownership of the community:** ask for a link to the community page and check that the request comes from an address on the same domain, or that the page links back to the game. Cheap for us and hard to fake; it can be an automatic first check before the human one.
+- **Vouching by an existing community:** an approved community can recommend another, and the request is approved faster. Good for growth inside a scene (user groups, clubs).
+- **Periodic re-check of the authorization:** the plan renews every year, but the authorization is checked again every two or three years (a quick look at the community link), so inactive or changed communities do not keep the price for ever.
+- **Per-game vouchers:** instead of unlocking the account, a code raises the limit of one game, the same way an administrator does today. Useful for one-off events.
+
+**Internal administration.** The addresses listed in `Admin:Emails` see an administration area: statistics (organizers, games by state, players and points, players per day, games with most players), community requests (approve or reject with a note) and the list of all games with their limit. For everybody else these pages do not exist.
 
 **Why it works:** the free plan spreads the product; every game shows it to tens or hundreds of people, including future organizers. Curated domains and plugins justify the upgrade.
 
@@ -515,6 +532,7 @@ Roster.slnx
 | Entity | Key fields |
 |---|---|
 | `Organizer` | Identity user, display name, preferred culture, plan |
+| `CommunityRequest` | Id, `OrganizerId`, organizer email, description, link, status (`Pending`, `Approved`, `Rejected`), created/decided timestamps, decided by, decision note |
 | `Game` | Id, slug, name, `DomainPackId`, brand, culture, state, lineup size, captain enabled, captain multiplier, join code, created/started/ended timestamps, `RowVersion` |
 | `SourceBinding` | Id, `GameId`, `PluginId`, configuration (JSON), secret reference (Key Vault), last sync time and result |
 | `Element` | Id, `GameId`, `SourceBindingId?`, `ExternalId?`, name, subtitle, image URL, group (room, pitch, group, category), metadata (JSON), consent status, source state (`Active`, `MissingFromSource`), selectable flag |

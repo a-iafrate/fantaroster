@@ -1,8 +1,16 @@
 @page "/organizer/account"
-@rendermode InteractiveServer
+@using System.Globalization
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Roster.Application.Plans
+@using Roster.Application.Services
+@using Roster.Domain.Organizers
+@using Roster.Web.Security
 @attribute [Authorize]
 @inject IStringLocalizer<SharedResource> Loc
+@inject AuthenticationStateProvider AuthState
+@inject PlanService Plans
+@inject PlanLimits Limits
 
 <PageTitle>@Loc["AccountTitle"]</PageTitle>
 
@@ -22,6 +30,63 @@
     {
         <p class="ds-alert" role="alert">@Loc["AccountDeleteFailed"]</p>
     }
+
+    @if (Community == "sent")
+    {
+        <p class="ds-alert ds-alert--success" role="status">@Loc["CommunitySent"]</p>
+    }
+    else if (Community == "invalid")
+    {
+        <p class="ds-alert" role="alert">@Loc["CommunityInvalid"]</p>
+    }
+    else if (Community == "pending")
+    {
+        <p class="ds-alert ds-alert--info" role="status">@Loc["CommunityAlreadyPending"]</p>
+    }
+    else if (Community == "already")
+    {
+        <p class="ds-alert ds-alert--info" role="status">@Loc["CommunityAlready"]</p>
+    }
+
+    <section id="community" class="account-section" aria-labelledby="account-community">
+        <h2 id="account-community" class="ds-section-title">@Loc["CommunityTitle"]</h2>
+        <p class="ds-muted">@Loc["CommunityDesc"]</p>
+        <p class="ds-muted">@string.Format(CultureInfo.CurrentCulture, Loc["CommunityLimitInfo"].Value, Limits.FreeParticipantLimit, Limits.CommunityParticipantLimit)</p>
+
+        @if (_plan is { IsCommunity: true } community)
+        {
+            <p class="ds-alert ds-alert--success" role="status">@string.Format(CultureInfo.CurrentCulture, Loc["CommunityStatusApproved"].Value, community.ParticipantLimit)</p>
+        }
+        else if (_plan?.LatestRequest is { Status: CommunityRequestStatus.Pending })
+        {
+            <p class="ds-alert ds-alert--info" role="status">@Loc["CommunityStatusPending"]</p>
+        }
+        else
+        {
+            @if (_plan?.LatestRequest is { Status: CommunityRequestStatus.Rejected } rejected)
+            {
+                <p class="ds-alert ds-alert--info" role="status">
+                    @Loc["CommunityStatusRejected"]
+                    @if (rejected.DecisionNote is { } note)
+                    {
+                        <br />@string.Format(CultureInfo.CurrentCulture, Loc["CommunityNoteFromUs"].Value, note)
+                    }
+                </p>
+            }
+
+            <form method="post" action="/organizer/account/community-request" class="ds-form account-delete">
+                <div class="ds-field">
+                    <label for="community-description" class="ds-label">@Loc["CommunityDescLabel"]</label>
+                    <textarea id="community-description" name="description" class="ds-input" rows="4" minlength="10" maxlength="2000" required></textarea>
+                </div>
+                <div class="ds-field">
+                    <label for="community-link" class="ds-label">@Loc["CommunityLinkLabel"]</label>
+                    <input id="community-link" name="link" type="url" class="ds-input" maxlength="500" inputmode="url" autocomplete="off" />
+                </div>
+                <button type="submit" class="ds-btn ds-btn--l ds-btn--primary" data-busy-label="@Loc["CommunityBusy"]">@Loc["CommunitySubmit"]</button>
+            </form>
+        }
+    </section>
 
     <section class="account-section" aria-labelledby="account-export">
         <h2 id="account-export" class="ds-section-title">@Loc["AccountExportTitle"]</h2>
@@ -46,4 +111,17 @@
 @code {
     [SupplyParameterFromQuery(Name = "error")]
     public string? Error { get; set; }
+
+    [SupplyParameterFromQuery(Name = "community")]
+    public string? Community { get; set; }
+
+    private OrganizerPlan? _plan;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthState.GetIdAsync() is { } organizerId)
+        {
+            _plan = await Plans.GetOrganizerPlanAsync(organizerId);
+        }
+    }
 }

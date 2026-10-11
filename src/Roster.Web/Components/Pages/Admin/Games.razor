@@ -1,0 +1,66 @@
+@page "/admin/games"
+@attribute [Authorize(Policy = AdminAccess.PolicyName)]
+@inject AdminService AdminData
+@inject IStringLocalizer<SharedResource> Loc
+
+<PageTitle>@Loc["AdminGamesTitle"]</PageTitle>
+
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["AdminGamesTitle"]</h1>
+            <p class="ds-page-desc">@Loc["AdminGamesDesc"]</p>
+        </div>
+    </header>
+
+    @if (Saved == "1")
+    {
+        <p class="ds-alert ds-alert--success" role="status">@Loc["AdminSaved"]</p>
+    }
+    else if (Error == "1")
+    {
+        <p class="ds-alert" role="alert">@Loc["AdminError"]</p>
+    }
+
+    @if (_games is { Count: 0 })
+    {
+        <p class="ds-muted">@Loc["AdminNoGames"]</p>
+    }
+
+    <ul class="adm-requests">
+        @foreach (var game in _games ?? [])
+        {
+            <li class="adm-request">
+                <div class="adm-request__head">
+                    <strong>@game.Name</strong>
+                    <span class="ds-chip">@Loc["State" + game.State]</span>
+                </div>
+                <p class="ds-muted">@(game.OrganizerEmail ?? Loc["AdminOwnerUnknown"]) · @Loc["AdminColCreated"] @game.CreatedAt.ToLocalTime().ToString("d", CultureInfo.CurrentCulture)</p>
+                <p>@Loc["AdminColPlayers"]: <strong>@game.Participants</strong> / @(string.Format(CultureInfo.CurrentCulture, (game.LimitOverride is null ? Loc["AdminLimitPlan"] : Loc["AdminLimitCustom"]).Value, game.EffectiveLimit))@(game.LimitLabel is { } label ? " · " + label : "")</p>
+                <form method="post" action="/admin/actions/games/@game.Id/limit" class="adm-inline">
+                    <div class="ds-field">
+                        <label class="ds-label" for="limit-@game.Id">@Loc["AdminLimitInput"]</label>
+                        <input id="limit-@game.Id" name="limit" class="ds-input" type="number" min="1" max="100000" inputmode="numeric" value="@game.LimitOverride" />
+                    </div>
+                    <div class="ds-field">
+                        <label class="ds-label" for="label-@game.Id">@Loc["AdminLabelInput"]</label>
+                        <input id="label-@game.Id" name="label" class="ds-input" type="text" maxlength="100" value="@game.LimitLabel" />
+                    </div>
+                    <button type="submit" class="ds-btn ds-btn--secondary" data-busy-label="@Loc["AdminSaveBusy"]">@Loc["AdminSave"]</button>
+                </form>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "saved")]
+    public string? Saved { get; set; }
+
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
+
+    private List<AdminGame>? _games;
+
+    protected override async Task OnInitializedAsync() => _games = await AdminData.GetGamesAsync();
+}

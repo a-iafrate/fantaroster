@@ -106,7 +106,30 @@ public sealed class RosterAppFixture : IAsyncLifetime
             throw new InvalidOperationException("Organizer sign-in needs the app started by the fixture (the magic link is read from its log).");
         }
 
-        var email = $"organizer-{Guid.NewGuid():N}@example.test";
+        return await SignInAsync($"organizer-{Guid.NewGuid():N}@example.test", width, height, colorScheme, ownedGames);
+    }
+
+    private const int AdminAddressCount = 40;
+    private int _nextAdmin;
+
+    /// <summary>Signs in as an administrator: the app lists admin-e2e-N addresses in Admin:Emails, one is used per call.</summary>
+    public async Task<(IPage Page, string Email)> NewAdminPageAsync(int width = 1280, int height = 800, ColorScheme colorScheme = ColorScheme.Light)
+    {
+        var index = Interlocked.Increment(ref _nextAdmin);
+        if (index > AdminAddressCount)
+        {
+            throw new InvalidOperationException("All the administrator addresses of the run are used.");
+        }
+
+        var email = $"admin-e2e-{index}@example.test";
+        return (await SignInAsync(email, width, height, colorScheme, []), email);
+    }
+
+    /// <summary>Whether the server log (where the development email sender writes) contains the text.</summary>
+    public bool ServerLogContains(string text) => ServerOutput().Contains(text, StringComparison.Ordinal);
+
+    private async Task<IPage> SignInAsync(string email, int width, int height, ColorScheme colorScheme, Guid[] ownedGames)
+    {
         var page = await NewPageAsync(width, height, colorScheme);
         await page.GotoAsync("/login");
         await page.Locator("#email").FillAsync(email);
@@ -204,6 +227,10 @@ public sealed class RosterAppFixture : IAsyncLifetime
             startInfo.Environment["Azure__SignalR__ConnectionString"] = string.Empty;
         }
         startInfo.Environment["Organizer__GameActions"] = GameActionsMode;
+        for (var i = 1; i <= AdminAddressCount; i++)
+        {
+            startInfo.Environment[$"Admin__Emails__{i - 1}"] = $"admin-e2e-{i}@example.test";
+        }
         // Every test signs in from the same address: the production limit on sign-in would stop the suite.
         startInfo.Environment["Security__RateLimits__LoginPer10Minutes"] = "10000";
         startInfo.Environment["Security__RateLimits__MagicLinkVerifyPer5Minutes"] = "10000";

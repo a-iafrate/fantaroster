@@ -83,7 +83,7 @@
     <value>Free Plan</value>
   </data>
   <data name="PlanFreeDesc" xml:space="preserve">
-    <value>1 live game, up to 150 players.</value>
+    <value>1 live game, up to {0} players.</value>
   </data>
   <data name="PlanUpgrade" xml:space="preserve">
     <value>Upgrade to Event</value>
@@ -1092,6 +1092,219 @@
   </data>
   <data name="DeleteGameBusy" xml:space="preserve">
     <value>Deleting…</value>
+  </data>
+  <data name="CommunityTitle" xml:space="preserve">
+    <value>Community plan</value>
+  </data>
+  <data name="CommunityDesc" xml:space="preserve">
+    <value>Run a user group, a club or a non-profit event series? Ask to be recognised as a community: after we check it, your games accept more players.</value>
+  </data>
+  <data name="CommunityLimitInfo" xml:space="preserve">
+    <value>Players per game: {0} on the Free plan, {1} as a community.</value>
+  </data>
+  <data name="CommunityDescLabel" xml:space="preserve">
+    <value>Who you are and what you organize</value>
+  </data>
+  <data name="CommunityLinkLabel" xml:space="preserve">
+    <value>Link to your community or event (optional)</value>
+  </data>
+  <data name="CommunitySubmit" xml:space="preserve">
+    <value>Send the request</value>
+  </data>
+  <data name="CommunityBusy" xml:space="preserve">
+    <value>Sending…</value>
+  </data>
+  <data name="CommunityStatusPending" xml:space="preserve">
+    <value>Your request is being checked. We will email you the answer.</value>
+  </data>
+  <data name="CommunityStatusApproved" xml:space="preserve">
+    <value>You are a recognised community: your games accept up to {0} players.</value>
+  </data>
+  <data name="CommunityStatusRejected" xml:space="preserve">
+    <value>Your last request was not approved. You can send a new one.</value>
+  </data>
+  <data name="CommunityNoteFromUs" xml:space="preserve">
+    <value>Note: {0}</value>
+  </data>
+  <data name="CommunitySent" xml:space="preserve">
+    <value>Request sent. We will email you the answer.</value>
+  </data>
+  <data name="CommunityInvalid" xml:space="preserve">
+    <value>Describe your community in at least 10 characters and check that the link starts with http:// or https://.</value>
+  </data>
+  <data name="CommunityAlreadyPending" xml:space="preserve">
+    <value>You already have a request being checked.</value>
+  </data>
+  <data name="CommunityAlready" xml:space="preserve">
+    <value>You are already a recognised community.</value>
+  </data>
+  <data name="CommunityMailApprovedSubject" xml:space="preserve">
+    <value>Your community request on {0} was approved</value>
+  </data>
+  <data name="CommunityMailApprovedBody" xml:space="preserve">
+    <value>Good news: your community request on {0} was approved. Your games now accept more players.</value>
+  </data>
+  <data name="CommunityMailRejectedSubject" xml:space="preserve">
+    <value>About your community request on {0}</value>
+  </data>
+  <data name="CommunityMailRejectedBody" xml:space="preserve">
+    <value>Thank you for your request. We could not approve it this time. You are welcome to send a new one with more details.</value>
+  </data>
+  <data name="CommunityMailNote" xml:space="preserve">
+    <value>Note from us: {0}</value>
+  </data>
+  <data name="AdminSection" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="AdminNavDashboard" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="AdminNavRequests" xml:space="preserve">
+    <value>Community requests</value>
+  </data>
+  <data name="AdminNavGames" xml:space="preserve">
+    <value>All games</value>
+  </data>
+  <data name="AdminDashboardTitle" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="AdminDashboardDesc" xml:space="preserve">
+    <value>How the service is used: games, players and points.</value>
+  </data>
+  <data name="AdminStatOrganizers" xml:space="preserve">
+    <value>Organizers</value>
+  </data>
+  <data name="AdminStatGames" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="AdminStatParticipants" xml:space="preserve">
+    <value>Players</value>
+  </data>
+  <data name="AdminStatParticipantsWeek" xml:space="preserve">
+    <value>New players, last 7 days</value>
+  </data>
+  <data name="AdminStatScoresValid" xml:space="preserve">
+    <value>Points assigned</value>
+  </data>
+  <data name="AdminStatScoresVoided" xml:space="preserve">
+    <value>Points voided</value>
+  </data>
+  <data name="AdminStatPending" xml:space="preserve">
+    <value>Requests to check</value>
+  </data>
+  <data name="AdminStatCommunities" xml:space="preserve">
+    <value>Recognised communities</value>
+  </data>
+  <data name="AdminGamesByState" xml:space="preserve">
+    <value>Games by state</value>
+  </data>
+  <data name="AdminJoinsPerDay" xml:space="preserve">
+    <value>Players joining, last 14 days</value>
+  </data>
+  <data name="AdminTopGames" xml:space="preserve">
+    <value>Games with most players</value>
+  </data>
+  <data name="AdminColGame" xml:space="preserve">
+    <value>Game</value>
+  </data>
+  <data name="AdminColOrganizer" xml:space="preserve">
+    <value>Organizer</value>
+  </data>
+  <data name="AdminColState" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="AdminColPlayers" xml:space="preserve">
+    <value>Players</value>
+  </data>
+  <data name="AdminColLimit" xml:space="preserve">
+    <value>Limit</value>
+  </data>
+  <data name="AdminColLabel" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="AdminColCreated" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="AdminColDay" xml:space="preserve">
+    <value>Day</value>
+  </data>
+  <data name="AdminLimitPlan" xml:space="preserve">
+    <value>{0} (plan)</value>
+  </data>
+  <data name="AdminLimitCustom" xml:space="preserve">
+    <value>{0} (custom)</value>
+  </data>
+  <data name="AdminRequestsTitle" xml:space="preserve">
+    <value>Community requests</value>
+  </data>
+  <data name="AdminRequestsDesc" xml:space="preserve">
+    <value>Check who asks to be a community, then approve or reject. The organizer is told by email.</value>
+  </data>
+  <data name="AdminNoRequests" xml:space="preserve">
+    <value>No requests yet.</value>
+  </data>
+  <data name="AdminRequestSent" xml:space="preserve">
+    <value>Sent {0}</value>
+  </data>
+  <data name="AdminRequestDecided" xml:space="preserve">
+    <value>{0} by {1}</value>
+  </data>
+  <data name="AdminNoteLabel" xml:space="preserve">
+    <value>Note for the organizer (optional)</value>
+  </data>
+  <data name="AdminApprove" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="AdminReject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="AdminApproveBusy" xml:space="preserve">
+    <value>Approving…</value>
+  </data>
+  <data name="AdminRejectBusy" xml:space="preserve">
+    <value>Rejecting…</value>
+  </data>
+  <data name="AdminRequestStatusPending" xml:space="preserve">
+    <value>To check</value>
+  </data>
+  <data name="AdminRequestStatusApproved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="AdminRequestStatusRejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="AdminDecidedNotice" xml:space="preserve">
+    <value>Decision saved and the organizer was emailed.</value>
+  </data>
+  <data name="AdminError" xml:space="preserve">
+    <value>The change could not be saved. Check the values and try again.</value>
+  </data>
+  <data name="AdminGamesTitle" xml:space="preserve">
+    <value>All games</value>
+  </data>
+  <data name="AdminGamesDesc" xml:space="preserve">
+    <value>Raise the player limit of a single game, for instance a launch event. Leave the limit empty to go back to the plan limit.</value>
+  </data>
+  <data name="AdminLimitInput" xml:space="preserve">
+    <value>Player limit</value>
+  </data>
+  <data name="AdminLabelInput" xml:space="preserve">
+    <value>Label (e.g. Launch event)</value>
+  </data>
+  <data name="AdminSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="AdminSaveBusy" xml:space="preserve">
+    <value>Saving…</value>
+  </data>
+  <data name="AdminSaved" xml:space="preserve">
+    <value>Limit saved.</value>
+  </data>
+  <data name="AdminNoGames" xml:space="preserve">
+    <value>No games yet.</value>
+  </data>
+  <data name="AdminOwnerUnknown" xml:space="preserve">
+    <value>(no owner)</value>
   </data>
 </root>
 

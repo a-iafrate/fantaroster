@@ -1,0 +1,98 @@
+@page "/admin"
+@attribute [Authorize(Policy = AdminAccess.PolicyName)]
+@inject AdminService AdminData
+@inject IStringLocalizer<SharedResource> Loc
+
+<PageTitle>@Loc["AdminDashboardTitle"]</PageTitle>
+
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["AdminDashboardTitle"]</h1>
+            <p class="ds-page-desc">@Loc["AdminDashboardDesc"]</p>
+        </div>
+    </header>
+
+    @if (_stats is { } stats)
+    {
+        <ul class="adm-stats">
+            <li class="adm-stat"><span class="adm-stat__value">@stats.Organizers</span><span class="adm-stat__label">@Loc["AdminStatOrganizers"]</span></li>
+            <li class="adm-stat"><span class="adm-stat__value">@stats.Games</span><span class="adm-stat__label">@Loc["AdminStatGames"]</span></li>
+            <li class="adm-stat"><span class="adm-stat__value">@stats.Participants</span><span class="adm-stat__label">@Loc["AdminStatParticipants"]</span></li>
+            <li class="adm-stat"><span class="adm-stat__value">@stats.ParticipantsLast7Days</span><span class="adm-stat__label">@Loc["AdminStatParticipantsWeek"]</span></li>
+            <li class="adm-stat"><span class="adm-stat__value">@stats.ScoreEntriesValid</span><span class="adm-stat__label">@Loc["AdminStatScoresValid"]</span></li>
+            <li class="adm-stat"><span class="adm-stat__value">@stats.ScoreEntriesVoided</span><span class="adm-stat__label">@Loc["AdminStatScoresVoided"]</span></li>
+            <li class="adm-stat"><a class="adm-stat__link" href="/admin/requests"><span class="adm-stat__value">@stats.PendingCommunityRequests</span><span class="adm-stat__label">@Loc["AdminStatPending"]</span></a></li>
+            <li class="adm-stat"><span class="adm-stat__value">@stats.ApprovedCommunities</span><span class="adm-stat__label">@Loc["AdminStatCommunities"]</span></li>
+        </ul>
+
+        <section class="adm-section" aria-labelledby="adm-states">
+            <h2 id="adm-states" class="ds-section-title">@Loc["AdminGamesByState"]</h2>
+            <ul class="adm-chips">
+                @foreach (var state in Enum.GetValues<GameState>())
+                {
+                    <li class="ds-chip">@Loc["State" + state] <strong>@(stats.GamesByState.GetValueOrDefault(state))</strong></li>
+                }
+            </ul>
+        </section>
+
+        <section class="adm-section" aria-labelledby="adm-joins">
+            <h2 id="adm-joins" class="ds-section-title">@Loc["AdminJoinsPerDay"]</h2>
+            <div class="adm-table-wrap" role="region" aria-labelledby="adm-joins" tabindex="0">
+                <table class="adm-table">
+                    <thead><tr><th scope="col">@Loc["AdminColDay"]</th><th scope="col">@Loc["AdminColPlayers"]</th></tr></thead>
+                    <tbody>
+                        @{ var max = Math.Max(1, stats.JoinsPerDay.Max(d => d.Count)); }
+                        @foreach (var day in stats.JoinsPerDay)
+                        {
+                            <tr>
+                                <th scope="row">@day.Day.ToString("d MMM", CultureInfo.CurrentCulture)</th>
+                                <td class="adm-bar"><progress value="@day.Count" max="@max" aria-label="@day.Day.ToString("d MMM", CultureInfo.CurrentCulture)"></progress> <span>@day.Count</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="adm-section" aria-labelledby="adm-top">
+            <h2 id="adm-top" class="ds-section-title">@Loc["AdminTopGames"]</h2>
+            @if (stats.TopGames.Count == 0)
+            {
+                <p class="ds-muted">@Loc["AdminNoGames"]</p>
+            }
+            else
+            {
+                <div class="adm-table-wrap" role="region" aria-labelledby="adm-top" tabindex="0">
+                    <table class="adm-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">@Loc["AdminColGame"]</th>
+                                <th scope="col">@Loc["AdminColOrganizer"]</th>
+                                <th scope="col">@Loc["AdminColState"]</th>
+                                <th scope="col">@Loc["AdminColPlayers"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var game in stats.TopGames)
+                            {
+                                <tr>
+                                    <th scope="row">@game.Name</th>
+                                    <td>@(game.OrganizerEmail ?? Loc["AdminOwnerUnknown"])</td>
+                                    <td>@Loc["State" + game.State]</td>
+                                    <td>@game.Participants</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    }
+</div>
+
+@code {
+    private AdminStats? _stats;
+
+    protected override async Task OnInitializedAsync() => _stats = await AdminData.GetStatsAsync();
+}

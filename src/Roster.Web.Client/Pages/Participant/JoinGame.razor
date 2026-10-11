@@ -156,6 +156,7 @@
             _error = response.StatusCode switch
             {
                 System.Net.HttpStatusCode.Conflict => Loc["NicknameTaken"],
+                System.Net.HttpStatusCode.Forbidden => Loc["GameFull"],
                 System.Net.HttpStatusCode.BadRequest => Loc["NicknameInvalid"],
                 _ => Loc["JoinFailed"],
             };

@@ -172,6 +172,25 @@ public sealed partial class AccessibilityTests(RosterAppFixture app)
     }
 
     [Theory]
+    [MemberData(nameof(Setups))]
+    public async Task Admin_pages_have_no_violations(int width, ColorScheme scheme)
+    {
+        var problems = new List<string>();
+        var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Live);
+        await TestData.AddScoresAsync(app.BaseUrl, game);
+        var (page, _) = await app.NewAdminPageAsync(width, HeightFor(width), scheme);
+
+        foreach (var path in new[] { "/admin", "/admin/requests", "/admin/games" })
+        {
+            await page.GotoAsync(path);
+            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            await AuditAsync(page, $"{path} {width} {scheme}", problems);
+        }
+
+        ShouldBeClean(problems);
+    }
+
+    [Theory]
     [InlineData(ColorScheme.Light)]
     [InlineData(ColorScheme.Dark)]
     public async Task Big_screen_has_no_violations(ColorScheme scheme)

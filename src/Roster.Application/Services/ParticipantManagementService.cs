@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Roster.Application.Participants;
 using Roster.Application.Participants.Commands;
 using Roster.Application.Ports.Data;
 using Roster.Application.Ports.Security;
@@ -19,6 +20,7 @@ public sealed class ParticipantManagementService
     private readonly IParticipantTokenService _tokenService;
     private readonly IProfanityFilter _profanityFilter;
     private readonly TimeProvider _timeProvider;
+    private readonly PlanService _plans;
 
     public ParticipantManagementService(
         IGameRepository gameRepository,
@@ -27,7 +29,8 @@ public sealed class ParticipantManagementService
         IUnitOfWork unitOfWork,
         IParticipantTokenService tokenService,
         IProfanityFilter profanityFilter,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        PlanService plans)
     {
         _gameRepository = gameRepository;
         _participantRepository = participantRepository;
@@ -36,6 +39,7 @@ public sealed class ParticipantManagementService
         _tokenService = tokenService;
         _profanityFilter = profanityFilter;
         _timeProvider = timeProvider;
+        _plans = plans;
     }
 
     public async Task<string> JoinGameAsync(JoinGameCommand command, CancellationToken cancellationToken = default)
@@ -46,6 +50,10 @@ public sealed class ParticipantManagementService
 
         if (game.State != GameState.Open && game.State != GameState.Live)
             throw new InvalidOperationException("Participants can only join when the game is Open or Live.");
+
+        var limit = await _plans.GetEffectiveLimitAsync(game, cancellationToken);
+        if (await _participantRepository.CountByGameIdAsync(command.GameId, cancellationToken) >= limit)
+            throw new ParticipantLimitReachedException(limit);
 
         if (_profanityFilter.ContainsProfanity(command.Nickname))
             throw new ArgumentException("The chosen nickname is not allowed.");

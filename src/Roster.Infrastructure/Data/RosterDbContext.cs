@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Roster.Domain.Elements;
 using Roster.Domain.Games;
+using Roster.Domain.Organizers;
 using Roster.Domain.Participants;
 using Roster.Domain.Referees;
 using Roster.Domain.Scores;
@@ -26,6 +27,7 @@ public sealed class RosterDbContext : IdentityDbContext<OrganizerUser>
     public DbSet<SponsorBonus> SponsorBonuses => Set<SponsorBonus>();
     public DbSet<SourceBinding> SourceBindings => Set<SourceBinding>();
     public DbSet<ConsentInvitation> ConsentInvitations => Set<ConsentInvitation>();
+    public DbSet<CommunityRequest> CommunityRequests => Set<CommunityRequest>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

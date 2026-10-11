@@ -412,4 +412,7 @@
   <data name="LanguageToggleAria" xml:space="preserve">
     <value>Lingua: {0}. Passa a {1}</value>
   </data>
+  <data name="GameFull" xml:space="preserve">
+    <value>Questa partita è al completo: non possono entrare altri giocatori.</value>
+  </data>
 </root>

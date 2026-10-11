@@ -1,0 +1,81 @@
+@page "/admin/requests"
+@attribute [Authorize(Policy = AdminAccess.PolicyName)]
+@inject CommunityRequestService RequestService
+@inject IStringLocalizer<SharedResource> Loc
+
+<PageTitle>@Loc["AdminRequestsTitle"]</PageTitle>
+
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["AdminRequestsTitle"]</h1>
+            <p class="ds-page-desc">@Loc["AdminRequestsDesc"]</p>
+        </div>
+    </header>
+
+    @if (Decided == "1")
+    {
+        <p class="ds-alert ds-alert--success" role="status">@Loc["AdminDecidedNotice"]</p>
+    }
+    else if (Error == "1")
+    {
+        <p class="ds-alert" role="alert">@Loc["AdminError"]</p>
+    }
+
+    @if (_requests is { Count: 0 })
+    {
+        <p class="ds-muted">@Loc["AdminNoRequests"]</p>
+    }
+
+    <ul class="adm-requests">
+        @foreach (var request in _requests ?? [])
+        {
+            <li class="adm-request">
+                <div class="adm-request__head">
+                    <strong>@request.OrganizerEmail</strong>
+                    <span class="ds-chip">@Loc["AdminRequestStatus" + request.Status]</span>
+                </div>
+                <p class="ds-muted">@string.Format(CultureInfo.CurrentCulture, Loc["AdminRequestSent"].Value, request.CreatedAt.ToLocalTime().ToString("g", CultureInfo.CurrentCulture))</p>
+                <p class="adm-request__text">@request.Description</p>
+                @if (request.Link is { } link)
+                {
+                    <p><a href="@link" target="_blank" rel="noopener noreferrer">@link</a><span class="visually-hidden"> @Loc["OpensNewTab"]</span></p>
+                }
+
+                @if (request.Status == CommunityRequestStatus.Pending)
+                {
+                    <form method="post" action="/admin/actions/requests/@request.Id/decide" class="ds-form">
+                        <div class="ds-field">
+                            <label class="ds-label" for="note-@request.Id">@Loc["AdminNoteLabel"]</label>
+                            <textarea id="note-@request.Id" name="note" class="ds-input" rows="2" maxlength="1000"></textarea>
+                        </div>
+                        <div class="adm-actions">
+                            <button type="submit" name="decision" value="approve" class="ds-btn ds-btn--primary" data-busy-label="@Loc["AdminApproveBusy"]">@Loc["AdminApprove"]</button>
+                            <button type="submit" name="decision" value="reject" class="ds-btn ds-btn--secondary" data-busy-label="@Loc["AdminRejectBusy"]">@Loc["AdminReject"]</button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <p class="ds-muted">@string.Format(CultureInfo.CurrentCulture, Loc["AdminRequestDecided"].Value, request.DecidedAt?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture), request.DecidedBy)</p>
+                    @if (request.DecisionNote is { } note)
+                    {
+                        <p class="ds-muted">@string.Format(CultureInfo.CurrentCulture, Loc["CommunityNoteFromUs"].Value, note)</p>
+                    }
+                }
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "decided")]
+    public string? Decided { get; set; }
+
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
+
+    private List<CommunityRequest>? _requests;
+
+    protected override async Task OnInitializedAsync() => _requests = await RequestService.ListAsync();
+}

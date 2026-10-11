@@ -4,11 +4,14 @@
 @using Roster.Domain.Games
 @using Roster.Infrastructure.Security
 @using Roster.Ui.Components
+@using Roster.Web.Security
 @implements IDisposable
 @inject IStringLocalizer<SharedResource> Loc
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 @inject OrganizerContext Context
+@inject AdminAccess AdminRights
+@inject Roster.Application.Plans.PlanLimits Limits
 
 @* Organizer shell (mockup 06): account level (my games) and game level (overview, elements, rules, ...).
    Sidebar from 1024 px; on phones a top bar and a drawer. Interactive island: the layout itself is static. *@
@@ -85,9 +88,23 @@
                 <i class="icon-shield" aria-hidden="true"></i><span>@Loc["AccountMenuPrivacy"]</span>
             </a>
         </nav>
+        @if (_isAdmin)
+        {
+            <nav class="org-nav" aria-label="@Loc["AdminSection"]">
+                <a href="/admin" class="org-nav-item" aria-current="@(AdminPath == "admin" ? "page" : null)" @onclick="CloseDrawer">
+                    <i class="icon-chart-no-axes-column" aria-hidden="true"></i><span>@Loc["AdminNavDashboard"]</span>
+                </a>
+                <a href="/admin/requests" class="org-nav-item" aria-current="@(AdminPath == "admin/requests" ? "page" : null)" @onclick="CloseDrawer">
+                    <i class="icon-badge-check" aria-hidden="true"></i><span>@Loc["AdminNavRequests"]</span>
+                </a>
+                <a href="/admin/games" class="org-nav-item" aria-current="@(AdminPath == "admin/games" ? "page" : null)" @onclick="CloseDrawer">
+                    <i class="icon-list" aria-hidden="true"></i><span>@Loc["AdminNavGames"]</span>
+                </a>
+            </nav>
+        }
         <div class="org-plan">
             <div class="org-plan-title">@Loc["PlanFree"]</div>
-            <div class="org-plan-desc">@Loc["PlanFreeDesc"]</div>
+            <div class="org-plan-desc">@string.Format(System.Globalization.CultureInfo.CurrentCulture, Loc["PlanFreeDesc"].Value, Limits.FreeParticipantLimit)</div>
         </div>
     }
 
@@ -135,7 +152,11 @@
 
     private int _pendingConsents => Context.PendingConsents;
 
-    private bool IsAccountHome => _game is null;
+    private bool IsAccountHome => _game is null && !AdminPath.StartsWith("admin", StringComparison.Ordinal);
+
+    private bool _isAdmin;
+
+    private string AdminPath => Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].TrimEnd('/');
 
     private bool OnAccountPage => Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].TrimEnd('/').Equals("organizer/account", StringComparison.OrdinalIgnoreCase);
 
@@ -145,6 +166,7 @@
         _email = user.FindFirstValue(ClaimTypes.Email) ?? user.Identity?.Name ?? string.Empty;
         _displayName = user.FindFirstValue(OrganizerClaimsPrincipalFactory.DisplayNameClaimType) ?? _email.Split('@')[0];
         _initials = Initials(_displayName);
+        _isAdmin = AdminRights.IsAdmin(user);
 
         Navigation.LocationChanged += OnLocationChanged;
         Context.Changed += OnContextChanged;

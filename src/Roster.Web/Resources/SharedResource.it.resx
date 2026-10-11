@@ -83,7 +83,7 @@
     <value>Piano Gratis</value>
   </data>
   <data name="PlanFreeDesc" xml:space="preserve">
-    <value>1 partita live, fino a 150 giocatori.</value>
+    <value>1 partita live, fino a {0} giocatori.</value>
   </data>
   <data name="PlanUpgrade" xml:space="preserve">
     <value>Passa a Evento</value>
@@ -1092,6 +1092,219 @@
   </data>
   <data name="DeleteGameBusy" xml:space="preserve">
     <value>Eliminazione…</value>
+  </data>
+  <data name="CommunityTitle" xml:space="preserve">
+    <value>Piano Community</value>
+  </data>
+  <data name="CommunityDesc" xml:space="preserve">
+    <value>Gestisci un gruppo di utenti, un club o una serie di eventi senza scopo di lucro? Chiedi di essere riconosciuto come community: dopo la nostra verifica le tue partite accettano più giocatori.</value>
+  </data>
+  <data name="CommunityLimitInfo" xml:space="preserve">
+    <value>Giocatori per partita: {0} con il piano Gratis, {1} come community.</value>
+  </data>
+  <data name="CommunityDescLabel" xml:space="preserve">
+    <value>Chi sei e cosa organizzi</value>
+  </data>
+  <data name="CommunityLinkLabel" xml:space="preserve">
+    <value>Link alla tua community o al tuo evento (facoltativo)</value>
+  </data>
+  <data name="CommunitySubmit" xml:space="preserve">
+    <value>Invia la richiesta</value>
+  </data>
+  <data name="CommunityBusy" xml:space="preserve">
+    <value>Invio…</value>
+  </data>
+  <data name="CommunityStatusPending" xml:space="preserve">
+    <value>La tua richiesta è in verifica. Ti scriveremo la risposta per email.</value>
+  </data>
+  <data name="CommunityStatusApproved" xml:space="preserve">
+    <value>Sei una community riconosciuta: le tue partite accettano fino a {0} giocatori.</value>
+  </data>
+  <data name="CommunityStatusRejected" xml:space="preserve">
+    <value>La tua ultima richiesta non è stata approvata. Puoi inviarne una nuova.</value>
+  </data>
+  <data name="CommunityNoteFromUs" xml:space="preserve">
+    <value>Nota: {0}</value>
+  </data>
+  <data name="CommunitySent" xml:space="preserve">
+    <value>Richiesta inviata. Ti scriveremo la risposta per email.</value>
+  </data>
+  <data name="CommunityInvalid" xml:space="preserve">
+    <value>Descrivi la tua community con almeno 10 caratteri e controlla che il link inizi con http:// o https://.</value>
+  </data>
+  <data name="CommunityAlreadyPending" xml:space="preserve">
+    <value>Hai già una richiesta in verifica.</value>
+  </data>
+  <data name="CommunityAlready" xml:space="preserve">
+    <value>Sei già una community riconosciuta.</value>
+  </data>
+  <data name="CommunityMailApprovedSubject" xml:space="preserve">
+    <value>La tua richiesta community su {0} è stata approvata</value>
+  </data>
+  <data name="CommunityMailApprovedBody" xml:space="preserve">
+    <value>Buone notizie: la tua richiesta community su {0} è stata approvata. Le tue partite ora accettano più giocatori.</value>
+  </data>
+  <data name="CommunityMailRejectedSubject" xml:space="preserve">
+    <value>A proposito della tua richiesta community su {0}</value>
+  </data>
+  <data name="CommunityMailRejectedBody" xml:space="preserve">
+    <value>Grazie per la richiesta. Questa volta non abbiamo potuto approvarla. Puoi inviarne una nuova con più dettagli.</value>
+  </data>
+  <data name="CommunityMailNote" xml:space="preserve">
+    <value>Nota da parte nostra: {0}</value>
+  </data>
+  <data name="AdminSection" xml:space="preserve">
+    <value>Amministrazione</value>
+  </data>
+  <data name="AdminNavDashboard" xml:space="preserve">
+    <value>Statistiche</value>
+  </data>
+  <data name="AdminNavRequests" xml:space="preserve">
+    <value>Richieste community</value>
+  </data>
+  <data name="AdminNavGames" xml:space="preserve">
+    <value>Tutte le partite</value>
+  </data>
+  <data name="AdminDashboardTitle" xml:space="preserve">
+    <value>Amministrazione</value>
+  </data>
+  <data name="AdminDashboardDesc" xml:space="preserve">
+    <value>Come viene usato il servizio: partite, giocatori e punti.</value>
+  </data>
+  <data name="AdminStatOrganizers" xml:space="preserve">
+    <value>Organizzatori</value>
+  </data>
+  <data name="AdminStatGames" xml:space="preserve">
+    <value>Partite</value>
+  </data>
+  <data name="AdminStatParticipants" xml:space="preserve">
+    <value>Giocatori</value>
+  </data>
+  <data name="AdminStatParticipantsWeek" xml:space="preserve">
+    <value>Nuovi giocatori, ultimi 7 giorni</value>
+  </data>
+  <data name="AdminStatScoresValid" xml:space="preserve">
+    <value>Punti assegnati</value>
+  </data>
+  <data name="AdminStatScoresVoided" xml:space="preserve">
+    <value>Punti annullati</value>
+  </data>
+  <data name="AdminStatPending" xml:space="preserve">
+    <value>Richieste da verificare</value>
+  </data>
+  <data name="AdminStatCommunities" xml:space="preserve">
+    <value>Community riconosciute</value>
+  </data>
+  <data name="AdminGamesByState" xml:space="preserve">
+    <value>Partite per stato</value>
+  </data>
+  <data name="AdminJoinsPerDay" xml:space="preserve">
+    <value>Iscrizioni dei giocatori, ultimi 14 giorni</value>
+  </data>
+  <data name="AdminTopGames" xml:space="preserve">
+    <value>Partite con più giocatori</value>
+  </data>
+  <data name="AdminColGame" xml:space="preserve">
+    <value>Partita</value>
+  </data>
+  <data name="AdminColOrganizer" xml:space="preserve">
+    <value>Organizzatore</value>
+  </data>
+  <data name="AdminColState" xml:space="preserve">
+    <value>Stato</value>
+  </data>
+  <data name="AdminColPlayers" xml:space="preserve">
+    <value>Giocatori</value>
+  </data>
+  <data name="AdminColLimit" xml:space="preserve">
+    <value>Limite</value>
+  </data>
+  <data name="AdminColLabel" xml:space="preserve">
+    <value>Etichetta</value>
+  </data>
+  <data name="AdminColCreated" xml:space="preserve">
+    <value>Creata</value>
+  </data>
+  <data name="AdminColDay" xml:space="preserve">
+    <value>Giorno</value>
+  </data>
+  <data name="AdminLimitPlan" xml:space="preserve">
+    <value>{0} (piano)</value>
+  </data>
+  <data name="AdminLimitCustom" xml:space="preserve">
+    <value>{0} (personalizzato)</value>
+  </data>
+  <data name="AdminRequestsTitle" xml:space="preserve">
+    <value>Richieste community</value>
+  </data>
+  <data name="AdminRequestsDesc" xml:space="preserve">
+    <value>Verifica chi chiede di essere una community, poi approva o rifiuta. L'organizzatore riceve una email.</value>
+  </data>
+  <data name="AdminNoRequests" xml:space="preserve">
+    <value>Nessuna richiesta per ora.</value>
+  </data>
+  <data name="AdminRequestSent" xml:space="preserve">
+    <value>Inviata il {0}</value>
+  </data>
+  <data name="AdminRequestDecided" xml:space="preserve">
+    <value>{0} da {1}</value>
+  </data>
+  <data name="AdminNoteLabel" xml:space="preserve">
+    <value>Nota per l'organizzatore (facoltativa)</value>
+  </data>
+  <data name="AdminApprove" xml:space="preserve">
+    <value>Approva</value>
+  </data>
+  <data name="AdminReject" xml:space="preserve">
+    <value>Rifiuta</value>
+  </data>
+  <data name="AdminApproveBusy" xml:space="preserve">
+    <value>Approvazione…</value>
+  </data>
+  <data name="AdminRejectBusy" xml:space="preserve">
+    <value>Rifiuto…</value>
+  </data>
+  <data name="AdminRequestStatusPending" xml:space="preserve">
+    <value>Da verificare</value>
+  </data>
+  <data name="AdminRequestStatusApproved" xml:space="preserve">
+    <value>Approvata</value>
+  </data>
+  <data name="AdminRequestStatusRejected" xml:space="preserve">
+    <value>Rifiutata</value>
+  </data>
+  <data name="AdminDecidedNotice" xml:space="preserve">
+    <value>Decisione salvata e organizzatore avvisato via email.</value>
+  </data>
+  <data name="AdminError" xml:space="preserve">
+    <value>Non è stato possibile salvare la modifica. Controlla i valori e riprova.</value>
+  </data>
+  <data name="AdminGamesTitle" xml:space="preserve">
+    <value>Tutte le partite</value>
+  </data>
+  <data name="AdminGamesDesc" xml:space="preserve">
+    <value>Alza il limite di giocatori di una singola partita, per esempio un evento di lancio. Lascia vuoto il limite per tornare a quello del piano.</value>
+  </data>
+  <data name="AdminLimitInput" xml:space="preserve">
+    <value>Limite giocatori</value>
+  </data>
+  <data name="AdminLabelInput" xml:space="preserve">
+    <value>Etichetta (es. Evento di lancio)</value>
+  </data>
+  <data name="AdminSave" xml:space="preserve">
+    <value>Salva</value>
+  </data>
+  <data name="AdminSaveBusy" xml:space="preserve">
+    <value>Salvataggio…</value>
+  </data>
+  <data name="AdminSaved" xml:space="preserve">
+    <value>Limite salvato.</value>
+  </data>
+  <data name="AdminNoGames" xml:space="preserve">
+    <value>Nessuna partita per ora.</value>
+  </data>
+  <data name="AdminOwnerUnknown" xml:space="preserve">
+    <value>(senza proprietario)</value>
   </data>
 </root>
 

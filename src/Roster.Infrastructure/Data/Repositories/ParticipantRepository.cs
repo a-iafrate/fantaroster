@@ -52,6 +52,9 @@ internal sealed class ParticipantRepository : IParticipantRepository
             .ToListAsync(cancellationToken);
     }
 
+    public Task<int> CountByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default) =>
+        _context.Participants.CountAsync(p => p.GameId == gameId, cancellationToken);
+
     public async Task<List<Participant>> GetParticipantsByGameIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         return await _context.Participants

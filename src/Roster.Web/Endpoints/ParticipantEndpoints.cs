@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Roster.Application.Participants;
 using Roster.Application.Participants.Commands;
 using Roster.Application.Participants.Queries;
 using Roster.Application.Ports.Security;
@@ -32,6 +33,11 @@ public static class ParticipantEndpoints
             catch (ArgumentException ex)
             {
                 return Results.BadRequest(new { Error = ex.Message });
+            }
+            catch (ParticipantLimitReachedException ex)
+            {
+                // Not a conflict of names: the game is full, and the client says so in its own words.
+                return Results.Json(new { Error = ex.Message, ex.Limit }, statusCode: StatusCodes.Status403Forbidden);
             }
             catch (InvalidOperationException ex)
             {

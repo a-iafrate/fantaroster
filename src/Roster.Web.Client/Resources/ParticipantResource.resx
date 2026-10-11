@@ -412,4 +412,7 @@
   <data name="LanguageToggleAria" xml:space="preserve">
     <value>Language: {0}. Switch to {1}</value>
   </data>
+  <data name="GameFull" xml:space="preserve">
+    <value>This game is full: no more players can join.</value>
+  </data>
 </root>

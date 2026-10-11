@@ -23,6 +23,12 @@ public sealed class Game
     /// <summary>The organizer (identity user id) who owns the game; only that person can see and manage it.</summary>
     public string? OrganizerId { get; private set; }
 
+    /// <summary>A participant limit set by an administrator for this game (for instance a launch event); it wins over the plan.</summary>
+    public int? ParticipantLimitOverride { get; private set; }
+
+    /// <summary>Why the limit was raised (shown to administrators only), e.g. "Launch event".</summary>
+    public string? LimitLabel { get; private set; }
+
     private Game()
     {
         Slug = string.Empty;
@@ -68,6 +74,25 @@ public sealed class Game
     /// <summary>Whether the given organizer owns the game. A game without an owner belongs to nobody.</summary>
     public bool IsOwnedBy(string? organizerId) =>
         !string.IsNullOrEmpty(organizerId) && OrganizerId is not null && string.Equals(OrganizerId, organizerId, StringComparison.Ordinal);
+
+    /// <summary>Sets or clears (<c>null</c>) the administrator limit of participants for this game.</summary>
+    public void SetParticipantLimitOverride(int? limit, string? label)
+    {
+        if (limit is < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(limit), "The participant limit must be at least 1.");
+        }
+
+        ParticipantLimitOverride = limit;
+        LimitLabel = limit is null || string.IsNullOrWhiteSpace(label) ? null : label.Trim();
+    }
+
+    /// <summary>
+    /// The most participants the game accepts: the administrator limit if there is one, otherwise the community limit
+    /// when the organizer is an approved community, otherwise the free limit.
+    /// </summary>
+    public int EffectiveParticipantLimit(int freeLimit, int communityLimit, bool organizerIsCommunity) =>
+        ParticipantLimitOverride ?? (organizerIsCommunity ? Math.Max(freeLimit, communityLimit) : freeLimit);
 
     public void Rename(string name)
     {

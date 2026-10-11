@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using NSubstitute;
 using Shouldly;
 using Xunit;
+using Roster.Application.Participants;
 using Roster.Application.Participants.Commands;
+using Roster.Application.Plans;
 using Roster.Application.Ports.Data;
 using Roster.Application.Ports.Security;
 using Roster.Application.Services;
@@ -21,6 +23,7 @@ public class JoinGameCommandHandlerTests
     private readonly IUnitOfWork _unitOfWork;
     private readonly IParticipantTokenService _tokenService;
     private readonly IProfanityFilter _profanityFilter;
+    private readonly ICommunityRequestRepository _communityRequests = Substitute.For<ICommunityRequestRepository>();
     private readonly ParticipantManagementService _service;
 
     public JoinGameCommandHandlerTests()
@@ -39,7 +42,8 @@ public class JoinGameCommandHandlerTests
             _unitOfWork,
             _tokenService,
             _profanityFilter,
-            TimeProvider.System);
+            TimeProvider.System,
+            new PlanService(new PlanLimits(2, 5), _communityRequests));
     }
 
     [Fact]
@@ -122,5 +126,55 @@ public class JoinGameCommandHandlerTests
         token.ShouldBe("raw-token");
         _participantRepository.Received(1).Add(Arg.Is<Participant>(p => p.Nickname == "Player1" && p.TokenHash == "token-hash"));
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    private Game OpenGame(string? organizerId = null)
+    {
+        var game = new Game(Guid.NewGuid(), "slug", "My Game", "pack", "brand", "en", 5, true, 1.5m, "CODE", DateTimeOffset.UtcNow);
+        game.Open();
+        if (organizerId is not null)
+        {
+            game.AssignToOrganizer(organizerId);
+        }
+
+        _gameRepository.GetByIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(game);
+        _tokenService.GenerateToken(Arg.Any<Guid>(), game.Id, Arg.Any<string>()).Returns(("raw-token", "token-hash"));
+        return game;
+    }
+
+    [Fact]
+    public async Task JoinGameAsync_WhenTheFreeLimitIsReached_ThrowsLimitReached()
+    {
+        var game = OpenGame("org-1");
+        _participantRepository.CountByGameIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(2);
+
+        var ex = await Should.ThrowAsync<ParticipantLimitReachedException>(() => _service.JoinGameAsync(new JoinGameCommand(game.Id, "Late")));
+
+        ex.Limit.ShouldBe(2);
+        _participantRepository.DidNotReceive().Add(Arg.Any<Participant>());
+    }
+
+    [Fact]
+    public async Task JoinGameAsync_WhenTheOrganizerIsACommunity_UsesTheCommunityLimit()
+    {
+        var game = OpenGame("org-1");
+        _communityRequests.IsApprovedAsync("org-1", Arg.Any<CancellationToken>()).Returns(true);
+        _participantRepository.CountByGameIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(4);
+
+        (await _service.JoinGameAsync(new JoinGameCommand(game.Id, "Fifth"))).ShouldBe("raw-token");
+
+        _participantRepository.CountByGameIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(5);
+        var ex = await Should.ThrowAsync<ParticipantLimitReachedException>(() => _service.JoinGameAsync(new JoinGameCommand(game.Id, "Sixth")));
+        ex.Limit.ShouldBe(5);
+    }
+
+    [Fact]
+    public async Task JoinGameAsync_WhenTheAdministratorRaisedTheLimit_UsesIt()
+    {
+        var game = OpenGame("org-1");
+        game.SetParticipantLimitOverride(1000, "Launch event");
+        _participantRepository.CountByGameIdAsync(game.Id, Arg.Any<CancellationToken>()).Returns(999);
+
+        (await _service.JoinGameAsync(new JoinGameCommand(game.Id, "Almost"))).ShouldBe("raw-token");
     }
 }

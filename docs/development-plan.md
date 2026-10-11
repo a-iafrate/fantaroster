@@ -270,11 +270,13 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 - [x] Security review: OWASP ASVS L1 checklist, rate limits, input validation, upload policies, signed tokens rotation, security headers, CSP compatible with Blazor; games belong to the organizer who created them. *(Done: strict CSP with nonce, security headers, per-path rate limits, ownership (`Game.OrganizerId`, migration `AddGameOrganizer` assigns existing games to the first organizer), edge validation of requests, Data Protection key ring configurable through `Security:DataProtection:KeysPath` (keys rotate every 90 days). Upload policies arrive with the photo reports (P1); the shared key ring on Azure with the deployment task.)*
 - [x] Privacy: privacy notice and terms (EN, IT), data retention job (photos 30 days after end), organizer data export and deletion. *(Terms and privacy pages (`/terms`, `/privacy`) linked from footer and sign in; organizer account page with JSON export and deletion of account and games. The photo retention job is not built because photos do not exist yet: it ships with the photo reports (P1), see `docs/design/open-questions.md`.)*
 - [x] Accessibility audit (automated with axe in Playwright + manual pass) to WCAG 2.2 AA. *(axe-core on every surface, light and dark, phone and laptop: `tests/Roster.E2E/AccessibilityTests.cs`, zero violations. The manual pass (screen reader, keyboard walkthrough) is still to do.)*
-- [ ] Azure provisioning with `azd` from the Aspire app model: Container Apps, Azure SQL, Storage, SignalR Service, Key Vault, Communication Services, Application Insights.
-- [ ] Custom domains and TLS for `fantaroster.com` and `imagiroster.com`.
-- [ ] CD pipeline: deploy on tag to a `staging` environment, manual approval to `production`.
+- [x] Azure provisioning with `azd` from the Aspire app model: Container Apps, Azure SQL, Storage, SignalR Service, Key Vault, Communication Services, Application Insights. *(Done, confirmed by the owner on 2026-10-11.)*
+- [x] Custom domains and TLS for `fantaroster.com` and `imagiroster.com`. *(Done, confirmed by the owner on 2026-10-11.)*
+- [x] CD pipeline: deploy on tag to a `staging` environment, manual approval to `production`. *(Done, confirmed by the owner on 2026-10-11.)*
 - [ ] Dashboards and alerts: join rate, hub connections, score latency, error rate.
 - [ ] Backup and restore test for the database.
+- [x] Plans and limits: participant limit per game (50 Free, 300 community, configurable), per-game limit set by an administrator (launch events), community request from the account page with approval by an administrator and an email with the decision. *(Done: `Game.EffectiveParticipantLimit`, `CommunityRequest`, migration `AddCommunityAndParticipantLimits`, join answers 403 when the game is full.)*
+- [x] Internal administration area (`Admin:Emails`): statistics dashboard, community requests, all games with their limit; hidden from everybody else. *(Done: `/admin`, `/admin/requests`, `/admin/games`; accessibility audited with axe.)*
 
 **Exit criteria**
 - Both brands served from production with correct theme, language and assets.
@@ -314,7 +316,7 @@ Prioritized by pilot feedback. Initial order:
 | 5 | Duplicate edition *(done early: dashboard card and game menu; rules, elements and sources are copied, people must consent again)* | 1 |
 | 6 | Google Sheets and ICS plugins | 3 |
 | 7 | Second public domain pack (Amateur sports or Events and parties) and a second real event outside conferences | 2 |
-| 8 | Payments for Premium and Pro plans | 5 |
+| 8 | Payments for Premium and Pro plans, and the Community plan (~€10 a year, bought only after authorization with an unlock code); the administrator per-game limit keeps working independently of plan and payment | 5 |
 | 9 | Passkeys for organizers | 2 |
 
 ### Phase 10 — P2 exploration
