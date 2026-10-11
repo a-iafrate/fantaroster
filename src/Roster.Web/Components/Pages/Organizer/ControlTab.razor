@@ -49,7 +49,7 @@
     else
     {
         <div class="ctl-action">
-            <button type="button" class="ds-btn ds-btn--l ds-btn--block @(Game.State == GameState.Live ? "ds-btn--danger" : "ds-btn--primary")" disabled="@_busy" @onclick="Advance">
+            <button type="button" class="ds-btn ds-btn--l ds-btn--block @(Game.State == GameState.Live ? "ds-btn--danger" : "ds-btn--primary")" disabled="@_busy" aria-busy="@(_busy ? "true" : null)" @onclick="Advance">
                 <i class="@ActionIcon" aria-hidden="true"></i>@ActionLabel
             </button>
             <p class="ds-muted ctl-action__note">@ActionNote</p>

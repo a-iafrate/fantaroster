@@ -51,7 +51,9 @@ public sealed class PrivacyTests(RosterAppFixture app)
     {
         var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
         var page = await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
-        await page.GotoAsync("/organizer/account");
+        // The account page is one click away in the side menu.
+        await page.GetByRole(AriaRole.Navigation).GetByRole(AriaRole.Link, new() { Name = "Account e privacy" }).ClickAsync();
+        await page.WaitForURLAsync("**/organizer/account");
         await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var download = await page.RunAndWaitForDownloadAsync(() => page.GetByRole(AriaRole.Link, new() { Name = "Scarica i miei dati" }).ClickAsync());
@@ -76,5 +78,34 @@ public sealed class PrivacyTests(RosterAppFixture app)
 
         await page.GotoAsync("/organizer");
         await page.WaitForURLAsync("**/login**");
+    }
+
+    [Fact]
+    public async Task The_sign_in_button_is_disabled_and_busy_once_pressed()
+    {
+        var page = await app.NewPageAsync(390, 844);
+        // A page that is leaving cannot be queried, so a recorder in the page notes what the button looked like, and the
+        // note is read from the page that follows.
+        await page.AddInitScriptAsync(
+            """
+            new MutationObserver(() => {
+                const busy = document.querySelector('button[type=submit][aria-busy=true]');
+                if (busy) {
+                    sessionStorage.setItem('busy', `${busy.disabled}|${busy.textContent.trim()}`);
+                }
+            }).observe(document, { subtree: true, attributes: true, childList: true, characterData: true });
+            """);
+        await page.GotoAsync("/login");
+        await page.Locator("#email").FillAsync($"busy-{Guid.NewGuid():N}@example.test");
+        await page.RouteAsync("**/login", async route =>
+        {
+            await Task.Delay(1000);
+            await route.ContinueAsync();
+        });
+
+        await page.GetByRole(AriaRole.Button, new() { Name = "Inviami il link" }).ClickAsync();
+        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Controlla la posta" })).ToBeVisibleAsync();
+
+        (await page.EvaluateAsync<string?>("() => sessionStorage.getItem('busy')")).ShouldBe("true|Invio in corso...");
     }
 }

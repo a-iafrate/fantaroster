@@ -1060,6 +1060,9 @@
   <data name="TermsS5Body" xml:space="preserve">
     <value>We may update these terms; the current version is always on this page.</value>
   </data>
+  <data name="AccountDeleting" xml:space="preserve">
+    <value>Deleting…</value>
+  </data>
 </root>
 
 

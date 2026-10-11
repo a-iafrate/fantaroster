@@ -59,7 +59,7 @@
                         <label for="email" class="ds-label">@Loc["LoginEmail"]</label>
                         <InputText id="email" @bind-Value="Email" class="ds-input" type="email" required autocomplete="email" inputmode="email" placeholder="@Loc["LoginEmailPlaceholder"]" />
                     </div>
-                    <button type="submit" disabled="@_isSubmitting" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary">
+                    <button type="submit" disabled="@_isSubmitting" aria-busy="@(_isSubmitting ? "true" : null)" data-busy-label="@Loc["LoginSending"]" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary">
                         <i class="icon-send" aria-hidden="true"></i>@(_isSubmitting ? Loc["LoginSending"] : Loc["LoginSend"])
                     </button>
                 </EditForm>

@@ -74,7 +74,7 @@
                                 <p class="ds-alert" id="nickname-error" role="alert">@_error</p>
                             }
                         </div>
-                        <button type="submit" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" disabled="@_submitting">
+                        <button type="submit" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" disabled="@_submitting" aria-busy="@(_submitting ? "true" : null)">
                             @(_submitting ? Loc["Joining"] : Loc["JoinButton"])
                         </button>
                         <p class="join__legal">@Loc["JoinLegal"]</p>

@@ -494,3 +494,38 @@
         animation: none;
     }
 }
+
+/* ---------- Busy button: disabled while the work runs, with a spinner ---------- */
+.ds-btn[aria-busy="true"] {
+    cursor: progress;
+}
+
+.ds-btn[aria-busy="true"]::before {
+    content: "";
+    flex: none;
+    width: 1em;
+    height: 1em;
+    margin-inline-end: var(--space-2);
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: ds-spin 0.7s linear infinite;
+}
+
+.ds-btn--primary[aria-busy="true"]:disabled {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+    opacity: 0.85;
+}
+
+.ds-btn--danger[aria-busy="true"]:disabled {
+    opacity: 0.85;
+}
+
+@keyframes ds-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+

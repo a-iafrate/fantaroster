@@ -109,7 +109,7 @@
                     {
                         <p class="ds-alert" role="alert">@_error</p>
                     }
-                    <button type="button" class="ref-confirm__btn" disabled="@_sending" @onclick="ConfirmAsync">
+                    <button type="button" class="ref-confirm__btn" disabled="@_sending" aria-busy="@(_sending ? "true" : null)" @onclick="ConfirmAsync">
                         @string.Format(Loc["Assign"], ParticipantFormat.Points(chosen.Points))
                     </button>
                 </div>

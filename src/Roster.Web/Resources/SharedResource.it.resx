@@ -1060,6 +1060,9 @@
   <data name="TermsS5Body" xml:space="preserve">
     <value>Possiamo aggiornare queste condizioni; la versione in vigore è sempre in questa pagina.</value>
   </data>
+  <data name="AccountDeleting" xml:space="preserve">
+    <value>Eliminazione…</value>
+  </data>
 </root>
 
 

@@ -97,7 +97,7 @@
         </ChildContent>
         <Actions>
             <button type="button" class="ds-btn ds-btn--secondary" @onclick="CancelDelete" disabled="@_isDeleting">@Loc["BtnCancel"]</button>
-            <button type="button" class="ds-btn ds-btn--danger" @onclick="ConfirmDeleteAsync" disabled="@_isDeleting">@Loc["DeleteGameConfirm"]</button>
+            <button type="button" class="ds-btn ds-btn--danger" @onclick="ConfirmDeleteAsync" disabled="@_isDeleting" aria-busy="@(_isDeleting ? "true" : null)">@Loc["DeleteGameConfirm"]</button>
         </Actions>
     </Modal>
 }

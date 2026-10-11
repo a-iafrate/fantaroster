@@ -76,7 +76,7 @@
                     {
                         <p class="ds-alert" role="alert">@_saveError</p>
                     }
-                    <button type="button" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" disabled="@(!CanSave(game) || _saving)" @onclick="SaveAsync">
+                    <button type="button" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary" disabled="@(!CanSave(game) || _saving)" aria-busy="@(_saving ? "true" : null)" @onclick="SaveAsync">
                         @(_saving ? Loc["Saving"] : Loc["SaveLineup"])
                     </button>
                 </div>

@@ -37,7 +37,7 @@
                 <p class="ds-alert ds-alert--success" role="status">@Loc["SettingsSaved"]</p>
             }
 
-            <button type="submit" class="ds-btn ds-btn--l ds-btn--primary" disabled="@_isSaving">@Loc["BtnSave"]</button>
+            <button type="submit" class="ds-btn ds-btn--l ds-btn--primary" disabled="@_isSaving" aria-busy="@(_isSaving ? "true" : null)">@Loc["BtnSave"]</button>
         </form>
     }
 </div>

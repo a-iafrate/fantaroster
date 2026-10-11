@@ -78,8 +78,11 @@
     else
     {
         <nav class="org-nav" aria-label="@Loc["MainNavLabel"]">
-            <a href="/organizer" class="org-nav-item" aria-current="@(IsAccountHome ? "page" : null)" @onclick="CloseDrawer">
+            <a href="/organizer" class="org-nav-item" aria-current="@(IsAccountHome && !OnAccountPage ? "page" : null)" @onclick="CloseDrawer">
                 <i class="icon-layout-grid" aria-hidden="true"></i><span>@Loc["DashboardTitle"]</span>
+            </a>
+            <a href="/organizer/account" class="org-nav-item" aria-current="@(OnAccountPage ? "page" : null)" @onclick="CloseDrawer">
+                <i class="icon-shield" aria-hidden="true"></i><span>@Loc["AccountMenuPrivacy"]</span>
             </a>
         </nav>
         <div class="org-plan">
@@ -136,6 +139,8 @@
     private int _pendingConsents => Context.PendingConsents;
 
     private bool IsAccountHome => _game is null;
+
+    private bool OnAccountPage => Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].TrimEnd('/').Equals("organizer/account", StringComparison.OrdinalIgnoreCase);
 
     protected override async Task OnInitializedAsync()
     {

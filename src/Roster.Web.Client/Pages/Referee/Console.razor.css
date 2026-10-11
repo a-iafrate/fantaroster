@@ -255,6 +255,25 @@
     cursor: pointer;
 }
 
+.ref-confirm__btn[aria-busy="true"]::before {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-inline-end: var(--space-2);
+    border: 3px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    vertical-align: -0.125em;
+    animation: ref-spin 0.7s linear infinite;
+}
+
+.ref-confirm__btn[aria-busy="true"]:disabled {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    opacity: 0.85;
+}
+
 .ref-confirm__btn:disabled {
     background: var(--color-line);
     color: var(--color-ink-2);
@@ -443,4 +462,10 @@
 
 .ref-menu-referee {
     font: var(--text-small);
+}
+
+@keyframes ref-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
