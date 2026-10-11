@@ -28,6 +28,14 @@ public sealed class RosterAppFixture : IAsyncLifetime
 
     public Uri BaseUrl { get; private set; } = null!;
 
+    /// <summary>
+    /// How the dashboard runs duplicate and delete: "Interactive" (default) or "Forms" (Organizer:GameActions).
+    /// Set ROSTER_E2E_GAME_ACTIONS=Forms to run the suite in the other mode.
+    /// </summary>
+    public string GameActionsMode { get; } = Environment.GetEnvironmentVariable("ROSTER_E2E_GAME_ACTIONS") is { Length: > 0 } mode ? mode : "Interactive";
+
+    public bool GameActionsAreForms => string.Equals(GameActionsMode, "Forms", StringComparison.OrdinalIgnoreCase);
+
     public IBrowser Browser { get; private set; } = null!;
 
     /// <summary>Database used by the app under test; tests seed their games here.</summary>
@@ -190,7 +198,12 @@ public sealed class RosterAppFixture : IAsyncLifetime
         // Never send real email from tests: without a connection string the app writes the magic link to its log.
         startInfo.Environment["AzureCommunicationServices__ConnectionString"] = string.Empty;
         // Local SignalR: tests must never talk to the Azure SignalR Service configured in appsettings.
-        startInfo.Environment["Azure__SignalR__ConnectionString"] = string.Empty;
+        // ROSTER_E2E_KEEP_SIGNALR=1 keeps the SignalR service configured in appsettings (to reproduce what runs for real).
+        if (Environment.GetEnvironmentVariable("ROSTER_E2E_KEEP_SIGNALR") != "1")
+        {
+            startInfo.Environment["Azure__SignalR__ConnectionString"] = string.Empty;
+        }
+        startInfo.Environment["Organizer__GameActions"] = GameActionsMode;
         // Every test signs in from the same address: the production limit on sign-in would stop the suite.
         startInfo.Environment["Security__RateLimits__LoginPer10Minutes"] = "10000";
         startInfo.Environment["Security__RateLimits__MagicLinkVerifyPer5Minutes"] = "10000";

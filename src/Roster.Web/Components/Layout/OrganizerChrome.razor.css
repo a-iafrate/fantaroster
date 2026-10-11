@@ -255,6 +255,14 @@
     margin-top: var(--space-3);
 }
 
+.org-account > summary {
+    list-style: none;
+}
+
+.org-account > summary::-webkit-details-marker {
+    display: none;
+}
+
 .org-account-btn {
     display: flex;
     align-items: center;

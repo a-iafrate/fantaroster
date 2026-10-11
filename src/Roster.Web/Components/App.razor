@@ -1,4 +1,5 @@
 @inject IBrandAccessor Brand
+@inject IStringLocalizer<SharedResource> Loc
 <!DOCTYPE html>
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-brand="@Brand.Current.Id">
 
@@ -25,10 +26,15 @@
 </head>
 
 <body>
+    @* Shown by boot.js when the real-time connection of an interactive page cannot be established. *@
+    <div id="circuit-error" class="circuit-error" role="alert" hidden>
+        <span>@Loc["CircuitErrorText"]</span>
+        <button type="button" class="ds-btn ds-btn--secondary" data-circuit-reload>@Loc["CircuitErrorReload"]</button>
+    </div>
     <Routes />
     <ReconnectModal />
     <script src="@Assets["js/boot.js"]"></script>
-    <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="@Assets["_framework/blazor.web.js"]" autostart="false"></script>
 </body>
 
 </html>

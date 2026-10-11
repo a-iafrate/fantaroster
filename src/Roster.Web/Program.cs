@@ -28,6 +28,7 @@ builder.Services.AddDbContext<RosterDbContext>(options =>
 builder.Services.AddScoped<IResyncService, ResyncService>();
 builder.Services.AddScoped<IGameCreationService, GameCreationService>();
 builder.Services.AddScoped<GameLifecycleService>();
+builder.Services.AddScoped<GameDuplicationService>();
 builder.Services.AddScoped<GameSettingsService>();
 builder.Services.AddScoped<ElementManagementService>();
 builder.Services.AddScoped<RuleManagementService>();
@@ -42,7 +43,12 @@ builder.Services.AddScoped<ScoreManagementService>();
 builder.Services.AddSingleton<Roster.Application.Games.Queries.LeaderboardStateStore>();
 builder.Services.AddSingleton(TimeProvider.System);
 
-var azureSignalRConnectionString = builder.Configuration["Azure:SignalR:ConnectionString"];
+// The Azure SignalR Service carries every connection, the Blazor circuits of the organizer console included. Its free tier
+// stops answering (HTTP 429 "Connection count reaches limit") once 20 connections are open or the daily quota is used, and the
+// pages then look dead: buttons do nothing. Locally the app uses the built-in SignalR unless Azure:SignalR:UseInDevelopment is true.
+var azureSignalRConnectionString = builder.Environment.IsDevelopment() && !builder.Configuration.GetValue<bool>("Azure:SignalR:UseInDevelopment")
+    ? null
+    : builder.Configuration["Azure:SignalR:ConnectionString"];
 
 if (!string.IsNullOrWhiteSpace(azureSignalRConnectionString))
 {
@@ -153,7 +159,7 @@ if (app.Configuration.GetValue<bool>("Security:TrustForwardedHeaders"))
 }
 
 app.UseMiddleware<Roster.Web.Security.SecurityHeadersMiddleware>(
-    (IReadOnlyCollection<string>)Roster.Web.Security.ContentSecurityPolicy.ConnectSourcesFor(app.Configuration["Azure:SignalR:ConnectionString"]).ToList());
+    (IReadOnlyCollection<string>)Roster.Web.Security.ContentSecurityPolicy.ConnectSourcesFor(azureSignalRConnectionString).ToList());
 app.UseMiddleware<BrandMiddleware>();
 
 var localizationOptions = new RequestLocalizationOptions
@@ -197,6 +203,7 @@ app.MapRazorComponents<App>()
 
 app.MapAuthEndpoints();
 app.MapAccountEndpoints();
+app.MapGameActionEndpoints();
 app.MapRefereeEndpoints();
 app.MapParticipantEndpoints();
 

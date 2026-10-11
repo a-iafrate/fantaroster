@@ -83,7 +83,7 @@
     <value>Free Plan</value>
   </data>
   <data name="PlanFreeDesc" xml:space="preserve">
-    <value>1 live game, up to 50 players.</value>
+    <value>1 live game, up to 150 players.</value>
   </data>
   <data name="PlanUpgrade" xml:space="preserve">
     <value>Upgrade to Event</value>
@@ -1061,6 +1061,36 @@
     <value>We may update these terms; the current version is always on this page.</value>
   </data>
   <data name="AccountDeleting" xml:space="preserve">
+    <value>Deleting…</value>
+  </data>
+  <data name="DuplicateMenu" xml:space="preserve">
+    <value>Duplicate</value>
+  </data>
+  <data name="DuplicateNone" xml:space="preserve">
+    <value>You have no games to duplicate yet.</value>
+  </data>
+  <data name="DuplicatePickTitle" xml:space="preserve">
+    <value>Which game do you want to start from?</value>
+  </data>
+  <data name="DuplicateNameFormat" xml:space="preserve">
+    <value>{0} (copy)</value>
+  </data>
+  <data name="DuplicateFailed" xml:space="preserve">
+    <value>The game could not be duplicated.</value>
+  </data>
+  <data name="CircuitErrorText" xml:space="preserve">
+    <value>The live connection to the server could not be established, so some buttons on this page will not work.</value>
+  </data>
+  <data name="CircuitErrorReload" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="DeleteGameFailed" xml:space="preserve">
+    <value>The game could not be deleted.</value>
+  </data>
+  <data name="DeleteGameDone" xml:space="preserve">
+    <value>Game deleted.</value>
+  </data>
+  <data name="DeleteGameBusy" xml:space="preserve">
     <value>Deleting…</value>
   </data>
 </root>

@@ -164,12 +164,7 @@ public sealed partial class AccessibilityTests(RosterAppFixture app)
             await AuditAsync(page, $"drawer {width} {scheme}", problems);
         }
 
-        var account = page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Menu account") });
-        for (var attempt = 0; attempt < 10 && await page.GetByRole(AriaRole.Group, new() { Name = "Menu account" }).CountAsync() == 0; attempt++)
-        {
-            await account.First.ClickAsync();
-            await page.WaitForTimeoutAsync(500);
-        }
+        await page.Locator("summary.org-account-btn").ClickAsync();
         await Expect(page.GetByRole(AriaRole.Group, new() { Name = "Menu account" })).ToBeVisibleAsync();
         await AuditAsync(page, $"account menu {width} {scheme}", problems);
 

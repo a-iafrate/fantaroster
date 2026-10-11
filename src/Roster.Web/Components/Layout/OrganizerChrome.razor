@@ -91,8 +91,9 @@
         </div>
     }
 
-    <div class="org-account">
-        <button type="button" class="org-account-btn" aria-expanded="@(_account ? "true" : "false")" @onclick="ToggleAccount">
+    @* A native disclosure: it opens at once, before the interactive circuit is up; boot.js closes it on outside click, Escape and navigation. *@
+    <details class="org-account" data-menu>
+        <summary class="org-account-btn">
             <span class="org-avatar" aria-hidden="true">@_initials</span>
             <span class="org-account-info">
                 <span class="org-account-name">@_displayName</span>
@@ -100,24 +101,21 @@
             </span>
             <i class="icon-chevrons-up-down" aria-hidden="true"></i>
             <span class="visually-hidden">@Loc["AccountMenu"]</span>
-        </button>
-        @if (_account)
-        {
-            <div class="org-menu" role="group" aria-label="@Loc["AccountMenu"]">
-                <LanguageToggle CssClass="org-menu-item" ShowCaption="true" />
-                <ThemeToggle CssClass="org-menu-item" ShowCaption="true" />
-                <hr class="ds-menu-separator" />
-                <a href="/organizer/account" class="org-menu-item" @onclick="CloseAccount">
-                    <i class="icon-shield" aria-hidden="true"></i><span>@Loc["AccountMenuPrivacy"]</span>
-                </a>
-                <form method="post" action="/auth/logout">
-                    <button type="submit" class="org-menu-item org-menu-item--danger">
-                        <i class="icon-log-out" aria-hidden="true"></i><span>@Loc["SignOut"]</span>
-                    </button>
-                </form>
-            </div>
-        }
-    </div>
+        </summary>
+        <div class="org-menu" role="group" aria-label="@Loc["AccountMenu"]">
+            <LanguageToggle CssClass="org-menu-item" ShowCaption="true" />
+            <ThemeToggle CssClass="org-menu-item" ShowCaption="true" />
+            <hr class="ds-menu-separator" />
+            <a href="/organizer/account" class="org-menu-item">
+                <i class="icon-shield" aria-hidden="true"></i><span>@Loc["AccountMenuPrivacy"]</span>
+            </a>
+            <form method="post" action="/auth/logout">
+                <button type="submit" class="org-menu-item org-menu-item--danger">
+                    <i class="icon-log-out" aria-hidden="true"></i><span>@Loc["SignOut"]</span>
+                </button>
+            </form>
+        </div>
+    </details>
 </aside>
 
 @code {
@@ -129,7 +127,6 @@
     private string _email = string.Empty;
     private string _initials = string.Empty;
     private bool _drawer;
-    private bool _account;
     private Guid? _gameId;
     private string _section = string.Empty;
 
@@ -166,7 +163,6 @@
         InvokeAsync(() =>
         {
             _drawer = false;
-            _account = false;
             ReadRoute();
             StateHasChanged();
         });
@@ -236,12 +232,8 @@
     {
         _restoreFocus = _drawer;
         _drawer = false;
-        _account = false;
     }
 
-    private void ToggleAccount() => _account = !_account;
-
-    private void CloseAccount() => _account = false;
 
     private void OnKeyDown(KeyboardEventArgs e)
     {

@@ -77,7 +77,8 @@ public sealed class OrganizerTests(RosterAppFixture app)
         var page = await app.NewOrganizerPageAsync(1280, 800);
         await WaitForInteractiveAsync(page);
 
-        await ClickUntilVisibleAsync(page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Menu account") }), page.GetByRole(AriaRole.Group, new() { Name = "Menu account" }));
+        await page.Locator("summary.org-account-btn").ClickAsync();
+        await Expect(page.GetByRole(AriaRole.Group, new() { Name = "Menu account" })).ToBeVisibleAsync();
         var theme = page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Tema") });
         await theme.ClickAsync();
         await Expect(page.Locator("html")).ToHaveAttributeAsync("data-theme-preference", "light");
@@ -203,14 +204,108 @@ public sealed class OrganizerTests(RosterAppFixture app)
     {
         var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
         var owner = await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
-        await Expect(owner.GetByText(TestScenario.Conference.GameName).First).ToBeVisibleAsync();
+        await Expect(owner.GetByRole(AriaRole.Link, new() { Name = TestScenario.Conference.GameName, Exact = true }).First).ToBeVisibleAsync();
         var other = await app.NewOrganizerPageAsync(1280, 800);
         await WaitForInteractiveAsync(other);
 
-        await Expect(other.GetByText(TestScenario.Conference.GameName)).ToHaveCountAsync(0);
+        await Expect(other.GetByRole(AriaRole.Link, new() { Name = TestScenario.Conference.GameName, Exact = true })).ToHaveCountAsync(0);
 
         await other.GotoAsync($"/organizer/games/{game.Id}");
         await WaitForInteractiveAsync(other);
         await Expect(other.GetByText("Partita non trovata.")).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task A_game_is_duplicated_from_the_dashboard_into_a_new_edition()
+    {
+        var scenario = TestScenario.Tournament;
+        var game = await TestData.SeedGameAsync(app.ConnectionString, scenario, TestGameState.Live);
+        var page = await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
+        await WaitForInteractiveAsync(page);
+
+        if (app.GameActionsAreForms)
+        {
+            // No wait for the interactive connection: the card is a native menu and the choice a plain form.
+            await page.GetByText("Duplica un'edizione").ClickAsync();
+            await page.GetByRole(AriaRole.Button, new() { Name = scenario.GameName }).ClickAsync();
+        }
+        else
+        {
+            var card = page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Duplica un'edizione") });
+            await ClickUntilVisibleAsync(card, page.GetByRole(AriaRole.Dialog));
+            await page.GetByRole(AriaRole.Dialog).GetByRole(AriaRole.Button, new() { Name = scenario.GameName }).ClickAsync();
+        }
+
+        await page.WaitForURLAsync(new Regex(@"/organizer/games/(?!" + game.Id + ")[0-9a-f-]{36}$"));
+        await page.GotoAsync("/organizer");
+        await Expect(page.GetByRole(AriaRole.Link, new() { Name = $"{scenario.GameName} (copia)", Exact = true })).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task A_game_is_deleted_from_its_menu_after_a_confirmation()
+    {
+        var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
+        var page = await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
+        await WaitForInteractiveAsync(page);
+
+        await page.Locator("details.dash-menu > summary").First.ClickAsync();
+        if (app.GameActionsAreForms)
+        {
+            await page.GetByText("Elimina", new() { Exact = true }).ClickAsync();
+            await Expect(page.GetByText("non può essere annullata")).ToBeVisibleAsync();
+        }
+        else
+        {
+            await page.GetByRole(AriaRole.Button, new() { Name = "Elimina", Exact = true }).ClickAsync();
+            await Expect(page.GetByRole(AriaRole.Dialog)).ToBeVisibleAsync();
+        }
+
+        await page.GetByRole(AriaRole.Button, new() { Name = "Sì, elimina tutto" }).ClickAsync();
+
+        await Expect(page.GetByText("Nessuna partita qui.")).ToBeVisibleAsync();
+        (await TestData.GameExistsAsync(app.ConnectionString, game.Id)).ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task The_form_endpoints_leave_the_games_of_other_organizers_alone()
+    {
+        var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
+        var other = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Tournament, TestGameState.Open);
+        var page = await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
+
+        var response = await page.APIRequest.PostAsync($"/organizer/actions/games/{other.Id}/delete", new() { MaxRedirects = 0 });
+
+        response.Status.ShouldBe(302);
+        (await TestData.GameExistsAsync(app.ConnectionString, other.Id)).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Without_the_live_connection_the_page_says_so_and_the_game_menu_still_opens()
+    {
+        var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
+        var page = await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
+        // The connection service refuses the circuit, as it does when its quota is used up.
+        await page.RouteAsync("**/_blazor/negotiate**", route => route.FulfillAsync(new() { Status = 429, Body = "Connection count reaches limit." }));
+        await page.ReloadAsync();
+
+        await Expect(page.GetByRole(AriaRole.Alert).Filter(new() { HasText = "connessione in tempo reale" })).ToBeVisibleAsync();
+
+        // A native menu: no circuit needed to open it, and the link in it works.
+        await page.Locator("details.dash-menu > summary").First.ClickAsync();
+        var open = page.GetByRole(AriaRole.Link, new() { Name = "Apri", Exact = true });
+        await Expect(open.First).ToBeVisibleAsync();
+        await app.ScreenshotAsync(page, "organizer-game-menu");
+
+        if (app.GameActionsAreForms)
+        {
+            // Duplicating is a plain form post in this mode: it works with the connection down.
+            await page.GetByRole(AriaRole.Button, new() { Name = "Duplica", Exact = true }).ClickAsync();
+            await page.WaitForURLAsync(new Regex(@"/organizer/games/(?!" + game.Id + ")[0-9a-f-]{36}$"));
+        }
+        else
+        {
+            await open.First.ClickAsync();
+            await page.WaitForURLAsync(new Regex($"/organizer/games/{game.Id}$"));
+        }
     }
 }

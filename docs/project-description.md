@@ -399,7 +399,7 @@ These apply to every domain, with extra rules where needed.
 
 | Plan | For whom | Price hypothesis |
 |---|---|---|
-| **Free** | Small groups, community events | Free up to ~30 participants for private games, ~300 for community events, with a "powered by" mark |
+| **Free** | Small groups, community events | Free up to 150 participants per game, with a "powered by" mark |
 | **Premium game** | Parties, weddings, tournaments, groups of friends | €3–9 per game, depending on participants |
 | **Pro event** | Commercial conferences, corporate events | €99–299 per event |
 | **Sponsor** | Event sponsors | Bonus and report package, sold through the organizer |

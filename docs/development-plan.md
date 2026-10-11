@@ -311,7 +311,7 @@ Prioritized by pilot feedback. Initial order:
 | 2 | Multiple referees with scope (elements or groups) | 2 |
 | 3 | Outputs: social card image, CSV export, outgoing webhook | 3 |
 | 4 | Sponsor bonus (QR, single claim, sponsor report, consent for contacts) | 3 |
-| 5 | Duplicate edition | 1 |
+| 5 | Duplicate edition *(done early: dashboard card and game menu; rules, elements and sources are copied, people must consent again)* | 1 |
 | 6 | Google Sheets and ICS plugins | 3 |
 | 7 | Second public domain pack (Amateur sports or Events and parties) and a second real event outside conferences | 2 |
 | 8 | Payments for Premium and Pro plans | 5 |

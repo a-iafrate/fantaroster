@@ -90,3 +90,7 @@ Decisions taken while implementing the mockups. When a mockup and the documentat
 - The organizer account menu is a group of links and buttons, not an ARIA `menu` (a menu would require every child to be a menu item, including the language and theme toggles).
 - Manual accessibility pass (screen reader, keyboard-only walkthrough) is still to do; axe covers what can be automated.
 
+## Dashboard game actions (October 2026)
+
+- Duplicate and delete on the organizer dashboard have two modes, chosen with `Organizer:GameActions`: `Interactive` (default: dialogs over the live Blazor connection) and `Forms` (plain form posts to `/organizer/actions/games/{id}/duplicate|delete`, which also work when the live connection is down). The endpoints check ownership in both modes. The E2E suite runs in the default mode; set `ROSTER_E2E_GAME_ACTIONS=Forms` to run it in the other. Decide which one stays once the live connection (Azure SignalR) is reliable in production.
+

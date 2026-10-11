@@ -11,10 +11,26 @@
 @inject IGameRepository GameRepository
 @inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthState
 @inject Roster.Application.Services.GameLifecycleService LifecycleService
+@inject Roster.Application.Services.GameDuplicationService DuplicationService
+@inject NavigationManager Navigation
+@inject IConfiguration Configuration
 @inject IDomainPackLoader DomainPacks
 @inject IStringLocalizer<SharedResource> Loc
 
 <PageTitle>@Loc["DashboardTitle"]</PageTitle>
+
+@if (Error == "duplicate")
+{
+    <p class="ds-alert dash-notice" role="alert">@Loc["DuplicateFailed"]</p>
+}
+else if (Error == "delete")
+{
+    <p class="ds-alert dash-notice" role="alert">@Loc["DeleteGameFailed"]</p>
+}
+else if (Deleted == "1")
+{
+    <p class="ds-alert ds-alert--success dash-notice" role="status">@Loc["DeleteGameDone"]</p>
+}
 
 <div class="ds-page">
     <header class="ds-page-header">
@@ -47,9 +63,43 @@
                 <li class="dash-card">
                     <div class="dash-card__top">
                         <span class="dash-status"><span class="dash-dot dash-dot--@StateClass(game.State)" aria-hidden="true"></span>@Loc["State" + game.State]</span>
-                        <button type="button" class="ds-icon-btn dash-card__menu" aria-label="@string.Format(Loc["GameActions"], game.Name)" aria-haspopup="dialog" @onclick="() => _menuGame = game">
-                            <i class="icon-ellipsis" aria-hidden="true"></i>
-                        </button>
+                        @if (UseForms)
+                        {
+                        @* A native disclosure: it opens without the interactive circuit; boot.js closes it. *@
+                        <details class="dash-menu" data-menu>
+                            <summary class="ds-icon-btn dash-card__menu" aria-label="@string.Format(Loc["GameActions"], game.Name)">
+                                <i class="icon-ellipsis" aria-hidden="true"></i>
+                            </summary>
+                            <div class="dash-menu__panel">
+                                <a class="ds-menu-item" href="/organizer/games/@game.Id"><i class="icon-external-link" aria-hidden="true"></i><span>@(game.State == GameState.Live ? Loc["ManageLive"] : Loc["OpenGame"])</span></a>
+                                <form method="post" action="/organizer/actions/games/@game.Id/duplicate">
+                                    <button type="submit" class="ds-menu-item"><i class="icon-copy" aria-hidden="true"></i><span>@Loc["DuplicateMenu"]</span></button>
+                                </form>
+                                @* Deleting asks first, without scripts: a nested disclosure holds the warning and the real button. *@
+                                <details class="dash-delete">
+                                    <summary class="ds-menu-item ds-menu-item--danger"><i class="icon-trash-2" aria-hidden="true"></i><span>@Loc["DeleteGameMenu"]</span></summary>
+                                    <form method="post" action="/organizer/actions/games/@game.Id/delete" class="dash-delete__form">
+                                        <p class="ds-muted">@string.Format(Loc["DeleteGameWarning"], game.Name)</p>
+                                        <button type="submit" class="ds-btn ds-btn--danger ds-btn--block" data-busy-label="@Loc["DeleteGameBusy"]">@Loc["DeleteGameConfirm"]</button>
+                                    </form>
+                                </details>
+                            </div>
+                        </details>
+                        }
+                        else
+                        {
+                        @* A native disclosure: it opens without the interactive circuit; boot.js closes it. *@
+                        <details class="dash-menu" data-menu>
+                            <summary class="ds-icon-btn dash-card__menu" aria-label="@string.Format(Loc["GameActions"], game.Name)">
+                                <i class="icon-ellipsis" aria-hidden="true"></i>
+                            </summary>
+                            <div class="dash-menu__panel">
+                                <a class="ds-menu-item" href="/organizer/games/@game.Id"><i class="icon-external-link" aria-hidden="true"></i><span>@(game.State == GameState.Live ? Loc["ManageLive"] : Loc["OpenGame"])</span></a>
+                                <button type="button" class="ds-menu-item" data-menu-close @onclick="() => DuplicateAsync(game)"><i class="icon-copy" aria-hidden="true"></i><span>@Loc["DuplicateMenu"]</span></button>
+                                <button type="button" class="ds-menu-item ds-menu-item--danger" data-menu-close @onclick="() => AskDelete(game)"><i class="icon-trash-2" aria-hidden="true"></i><span>@Loc["DeleteGameMenu"]</span></button>
+                            </div>
+                        </details>
+                        }
                     </div>
                     <a class="dash-card__name" href="/organizer/games/@game.Id">@game.Name</a>
                     <div class="ds-muted dash-card__meta">@PackName(game)</div>
@@ -59,11 +109,40 @@
                     </div>
                 </li>
             }
+            @if (UseForms)
+            {
             <li class="dash-card dash-card--ghost">
-                <i class="icon-copy" aria-hidden="true"></i>
-                <div class="dash-card__name">@Loc["DuplicateTitle"]</div>
-                <div class="ds-muted">@Loc["DuplicateDesc"]</div>
+                <details class="dash-menu dash-ghost" data-menu>
+                    <summary class="dash-ghost__summary" aria-disabled="@(Games.Count == 0 ? "true" : null)">
+                        <i class="icon-copy" aria-hidden="true"></i>
+                        <span class="dash-card__name">@Loc["DuplicateTitle"]</span>
+                        <span class="ds-muted">@(Games.Count == 0 ? Loc["DuplicateNone"] : Loc["DuplicateDesc"])</span>
+                    </summary>
+                    @if (Games.Count > 0)
+                    {
+                        <div class="dash-menu__panel dash-ghost__panel">
+                            <p class="dash-ghost__title">@Loc["DuplicatePickTitle"]</p>
+                            @foreach (var game in Games)
+                            {
+                                <form method="post" action="/organizer/actions/games/@game.Id/duplicate">
+                                    <button type="submit" class="ds-menu-item"><i class="icon-copy" aria-hidden="true"></i><span>@game.Name</span></button>
+                                </form>
+                            }
+                        </div>
+                    }
+                </details>
             </li>
+            }
+            else
+            {
+            <li class="dash-card dash-card--ghost">
+                <button type="button" class="dash-ghost-btn" disabled="@(Games.Count == 0)" aria-haspopup="dialog" @onclick="OpenDuplicate">
+                    <i class="icon-copy" aria-hidden="true"></i>
+                    <span class="dash-card__name">@Loc["DuplicateTitle"]</span>
+                    <span class="ds-muted">@(Games.Count == 0 ? Loc["DuplicateNone"] : Loc["DuplicateDesc"])</span>
+                </button>
+            </li>
+            }
         </ul>
 
         @if (!Filtered().Any())
@@ -75,17 +154,29 @@
 
 <a href="/organizer/create-game" class="ds-btn ds-btn--l ds-btn--primary ds-fab"><i class="icon-plus" aria-hidden="true"></i>@Loc["NewGame"]</a>
 
-@if (_menuGame is { } menuGame)
+@if (!UseForms && _picker)
 {
-    <button type="button" class="ds-scrim" tabindex="-1" aria-label="@Loc["BtnClose"]" @onclick="() => _menuGame = null"></button>
-    <div class="ds-sheet" role="dialog" aria-modal="true" aria-label="@menuGame.Name">
-        <div class="ds-sheet__grabber" aria-hidden="true"></div>
-        <a class="ds-menu-item" href="/organizer/games/@menuGame.Id"><i class="icon-external-link" aria-hidden="true"></i><span>@(menuGame.State == GameState.Live ? Loc["ManageLive"] : Loc["OpenGame"])</span></a>
-        <button type="button" class="ds-menu-item ds-menu-item--danger" @onclick="() => AskDelete(menuGame)"><i class="icon-trash-2" aria-hidden="true"></i><span>@Loc["DeleteGameMenu"]</span></button>
-    </div>
+    <Modal Title="@Loc["DuplicatePickTitle"]" CloseLabel="@Loc["BtnCancel"]" OnClose="() => _picker = false">
+        <ChildContent>
+            @if (!string.IsNullOrEmpty(_duplicateError))
+            {
+                <p class="ds-alert" role="alert">@_duplicateError</p>
+            }
+            <ul class="dash-pick">
+                @foreach (var game in Games ?? [])
+                {
+                    <li>
+                        <button type="button" class="ds-menu-item" disabled="@_isDuplicating" @onclick="() => DuplicateAsync(game)">
+                            <i class="icon-copy" aria-hidden="true"></i><span>@game.Name</span>
+                        </button>
+                    </li>
+                }
+            </ul>
+        </ChildContent>
+    </Modal>
 }
 
-@if (_gameToDelete is { } toDelete)
+@if (!UseForms && _gameToDelete is { } toDelete)
 {
     <Modal Title="@Loc["DeleteGameTitle"]" CloseLabel="@Loc["BtnCancel"]" OnClose="CancelDelete">
         <ChildContent>
@@ -103,18 +194,33 @@
 }
 
 @code {
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
+
+    [SupplyParameterFromQuery(Name = "deleted")]
+    public string? Deleted { get; set; }
+
     private enum GameFilter { All, Live, Preparing, Ended }
 
     private static readonly GameFilter[] Filters = [GameFilter.All, GameFilter.Live, GameFilter.Preparing, GameFilter.Ended];
 
     private List<Game>? Games;
     private GameFilter _filter = GameFilter.All;
-    private Game? _menuGame;
+
+    private string? _organizerId;
     private Game? _gameToDelete;
     private bool _isDeleting;
     private string? _deleteError;
+    private bool _picker;
+    private bool _isDuplicating;
+    private string? _duplicateError;
 
-    private string? _organizerId;
+    /// <summary>
+    /// How duplicate and delete work: "Interactive" (default) runs them over the live connection with dialogs;
+    /// "Forms" posts plain forms to the server, so they also work when the live connection is down.
+    /// Set with Organizer:GameActions.
+    /// </summary>
+    private bool UseForms => string.Equals(Configuration["Organizer:GameActions"], "Forms", StringComparison.OrdinalIgnoreCase);
 
     protected override async Task OnInitializedAsync()
     {
@@ -162,9 +268,40 @@
             : (pack.Name.TryGetValue(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, out var name) ? name : pack.Name.Values.FirstOrDefault() ?? game.DomainPackId);
     }
 
+    private void OpenDuplicate()
+    {
+        _duplicateError = null;
+        _picker = true;
+    }
+
+    private async Task DuplicateAsync(Game game)
+    {
+        if (_isDuplicating || _organizerId is null)
+        {
+            return;
+        }
+
+        _isDuplicating = true;
+        try
+        {
+            var id = await DuplicationService.DuplicateAsync(game.Id, _organizerId, string.Format(CultureInfo.CurrentCulture, Loc["DuplicateNameFormat"].Value, game.Name));
+            if (id is null)
+            {
+                _duplicateError = Loc["DuplicateFailed"];
+                _picker = true;
+                return;
+            }
+
+            Navigation.NavigateTo($"/organizer/games/{id}");
+        }
+        finally
+        {
+            _isDuplicating = false;
+        }
+    }
+
     private void AskDelete(Game game)
     {
-        _menuGame = null;
         _deleteError = null;
         _gameToDelete = game;
     }
@@ -179,7 +316,8 @@
 
     private async Task ConfirmDeleteAsync()
     {
-        if (_gameToDelete is null || _isDeleting)
+        // The list holds only the games of the organizer, and ownership is checked again before deleting.
+        if (_gameToDelete is null || _isDeleting || !_gameToDelete.IsOwnedBy(_organizerId))
         {
             return;
         }

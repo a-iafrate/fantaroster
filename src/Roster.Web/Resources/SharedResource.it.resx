@@ -83,7 +83,7 @@
     <value>Piano Gratis</value>
   </data>
   <data name="PlanFreeDesc" xml:space="preserve">
-    <value>1 partita live, fino a 50 giocatori.</value>
+    <value>1 partita live, fino a 150 giocatori.</value>
   </data>
   <data name="PlanUpgrade" xml:space="preserve">
     <value>Passa a Evento</value>
@@ -1061,6 +1061,36 @@
     <value>Possiamo aggiornare queste condizioni; la versione in vigore è sempre in questa pagina.</value>
   </data>
   <data name="AccountDeleting" xml:space="preserve">
+    <value>Eliminazione…</value>
+  </data>
+  <data name="DuplicateMenu" xml:space="preserve">
+    <value>Duplica</value>
+  </data>
+  <data name="DuplicateNone" xml:space="preserve">
+    <value>Non hai ancora partite da duplicare.</value>
+  </data>
+  <data name="DuplicatePickTitle" xml:space="preserve">
+    <value>Da quale partita vuoi partire?</value>
+  </data>
+  <data name="DuplicateNameFormat" xml:space="preserve">
+    <value>{0} (copia)</value>
+  </data>
+  <data name="DuplicateFailed" xml:space="preserve">
+    <value>Non è stato possibile duplicare la partita.</value>
+  </data>
+  <data name="CircuitErrorText" xml:space="preserve">
+    <value>Non è stato possibile stabilire la connessione in tempo reale con il server, quindi alcuni pulsanti di questa pagina non funzioneranno.</value>
+  </data>
+  <data name="CircuitErrorReload" xml:space="preserve">
+    <value>Riprova</value>
+  </data>
+  <data name="DeleteGameFailed" xml:space="preserve">
+    <value>Non è stato possibile eliminare la partita.</value>
+  </data>
+  <data name="DeleteGameDone" xml:space="preserve">
+    <value>Partita eliminata.</value>
+  </data>
+  <data name="DeleteGameBusy" xml:space="preserve">
     <value>Eliminazione…</value>
   </data>
 </root>
