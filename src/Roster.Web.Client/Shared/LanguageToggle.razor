@@ -1,0 +1,46 @@
+@using System.Globalization
+@inject NavigationManager Navigation
+@inject IStringLocalizer<ParticipantResource> Loc
+
+@* A plain link: /culture/set remembers the language in a cookie and comes back. It works in static pages and in every render mode.
+   Shows the current language; activating it switches to the other one. With a caption it renders as a menu row. *@
+<a class="@CssClass" href="@Href" data-enhance-nav="false" hreflang="@Other" aria-label="@string.Format(Loc["LanguageToggleAria"], CurrentName, OtherName)">
+    <i class="icon-globe" aria-hidden="true"></i>
+    @if (ShowCaption)
+    {
+        <span>@Loc["LanguageCaption"]</span>
+        <span class="ds-menu-item__value">@CurrentName</span>
+    }
+    else
+    {
+        <span>@CurrentName</span>
+    }
+</a>
+
+@code {
+    private static readonly string[] Supported = ["en", "it"];
+
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    /// <summary>Shows the word "Language" before the current language, for menus.</summary>
+    [Parameter]
+    public bool ShowCaption { get; set; }
+
+    private string Current => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    private string Other => Supported.FirstOrDefault(c => !string.Equals(c, Current, StringComparison.OrdinalIgnoreCase)) ?? "en";
+
+    private string CurrentName => NameOf(Current);
+
+    private string OtherName => NameOf(Other);
+
+    private string Href => $"/culture/set?culture={Other}&returnUrl={Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri))}";
+
+    /// <summary>Each language is written in itself, so people can always find theirs.</summary>
+    private static string NameOf(string culture) => culture switch
+    {
+        "it" => "Italiano",
+        _ => "English",
+    };
+}

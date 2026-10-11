@@ -136,6 +136,22 @@ public sealed class RosterAppFixture : IAsyncLifetime
         }
     }
 
+    /// <summary>
+    /// A page that reaches the app through another host name, e.g. "imagiroster.localhost": the app picks the brand from the
+    /// host, and Chromium resolves every *.localhost name to the loopback address.
+    /// </summary>
+    public async Task<IPage> NewPageForHostAsync(string host, int width = 390, int height = 844, ColorScheme colorScheme = ColorScheme.Light, string locale = "en-US")
+    {
+        var context = await Browser.NewContextAsync(new BrowserNewContextOptions
+        {
+            BaseURL = new UriBuilder(BaseUrl) { Host = host }.Uri.ToString(),
+            ViewportSize = new ViewportSize { Width = width, Height = height },
+            ColorScheme = colorScheme,
+            Locale = locale,
+        });
+        return await context.NewPageAsync();
+    }
+
     private async Task<Uri> StartServerAsync()
     {
         var port = GetFreePort();

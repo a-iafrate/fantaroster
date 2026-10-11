@@ -1,10 +1,12 @@
+@inject IBrandAccessor Brand
 <!DOCTYPE html>
-<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-brand="@Brand.Current.Id">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <base href="/" />
+    <meta name="theme-color" content="@Brand.Current.ThemeColor" />
     <script src="@Assets["js/theme.js"]"></script>
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
@@ -26,7 +28,7 @@
     <Routes />
     <ReconnectModal />
     <script>
-        window.rosterGetBrowserLanguage = () => navigator.language || 'en';
+        window.rosterGetBrowserLanguage = () => document.documentElement.lang || navigator.language || 'en';
     </script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script>

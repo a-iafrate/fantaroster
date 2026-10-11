@@ -22,7 +22,7 @@ public static class GameEndpoints
             [FromRoute] Guid gameId,
             Roster.Application.Ports.Data.IGameRepository repository,
             IDomainPackLoader domainPacks,
-            Microsoft.Extensions.Options.IOptions<Roster.Web.Options.BrandOptions> brand,
+            Roster.Web.Brand.IBrandAccessor brands,
             CancellationToken cancellationToken) =>
         {
             var game = await repository.GetByIdAsync(gameId, cancellationToken);
@@ -42,7 +42,7 @@ public static class GameEndpoints
                 game.CaptainMultiplier,
                 game.State.ToString(),
                 game.JoinCode,
-                brand.Value.Name,
+                brands.ForGame(game.Brand).Name,
                 new GameTermsResponse(
                     terms?.ElementSingular ?? string.Empty,
                     terms?.ElementPlural ?? string.Empty,

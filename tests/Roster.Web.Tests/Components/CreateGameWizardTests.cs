@@ -9,6 +9,7 @@ using Roster.DomainPacks;
 using Roster.Plugins.Abstractions;
 using Roster.Web;
 using Roster.Web.Components.Pages.Organizer;
+using Roster.Web.Brand;
 using Roster.Web.Options;
 using Shouldly;
 using Xunit;
@@ -36,7 +37,9 @@ public class CreateGameWizardTests : TestContext
         _localizer[Arg.Any<string>()].Returns(callInfo => new LocalizedString(callInfo.Arg<string>(), callInfo.Arg<string>()));
         Services.AddSingleton(_localizer);
 
-        Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(new BrandOptions { Id = "FantaRoster", Name = "FantaRoster" }));
+        var brands = Substitute.For<IBrandAccessor>();
+        brands.Current.Returns(new BrandDefinition { Id = "fantaroster", Name = "FantaRoster" });
+        Services.AddSingleton(brands);
     }
 
     [Fact]

@@ -7,6 +7,8 @@ using Roster.Infrastructure.Data;
 using Roster.Plugins.Abstractions;
 using Roster.Plugins.Csv;
 using Roster.Plugins.Sessionize;
+using Microsoft.AspNetCore.Localization;
+using Roster.Web.Brand;
 using Roster.Web.Components;
 using Roster.Web.Endpoints;
 
@@ -15,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.Configure<Roster.Web.Options.BrandOptions>(builder.Configuration.GetSection(Roster.Web.Options.BrandOptions.SectionName));
+builder.Services.AddSingleton<BrandResolver>();
+builder.Services.AddScoped<IBrandAccessor, BrandAccessor>();
 
 builder.Services.AddDbContext<RosterDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("sqldb")));
@@ -112,11 +116,18 @@ builder.Services.AddScoped(sp =>
 
 var app = builder.Build();
 
-var supportedCultures = new[] { "en", "it" };
-var localizationOptions = new RequestLocalizationOptions()
-    .SetDefaultCulture("en")
-    .AddSupportedCultures(supportedCultures)
-    .AddSupportedUICultures(supportedCultures);
+// Brand first (from the host), then the language: the person's choice (cookie) wins, otherwise the brand's default.
+app.UseMiddleware<BrandMiddleware>();
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en"),
+};
+localizationOptions.AddSupportedCultures(CultureEndpoints.SupportedCultures);
+localizationOptions.AddSupportedUICultures(CultureEndpoints.SupportedCultures);
+localizationOptions.RequestCultureProviders.Clear();
+localizationOptions.RequestCultureProviders.Add(new CookieRequestCultureProvider());
+localizationOptions.RequestCultureProviders.Add(new BrandCultureProvider(app.Services.GetRequiredService<BrandResolver>()));
 
 app.UseRequestLocalization(localizationOptions);
 
@@ -148,6 +159,7 @@ app.MapParticipantEndpoints();
 
 app.MapGameEndpoints();
 app.MapPwaEndpoints();
+app.MapCultureEndpoints();
 app.MapScoreEndpoints();
 app.MapHub<Roster.Web.Hubs.GameHub>("/hubs/game");
 

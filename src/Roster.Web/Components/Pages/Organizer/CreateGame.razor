@@ -1,20 +1,18 @@
 @page "/organizer/create-game"
 @using System.Globalization
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.Extensions.Options
 @using Roster.Application.Ports
 @using Roster.DomainPacks
 @using Roster.Plugins.Abstractions
 @using Roster.Web.Client.Components.Participant
 @using Roster.Web.Components.Pages.Organizer
-@using Roster.Web.Options
 @attribute [Authorize]
 @inject IDomainPackLoader DomainPackLoader
 @inject IGameCreationService GameCreationService
 @inject IPluginRegistry PluginRegistry
 @inject NavigationManager Navigation
 @inject IStringLocalizer<SharedResource> Loc
-@inject IOptions<BrandOptions> BrandOptions
+@inject IBrandAccessor Brands
 @rendermode InteractiveServer
 @layout Roster.Web.Components.Layout.EmptyLayout
 
@@ -424,7 +422,7 @@
             var cmd = new CreateGameCommand(
                 Name: _state.Name,
                 DomainPackId: _state.DomainPackId,
-                Brand: BrandOptions.Value.Id,
+                Brand: Brands.Current.Id,
                 Culture: _state.Culture,
                 LineupSize: _state.LineupSize,
                 CaptainEnabled: _state.CaptainEnabled,

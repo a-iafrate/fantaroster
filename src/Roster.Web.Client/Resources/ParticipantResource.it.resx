@@ -406,4 +406,10 @@
   <data name="YouAreRank" xml:space="preserve">
     <value>Sei {0}°.</value>
   </data>
+  <data name="LanguageCaption" xml:space="preserve">
+    <value>Lingua</value>
+  </data>
+  <data name="LanguageToggleAria" xml:space="preserve">
+    <value>Lingua: {0}. Passa a {1}</value>
+  </data>
 </root>

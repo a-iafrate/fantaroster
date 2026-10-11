@@ -261,10 +261,13 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 **Goal:** production-ready for one real event, under both brands.
 
 **Tasks**
-- [ ] Brand resolution middleware and `BrandOptions` (FantaRoster, ImagiRoster); theme token layers per brand; brand assets (logo, icons, social image).
-- [ ] Complete EN and IT resources; culture selection (brand default → user choice); date/number formats.
+- [x] Brand resolution middleware and `BrandOptions` (FantaRoster, ImagiRoster): the brand comes from the host with a configurable fallback; each game keeps the brand it was created under; the PWA manifest and `<html data-brand>` follow the brand. *(Details in `docs/design/open-questions.md`.)*
+- [x] Brand-specific assets: logo, icons and social image per brand. *(Operational as of 2026-10-11, confirmed by the owner; `BrandDefinition.LogoPath` and the `data-brand` hook are in place.)*
+- [x] Culture selection: brand default, then the person's choice (cookie, language toggle in every menu); the WebAssembly client follows the server language.
+- [x] Complete EN and IT resources; date/number formats per culture. *(Operational as of 2026-10-11, confirmed by the owner.)*
 - [x] Import the tokens from `docs/design/tokens/` into `Roster.Ui` and apply the mockups in `docs/design/screens/` to every screen. *(Applied to every screen: public site, sign in, consent, participant, referee, organizer console, big screen. Deviations and open points: `docs/design/open-questions.md`. Verified with Playwright on phones and laptops, light and dark, with two domain packs: `tests/Roster.E2E`.)*
-- [ ] Security review: OWASP ASVS L1 checklist, rate limits, input validation, upload policies, signed tokens rotation, security headers, CSP compatible with Blazor.
+- [ ] Integration tests on an isolated database: no test may use the database or services configured in `appsettings.json` (Testcontainers or a dedicated LocalDB per run), so the suite is reliable and can run in CI.
+- [ ] Security review: OWASP ASVS L1 checklist, rate limits, input validation, upload policies, signed tokens rotation, security headers, CSP compatible with Blazor; games belong to the organizer who created them.
 - [ ] Privacy: privacy notice and terms (EN, IT), data retention job (photos 30 days after end), organizer data export and deletion.
 - [ ] Accessibility audit (automated with axe in Playwright + manual pass) to WCAG 2.2 AA.
 - [ ] Azure provisioning with `azd` from the Aspire app model: Container Apps, Azure SQL, Storage, SignalR Service, Key Vault, Communication Services, Application Insights.

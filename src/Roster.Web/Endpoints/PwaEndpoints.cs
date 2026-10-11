@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
-using Roster.Web.Options;
+using Roster.Web.Brand;
 
 namespace Roster.Web.Endpoints;
 
@@ -10,19 +9,21 @@ public static class PwaEndpoints
 {
     public static void MapPwaEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/manifest.webmanifest", (IOptions<BrandOptions> options) =>
+        // One manifest URL, a different manifest per brand (the brand comes from the host).
+        app.MapGet("/manifest.webmanifest", (IBrandAccessor brands) =>
         {
-            var brand = options.Value;
-            var isFanta = brand.Id == "fantaroster";
+            var brand = brands.Current;
 
             return Results.Json(new
             {
+                id = "/",
                 name = brand.Name,
                 short_name = brand.Name,
+                lang = brand.DefaultCulture,
                 start_url = "/",
                 display = "standalone",
-                background_color = isFanta ? "#1A1B1E" : "#FFFFFF",
-                theme_color = isFanta ? "#F59E0B" : "#2563EB",
+                background_color = brand.BackgroundColor,
+                theme_color = brand.ThemeColor,
                 icons = new[]
                 {
                     new

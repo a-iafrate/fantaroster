@@ -1,14 +1,12 @@
 @page "/organizer/games/{Id:guid}/poster"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
-@using Microsoft.Extensions.Options
 @using Roster.Application.Ports.Data
 @using Roster.Domain.Games
-@using Roster.Web.Options
 @attribute [Authorize]
 @inject IGameRepository GameRepository
 @inject IStringLocalizer<SharedResource> Loc
-@inject IOptions<BrandOptions> BrandOptions
+@inject IBrandAccessor Brands
 @inject NavigationManager Navigation
 @layout Roster.Web.Components.Layout.EmptyLayout
 
@@ -41,7 +39,7 @@ else
         </div>
         
         <div class="poster-footer">
-            <span class="brand-name">@BrandOptions.Value.Name</span>
+            <span class="brand-name">@Brands.ForGame(Game.Brand).Name</span>
         </div>
     </div>
 

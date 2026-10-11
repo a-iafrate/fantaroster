@@ -66,3 +66,11 @@ Decisions taken while implementing the mockups. When a mockup and the documentat
 - The brand wordmark splits the configured brand name at its second capital letter; nothing in the pages names a brand.
 - Sign in: the passkey button is removed (P1), as are the terms and privacy links (no such pages yet). The consent page is now interactive (its buttons did nothing before) and shows what the choice means and two example rules; changing an answer is done through the organizer.
 - Plugin configuration labels and descriptions (for example the CSV fields) are English-only text from the plugin schema: localizing them needs a change to the plugin contract (ADR).
+
+## Brand and language (October 2026)
+
+- One deployment serves both brands. `BrandResolver` matches the request host against the patterns of each brand (`fantaroster.*` matches `fantaroster.com`, `www.fantaroster.it` and `fantaroster.localhost`); an unknown host uses `Brand:DefaultBrandId`. The brands live in the `Brand` section of the configuration; without it the two built-in definitions apply.
+- The brand is available through `IBrandAccessor` (per request or circuit); no page, namespace or component names a brand. A game stores the brand it was created under, so a game opened on another brand's host keeps its own name (big screen, poster, game info).
+- Language: the person's choice (cookie, set through `/culture/set`, local redirects only) wins, otherwise the default language of the brand. Accept-Language is deliberately not used, so a brand always opens in its own language. The page language is written in `<html lang>` and the WebAssembly client reads it.
+- Theme tokens: both brand layers in `docs/design/tokens` have the same colors, so there is no extra CSS yet; `<html data-brand>` is the hook for a future brand layer. Logo, icons and social image exist once; per-brand assets wait for the design deliverables.
+- Local testing of the second brand: open `http://imagiroster.localhost:5038` (browsers resolve every `*.localhost` name to the loopback address).

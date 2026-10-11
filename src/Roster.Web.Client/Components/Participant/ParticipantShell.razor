@@ -67,6 +67,7 @@
                     <a class="ds-menu-item" href="@ParticipantRoutes.For(GameId, ParticipantTab.Rules)" @ref="_firstMenuItem" @onclick="CloseMenuAsync">
                         <i class="icon-circle-help" aria-hidden="true"></i><span>@Loc["HowToPlay"]</span>
                     </a>
+                    <LanguageToggle CssClass="ds-menu-item" ShowCaption="true" />
                     <ThemeToggle CssClass="ds-menu-item" ShowCaption="true" />
                     <hr class="ds-menu-separator" />
                     <button type="button" class="ds-menu-item ds-menu-item--danger" @onclick="AskLeave">

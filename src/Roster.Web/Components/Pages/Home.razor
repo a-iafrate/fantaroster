@@ -1,13 +1,11 @@
 @page "/"
 @using System.Globalization
-@using Microsoft.Extensions.Options
 @using Roster.DomainPacks
-@using Roster.Web.Options
 @inject IDomainPackLoader DomainPacks
-@inject IOptions<BrandOptions> Brand
+@inject IBrandAccessor Brand
 @inject IStringLocalizer<SharedResource> Loc
 
-<PageTitle>@Brand.Value.Name - @Loc["HeroTitle"]</PageTitle>
+<PageTitle>@Brand.Current.Name - @Loc["HeroTitle"]</PageTitle>
 
 @* Landing (mockup 04, screen 17). Everything about a use case comes from the domain packs, never from this page. *@
 <section class="hero">

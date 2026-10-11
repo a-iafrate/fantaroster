@@ -1,8 +1,6 @@
 @inherits LayoutComponentBase
-@using Microsoft.Extensions.Options
-@using Roster.Web.Options
 @inject IStringLocalizer<SharedResource> Loc
-@inject IOptions<BrandOptions> Brand
+@inject IBrandAccessor Brand
 @inject TimeProvider Time
 
 <a href="#main" class="skip-link">@Loc["SkipToContent"]</a>
@@ -28,7 +26,7 @@
             <div class="pub-menu__panel">
                 <a href="/#how" class="pub-menu__link">@Loc["PubNavHow"]<i class="icon-chevron-right" aria-hidden="true"></i></a>
                 <a href="/#domains" class="pub-menu__link">@Loc["PubNavDomains"]<i class="icon-chevron-right" aria-hidden="true"></i></a>
-                <div class="pub-menu__settings"><ThemeToggle CssClass="ds-chip" /></div>
+                <div class="pub-menu__settings"><LanguageToggle CssClass="ds-chip" /><ThemeToggle CssClass="ds-chip" /></div>
                 <a href="/j" class="ds-btn ds-btn--l ds-btn--block ds-btn--secondary"><i class="icon-qr-code" aria-hidden="true"></i>@Loc["PubHaveCode"]</a>
                 <a href="/login" class="ds-btn ds-btn--l ds-btn--block ds-btn--secondary">@Loc["PubSignIn"]</a>
                 <a href="/organizer/create-game" class="ds-btn ds-btn--l ds-btn--block ds-btn--primary">@Loc["PubCreate"]</a>
@@ -59,8 +57,8 @@
             </nav>
         </div>
         <div class="pub-footer__bottom">
-            <span>@string.Format(Loc["PubCopyright"], Time.GetUtcNow().Year, Brand.Value.Name)</span>
-            <ThemeToggle CssClass="pub-footer__chip" />
+            <span>@string.Format(Loc["PubCopyright"], Time.GetUtcNow().Year, Brand.Current.Name)</span>
+            <span class="pub-footer__chips"><LanguageToggle CssClass="pub-footer__chip" /><ThemeToggle CssClass="pub-footer__chip" /></span>
         </div>
     </footer>
 </div>
