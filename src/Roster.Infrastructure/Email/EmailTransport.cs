@@ -10,7 +10,7 @@ namespace Roster.Infrastructure.Email;
 /// </summary>
 public sealed partial class EmailTransport(IConfiguration configuration, ILogger<EmailTransport> logger)
 {
-    public async Task SendAsync(string toEmail, string subject, string textBody, CancellationToken cancellationToken = default)
+    public async Task SendAsync(string toEmail, string subject, string textBody, string? htmlBody = null, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toEmail);
 
@@ -24,7 +24,7 @@ public sealed partial class EmailTransport(IConfiguration configuration, ILogger
 
         LogSendingAcs(logger, toEmail);
         var senderAddress = configuration["AzureCommunicationServices:SenderAddress"] ?? "donotreply@fantaroster.com";
-        var message = new EmailMessage(senderAddress, toEmail, new EmailContent(subject) { PlainText = textBody });
+        var message = new EmailMessage(senderAddress, toEmail, new EmailContent(subject) { PlainText = textBody, Html = htmlBody });
         await new EmailClient(connectionString).SendAsync(Azure.WaitUntil.Completed, message, cancellationToken);
     }
 

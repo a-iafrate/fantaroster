@@ -91,7 +91,7 @@ if (builder.Configuration["Security:DataProtection:KeysPath"] is { Length: > 0 }
 {
     dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
 }
-builder.Services.AddSingleton<Microsoft.AspNetCore.Identity.IEmailSender<OrganizerUser>, Roster.Infrastructure.Email.IdentityEmailSender>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IEmailSender<OrganizerUser>, Roster.Web.Email.MagicLinkEmailSender>();
 
 // Authentication & Identity
 builder.Services.AddHttpContextAccessor();

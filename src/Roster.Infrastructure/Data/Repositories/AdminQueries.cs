@@ -12,28 +12,37 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
     private const int TopGamesCount = 10;
     private const int JoinDays = 14;
 
+    /// <summary>
+    /// A handful of small aggregate queries, none of them reading whole tables: the database may be far away, so every
+    /// round trip counts.
+    /// </summary>
     public async Task<AdminStats> GetStatsAsync(DateTimeOffset now, CancellationToken cancellationToken = default)
     {
         var organizers = await context.Users.CountAsync(cancellationToken);
+
         var gamesByState = await context.Games
             .GroupBy(g => g.State)
             .Select(g => new { State = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
-        var participants = await context.Participants.CountAsync(cancellationToken);
-        var weekAgo = now.AddDays(-7);
-        var participantsLastWeek = await context.Participants.CountAsync(p => p.JoinedAt >= weekAgo, cancellationToken);
-        var valid = await context.ScoreEntries.CountAsync(s => s.Status == ScoreStatus.Valid, cancellationToken);
-        var voided = await context.ScoreEntries.CountAsync(s => s.Status == ScoreStatus.Voided, cancellationToken);
-        var pending = await context.CommunityRequests.CountAsync(r => r.Status == CommunityRequestStatus.Pending, cancellationToken);
-        var approved = await context.CommunityRequests
-            .Where(r => r.Status == CommunityRequestStatus.Approved)
-            .Select(r => r.OrganizerId)
-            .Distinct()
-            .CountAsync(cancellationToken);
 
-        // Joins per day: grouped in memory, the window is small.
-        var since = now.AddDays(-(JoinDays - 1));
-        var firstDay = new DateTimeOffset(since.UtcDateTime.Date, TimeSpan.Zero);
+        var weekAgo = now.AddDays(-7);
+        var participantTotals = await context.Participants
+            .GroupBy(_ => 1)
+            .Select(g => new { Total = g.Count(), LastWeek = g.Count(p => p.JoinedAt >= weekAgo) })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var scores = await context.ScoreEntries
+            .GroupBy(s => s.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToListAsync(cancellationToken);
+
+        // The community requests are few: read them once for the counts and for the owners of the top games.
+        var requests = await context.CommunityRequests
+            .Select(r => new { r.OrganizerId, r.Status })
+            .ToListAsync(cancellationToken);
+        var communityOrganizers = requests.Where(r => r.Status == CommunityRequestStatus.Approved).Select(r => r.OrganizerId).ToHashSet(StringComparer.Ordinal);
+
+        var firstDay = new DateTimeOffset(now.UtcDateTime.AddDays(-(JoinDays - 1)).Date, TimeSpan.Zero);
         var joined = await context.Participants
             .Where(p => p.JoinedAt >= firstDay)
             .Select(p => p.JoinedAt)
@@ -45,26 +54,59 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
             .Select(day => new DailyCount(day, perDay.GetValueOrDefault(day)))
             .ToList();
 
-        var top = (await GetGamesAsync(cancellationToken)).OrderByDescending(g => g.Participants).Take(TopGamesCount).ToList();
+        var topCounts = await context.Participants
+            .GroupBy(p => p.GameId)
+            .Select(g => new { GameId = g.Key, Count = g.Count() })
+            .OrderByDescending(g => g.Count)
+            .Take(TopGamesCount)
+            .ToListAsync(cancellationToken);
+        var topIds = topCounts.Select(t => t.GameId).ToList();
+        var topGames = topIds.Count == 0 ? [] : await ReadGamesAsync(topIds, communityOrganizers, topCounts.ToDictionary(t => t.GameId, t => t.Count), cancellationToken);
 
         return new AdminStats(
             organizers,
             gamesByState.Sum(g => g.Count),
             gamesByState.ToDictionary(g => g.State, g => g.Count),
-            participants,
-            participantsLastWeek,
-            valid,
-            voided,
-            pending,
-            approved,
+            participantTotals?.Total ?? 0,
+            participantTotals?.LastWeek ?? 0,
+            scores.Where(s => s.Status == ScoreStatus.Valid).Sum(s => s.Count),
+            scores.Where(s => s.Status == ScoreStatus.Voided).Sum(s => s.Count),
+            requests.Count(r => r.Status == CommunityRequestStatus.Pending),
+            communityOrganizers.Count,
             joins,
-            top);
+            topGames.OrderByDescending(g => g.Participants).ToList());
     }
 
     public async Task<List<AdminGameRow>> GetGamesAsync(CancellationToken cancellationToken = default)
     {
+        var communityOrganizers = (await context.CommunityRequests
+            .Where(r => r.Status == CommunityRequestStatus.Approved)
+            .Select(r => r.OrganizerId)
+            .ToListAsync(cancellationToken)).ToHashSet(StringComparer.Ordinal);
+
+        var counts = await context.Participants
+            .GroupBy(p => p.GameId)
+            .Select(g => new { GameId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(g => g.GameId, g => g.Count, cancellationToken);
+
+        return (await ReadGamesAsync(null, communityOrganizers, counts, cancellationToken)).OrderByDescending(g => g.CreatedAt).ToList();
+    }
+
+    /// <summary>The games (all, or the given ones) with the email of their organizer.</summary>
+    private async Task<List<AdminGameRow>> ReadGamesAsync(
+        List<Guid>? ids,
+        HashSet<string> communityOrganizers,
+        Dictionary<Guid, int> participantCounts,
+        CancellationToken cancellationToken)
+    {
+        var games = context.Games.AsNoTracking();
+        if (ids is not null)
+        {
+            games = games.Where(g => ids.Contains(g.Id));
+        }
+
         var rows = await (
-            from g in context.Games.AsNoTracking()
+            from g in games
             join u in context.Users on g.OrganizerId equals u.Id into owners
             from owner in owners.DefaultIfEmpty()
             select new
@@ -77,23 +119,16 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
                 g.CreatedAt,
                 g.ParticipantLimitOverride,
                 g.LimitLabel,
-                Participants = context.Participants.Count(p => p.GameId == g.Id),
             }).ToListAsync(cancellationToken);
 
-        var communityOrganizers = (await context.CommunityRequests
-            .Where(r => r.Status == CommunityRequestStatus.Approved)
-            .Select(r => r.OrganizerId)
-            .ToListAsync(cancellationToken)).ToHashSet(StringComparer.Ordinal);
-
         return rows
-            .OrderByDescending(r => r.CreatedAt)
             .Select(r => new AdminGameRow(
                 r.Id,
                 r.Name,
                 r.OrganizerEmail,
                 r.OrganizerId is not null && communityOrganizers.Contains(r.OrganizerId),
                 r.State,
-                r.Participants,
+                participantCounts.GetValueOrDefault(r.Id),
                 r.CreatedAt,
                 r.ParticipantLimitOverride,
                 r.LimitLabel))

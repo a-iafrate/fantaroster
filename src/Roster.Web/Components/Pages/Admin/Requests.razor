@@ -1,5 +1,6 @@
 @page "/admin/requests"
 @attribute [Authorize(Policy = AdminAccess.PolicyName)]
+@attribute [StreamRendering]
 @inject CommunityRequestService RequestService
 @inject IStringLocalizer<SharedResource> Loc
 
@@ -22,7 +23,11 @@
         <p class="ds-alert" role="alert">@Loc["AdminError"]</p>
     }
 
-    @if (_requests is { Count: 0 })
+    @if (_requests is null)
+    {
+        <p class="ds-loading" role="status"><span class="ds-spinner" aria-hidden="true"></span>@Loc["AdminLoading"]</p>
+    }
+    else if (_requests is { Count: 0 })
     {
         <p class="ds-muted">@Loc["AdminNoRequests"]</p>
     }

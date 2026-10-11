@@ -1,5 +1,6 @@
 @page "/admin"
 @attribute [Authorize(Policy = AdminAccess.PolicyName)]
+@attribute [StreamRendering]
 @inject AdminService AdminData
 @inject IStringLocalizer<SharedResource> Loc
 
@@ -13,7 +14,11 @@
         </div>
     </header>
 
-    @if (_stats is { } stats)
+    @if (_stats is null)
+    {
+        <p class="ds-loading" role="status"><span class="ds-spinner" aria-hidden="true"></span>@Loc["AdminLoading"]</p>
+    }
+    else if (_stats is { } stats)
     {
         <ul class="adm-stats">
             <li class="adm-stat"><span class="adm-stat__value">@stats.Organizers</span><span class="adm-stat__label">@Loc["AdminStatOrganizers"]</span></li>

@@ -1,5 +1,6 @@
 @page "/admin/games"
 @attribute [Authorize(Policy = AdminAccess.PolicyName)]
+@attribute [StreamRendering]
 @inject AdminService AdminData
 @inject IStringLocalizer<SharedResource> Loc
 
@@ -22,7 +23,11 @@
         <p class="ds-alert" role="alert">@Loc["AdminError"]</p>
     }
 
-    @if (_games is { Count: 0 })
+    @if (_games is null)
+    {
+        <p class="ds-loading" role="status"><span class="ds-spinner" aria-hidden="true"></span>@Loc["AdminLoading"]</p>
+    }
+    else if (_games is { Count: 0 })
     {
         <p class="ds-muted">@Loc["AdminNoGames"]</p>
     }

@@ -1306,6 +1306,39 @@
   <data name="AdminOwnerUnknown" xml:space="preserve">
     <value>(senza proprietario)</value>
   </data>
+  <data name="MailLoginSubject" xml:space="preserve">
+    <value>Il tuo link di accesso a {0}</value>
+  </data>
+  <data name="MailLoginHeading" xml:space="preserve">
+    <value>Accedi a {0}</value>
+  </data>
+  <data name="MailLoginIntro" xml:space="preserve">
+    <value>Premi il pulsante per accedere. Il link funziona una sola volta e solo per un tempo limitato.</value>
+  </data>
+  <data name="MailLoginIgnore" xml:space="preserve">
+    <value>Se non hai chiesto tu di accedere puoi ignorare questa email: nessuno può entrare nel tuo account senza il link.</value>
+  </data>
+  <data name="MailLoginButton" xml:space="preserve">
+    <value>Accedi</value>
+  </data>
+  <data name="MailButtonFallback" xml:space="preserve">
+    <value>Se il pulsante non funziona, copia questo indirizzo nel browser:</value>
+  </data>
+  <data name="MailFooter" xml:space="preserve">
+    <value>{0} · {1}</value>
+  </data>
+  <data name="CommunityMailApprovedHeading" xml:space="preserve">
+    <value>La tua richiesta community è stata approvata</value>
+  </data>
+  <data name="CommunityMailRejectedHeading" xml:space="preserve">
+    <value>A proposito della tua richiesta community</value>
+  </data>
+  <data name="CommunityMailButton" xml:space="preserve">
+    <value>Vai al mio account</value>
+  </data>
+  <data name="AdminLoading" xml:space="preserve">
+    <value>Caricamento delle statistiche…</value>
+  </data>
 </root>
 
 
