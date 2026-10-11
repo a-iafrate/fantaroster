@@ -50,4 +50,26 @@ public class AdminServiceTests
     [Fact]
     public async Task SetGameLimitAsync_UnknownGame_ReturnsFalse() =>
         (await _service.SetGameLimitAsync(Guid.NewGuid(), 800, null)).ShouldBeFalse();
+
+    [Fact]
+    public async Task SearchGamesAsync_NormalizesTheQueryAndAppliesThePlanLimits()
+    {
+        var row = new AdminGameRow(Guid.NewGuid(), "Game", "a@example.test", true, GameState.Open, 3, DateTimeOffset.UnixEpoch, null, null);
+        AdminGameQuery? received = null;
+        _queries.SearchGamesAsync(Arg.Do<AdminGameQuery>(q => received = q), Arg.Any<CancellationToken>()).Returns(([row], 61));
+
+        var page = await _service.SearchGamesAsync(new AdminGameQuery("  lions  ", Page: 0, PageSize: 5000));
+
+        received.ShouldNotBeNull();
+        received.Search.ShouldBe("lions");
+        received.Page.ShouldBe(1);
+        received.PageSize.ShouldBe(AdminGameQuery.MaxPageSize);
+        page.Total.ShouldBe(61);
+        page.PageCount.ShouldBe(1);
+        page.Items.Single().EffectiveLimit.ShouldBe(300);
+    }
+
+    [Fact]
+    public void AdminGamePage_PageCount_RoundsUp() =>
+        new AdminGamePage([], 51, 1, 25).PageCount.ShouldBe(3);
 }

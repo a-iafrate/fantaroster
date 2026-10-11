@@ -1339,6 +1339,51 @@
   <data name="AdminLoading" xml:space="preserve">
     <value>Loading the statistics…</value>
   </data>
+  <data name="AdminSearchLabel" xml:space="preserve">
+    <value>Search by game name or organizer email</value>
+  </data>
+  <data name="AdminSearchButton" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="AdminFilterAllStates" xml:space="preserve">
+    <value>All states</value>
+  </data>
+  <data name="AdminFilterCustom" xml:space="preserve">
+    <value>Only games with a custom limit</value>
+  </data>
+  <data name="AdminSortLabel" xml:space="preserve">
+    <value>Sort by</value>
+  </data>
+  <data name="AdminSortNewest" xml:space="preserve">
+    <value>Newest first</value>
+  </data>
+  <data name="AdminSortOldest" xml:space="preserve">
+    <value>Oldest first</value>
+  </data>
+  <data name="AdminSortPlayers" xml:space="preserve">
+    <value>Most players</value>
+  </data>
+  <data name="AdminSortName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="AdminResultCount" xml:space="preserve">
+    <value>{0} games</value>
+  </data>
+  <data name="AdminNoResults" xml:space="preserve">
+    <value>No game matches your search.</value>
+  </data>
+  <data name="AdminPagerLabel" xml:space="preserve">
+    <value>Pages</value>
+  </data>
+  <data name="AdminPagePrev" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="AdminPageNext" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="AdminPageOf" xml:space="preserve">
+    <value>Page {0} of {1}</value>
+  </data>
 </root>
 
 

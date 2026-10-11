@@ -1339,6 +1339,51 @@
   <data name="AdminLoading" xml:space="preserve">
     <value>Caricamento delle statistiche…</value>
   </data>
+  <data name="AdminSearchLabel" xml:space="preserve">
+    <value>Cerca per nome della partita o email dell'organizzatore</value>
+  </data>
+  <data name="AdminSearchButton" xml:space="preserve">
+    <value>Cerca</value>
+  </data>
+  <data name="AdminFilterAllStates" xml:space="preserve">
+    <value>Tutti gli stati</value>
+  </data>
+  <data name="AdminFilterCustom" xml:space="preserve">
+    <value>Solo partite con limite personalizzato</value>
+  </data>
+  <data name="AdminSortLabel" xml:space="preserve">
+    <value>Ordina per</value>
+  </data>
+  <data name="AdminSortNewest" xml:space="preserve">
+    <value>Più recenti</value>
+  </data>
+  <data name="AdminSortOldest" xml:space="preserve">
+    <value>Meno recenti</value>
+  </data>
+  <data name="AdminSortPlayers" xml:space="preserve">
+    <value>Più giocatori</value>
+  </data>
+  <data name="AdminSortName" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="AdminResultCount" xml:space="preserve">
+    <value>{0} partite</value>
+  </data>
+  <data name="AdminNoResults" xml:space="preserve">
+    <value>Nessuna partita corrisponde alla ricerca.</value>
+  </data>
+  <data name="AdminPagerLabel" xml:space="preserve">
+    <value>Pagine</value>
+  </data>
+  <data name="AdminPagePrev" xml:space="preserve">
+    <value>Precedente</value>
+  </data>
+  <data name="AdminPageNext" xml:space="preserve">
+    <value>Successiva</value>
+  </data>
+  <data name="AdminPageOf" xml:space="preserve">
+    <value>Pagina {0} di {1}</value>
+  </data>
 </root>
 
 

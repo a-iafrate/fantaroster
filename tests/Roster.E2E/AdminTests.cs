@@ -136,4 +136,32 @@ public sealed class AdminTests(RosterAppFixture app)
 
         await Expect(admin.GetByRole(AriaRole.Alert)).ToContainTextAsync("Non è stato possibile salvare");
     }
+
+    [Fact]
+    public async Task The_list_of_games_is_searched_and_a_saved_limit_returns_to_the_same_search()
+    {
+        var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
+        await app.NewOrganizerPageAsync(1280, 800, ownedGames: game.Id);
+        var email = await TestData.GetOrganizerEmailAsync(app.ConnectionString, game.Id);
+        var (admin, _) = await app.NewAdminPageAsync();
+
+        await admin.GotoAsync("/admin/games");
+        await admin.Locator("#adm-q").FillAsync(email);
+        await admin.GetByRole(AriaRole.Button, new() { Name = "Cerca" }).ClickAsync();
+
+        await Expect(admin.GetByText("1 partite")).ToBeVisibleAsync();
+        await Expect(admin.GetByRole(AriaRole.Row)).ToHaveCountAsync(2); // the header and the one game
+        await admin.Locator($"#limit-{game.Id}").FillAsync("200");
+        await admin.Locator($"#limit-{game.Id}").PressAsync("Enter");
+
+        await Expect(admin.GetByText("Limite salvato")).ToBeVisibleAsync();
+        await Expect(admin.GetByText("1 partite")).ToBeVisibleAsync();
+        admin.Url.ShouldContain("q=");
+        await Expect(admin.GetByText("200 (personalizzato)")).ToBeVisibleAsync();
+
+        await admin.GotoAsync("/admin/games?custom=1&q=" + Uri.EscapeDataString(email));
+        await Expect(admin.GetByText("1 partite")).ToBeVisibleAsync();
+        await admin.GotoAsync("/admin/games?q=" + Uri.EscapeDataString("nessuna-partita-" + Guid.NewGuid().ToString("N")));
+        await Expect(admin.GetByText("Nessuna partita corrisponde alla ricerca.")).ToBeVisibleAsync();
+    }
 }

@@ -77,6 +77,86 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
             topGames.OrderByDescending(g => g.Participants).ToList());
     }
 
+    public async Task<(List<AdminGameRow> Rows, int Total)> SearchGamesAsync(AdminGameQuery query, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+
+        var games =
+            from g in context.Games.AsNoTracking()
+            join u in context.Users on g.OrganizerId equals u.Id into owners
+            from owner in owners.DefaultIfEmpty()
+            select new
+            {
+                g.Id,
+                g.Name,
+                OrganizerEmail = owner == null ? null : owner.Email,
+                g.OrganizerId,
+                g.State,
+                g.CreatedAt,
+                g.ParticipantLimitOverride,
+                g.LimitLabel,
+            };
+
+        if (query.Search is { Length: > 0 } search)
+        {
+            games = games.Where(g => g.Name.Contains(search) || (g.OrganizerEmail != null && g.OrganizerEmail.Contains(search)));
+        }
+
+        if (query.State is { } state)
+        {
+            games = games.Where(g => g.State == state);
+        }
+
+        if (query.CustomLimitOnly)
+        {
+            games = games.Where(g => g.ParticipantLimitOverride != null);
+        }
+
+        var total = await games.CountAsync(cancellationToken);
+
+        var ordered = query.Sort switch
+        {
+            AdminGameSort.Oldest => games.OrderBy(g => g.CreatedAt),
+            AdminGameSort.Name => games.OrderBy(g => g.Name).ThenByDescending(g => g.CreatedAt),
+            AdminGameSort.MostPlayers => games.OrderByDescending(g => context.Participants.Count(p => p.GameId == g.Id)).ThenByDescending(g => g.CreatedAt),
+            _ => games.OrderByDescending(g => g.CreatedAt),
+        };
+
+        var page = await ordered.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize).ToListAsync(cancellationToken);
+        var ids = page.Select(g => g.Id).ToList();
+
+        // Players are counted for the games of the page only.
+        var counts = ids.Count == 0
+            ? []
+            : await context.Participants
+                .Where(p => ids.Contains(p.GameId))
+                .GroupBy(p => p.GameId)
+                .Select(g => new { GameId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.GameId, g => g.Count, cancellationToken);
+
+        var organizerIds = page.Select(g => g.OrganizerId).Where(o => o is not null).Distinct().ToList();
+        var communityOrganizers = organizerIds.Count == 0
+            ? []
+            : (await context.CommunityRequests
+                .Where(r => r.Status == CommunityRequestStatus.Approved && organizerIds.Contains(r.OrganizerId))
+                .Select(r => r.OrganizerId)
+                .ToListAsync(cancellationToken)).ToHashSet(StringComparer.Ordinal);
+
+        var rows = page
+            .Select(r => new AdminGameRow(
+                r.Id,
+                r.Name,
+                r.OrganizerEmail,
+                r.OrganizerId is not null && communityOrganizers.Contains(r.OrganizerId),
+                r.State,
+                counts.GetValueOrDefault(r.Id),
+                r.CreatedAt,
+                r.ParticipantLimitOverride,
+                r.LimitLabel))
+            .ToList();
+        return (rows, total);
+    }
+
     public async Task<List<AdminGameRow>> GetGamesAsync(CancellationToken cancellationToken = default)
     {
         var communityOrganizers = (await context.CommunityRequests

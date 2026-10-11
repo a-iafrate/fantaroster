@@ -82,6 +82,7 @@ public static class CommunityAndAdminEndpoints
             CancellationToken cancellationToken) =>
         {
             var form = await context.Request.ReadFormAsync(cancellationToken);
+            var back = ReturnPath(form["returnUrl"].ToString());
             var rawLimit = form["limit"].ToString().Trim();
             var label = form["label"].ToString().Trim();
             int? limit = null;
@@ -89,7 +90,7 @@ public static class CommunityAndAdminEndpoints
             {
                 if (!int.TryParse(rawLimit, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var parsed) || parsed < 1 || parsed > MaxLimit)
                 {
-                    return Results.Redirect("/admin/games?error=1");
+                    return Results.Redirect(WithFlag(back, "error"));
                 }
 
                 limit = parsed;
@@ -97,15 +98,31 @@ public static class CommunityAndAdminEndpoints
 
             if (label.Length > MaxLabel)
             {
-                return Results.Redirect("/admin/games?error=1");
+                return Results.Redirect(WithFlag(back, "error"));
             }
 
             var done = await service.SetGameLimitAsync(gameId, limit, label, cancellationToken);
-            return Results.Redirect(done ? "/admin/games?saved=1" : "/admin/games?error=1");
+            return Results.Redirect(WithFlag(back, done ? "saved" : "error"));
         })
         .WithName("SetGameParticipantLimit");
 
         return app;
+    }
+
+    /// <summary>The list the administrator came from (search, filters, page), only ever a path inside the games list.</summary>
+    private static string ReturnPath(string value) =>
+        value.StartsWith("/admin/games", StringComparison.Ordinal) && !value.Contains("//", StringComparison.Ordinal) && !value.Contains('\\', StringComparison.Ordinal) && value.Length <= 500
+            ? value
+            : "/admin/games";
+
+    /// <summary>The path with the result flag (saved or error) in place of any earlier one.</summary>
+    private static string WithFlag(string path, string flag)
+    {
+        var parts = path.Split('?', 2);
+        var kept = parts.Length == 2
+            ? parts[1].Split('&', StringSplitOptions.RemoveEmptyEntries).Where(p => !p.StartsWith("saved=", StringComparison.Ordinal) && !p.StartsWith("error=", StringComparison.Ordinal))
+            : [];
+        return parts[0] + "?" + string.Join('&', kept.Append(flag + "=1"));
     }
 
     private static bool IsValidLink(string link) =>

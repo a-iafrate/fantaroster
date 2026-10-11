@@ -23,39 +23,107 @@
         <p class="ds-alert" role="alert">@Loc["AdminError"]</p>
     }
 
-    @if (_games is null)
+    @* A plain GET form: the search, the filters and the order live in the address, so a list can be shared and paged. *@
+    <form method="get" action="/admin/games" class="adm-filters" role="search" aria-label="@Loc["AdminSearchButton"]">
+        <div class="ds-field adm-filters__search">
+            <label class="ds-label" for="adm-q">@Loc["AdminSearchLabel"]</label>
+            <input id="adm-q" name="q" type="search" class="ds-input" maxlength="100" value="@Q" autocomplete="off" />
+        </div>
+        <div class="ds-field">
+            <label class="ds-label" for="adm-state">@Loc["AdminColState"]</label>
+            <select id="adm-state" name="state" class="ds-input">
+                <option value="">@Loc["AdminFilterAllStates"]</option>
+                @foreach (var state in Enum.GetValues<GameState>())
+                {
+                    <option value="@state" selected="@(State == state.ToString())">@Loc["State" + state]</option>
+                }
+            </select>
+        </div>
+        <div class="ds-field">
+            <label class="ds-label" for="adm-sort">@Loc["AdminSortLabel"]</label>
+            <select id="adm-sort" name="sort" class="ds-input">
+                <option value="newest" selected="@(Sort is not ("oldest" or "players" or "name"))">@Loc["AdminSortNewest"]</option>
+                <option value="oldest" selected="@(Sort == "oldest")">@Loc["AdminSortOldest"]</option>
+                <option value="players" selected="@(Sort == "players")">@Loc["AdminSortPlayers"]</option>
+                <option value="name" selected="@(Sort == "name")">@Loc["AdminSortName"]</option>
+            </select>
+        </div>
+        <label class="adm-check">
+            <input type="checkbox" name="custom" value="1" checked="@(Custom == "1")" />
+            <span>@Loc["AdminFilterCustom"]</span>
+        </label>
+        <button type="submit" class="ds-btn ds-btn--primary">@Loc["AdminSearchButton"]</button>
+    </form>
+
+    @if (_page is null)
     {
         <p class="ds-loading" role="status"><span class="ds-spinner" aria-hidden="true"></span>@Loc["AdminLoading"]</p>
     }
-    else if (_games is { Count: 0 })
+    else if (_page.Total == 0)
     {
-        <p class="ds-muted">@Loc["AdminNoGames"]</p>
+        <p class="ds-muted" role="status">@(HasFilters ? Loc["AdminNoResults"] : Loc["AdminNoGames"])</p>
     }
+    else
+    {
+        <p class="ds-muted" role="status">@string.Format(CultureInfo.CurrentCulture, Loc["AdminResultCount"].Value, _page.Total)</p>
 
-    <ul class="adm-requests">
-        @foreach (var game in _games ?? [])
+        <div class="adm-table-wrap" role="region" aria-label="@Loc["AdminGamesTitle"]" tabindex="0">
+            <table class="adm-table adm-table--games">
+                <thead>
+                    <tr>
+                        <th scope="col">@Loc["AdminColGame"]</th>
+                        <th scope="col">@Loc["AdminColOrganizer"]</th>
+                        <th scope="col">@Loc["AdminColPlayers"]</th>
+                        <th scope="col">@Loc["AdminLimitInput"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var game in _page.Items)
+                    {
+                        <tr>
+                            <th scope="row">
+                                <span class="adm-game__name">@game.Name</span>
+                                <span class="adm-game__meta">@Loc["State" + game.State] · @game.CreatedAt.ToLocalTime().ToString("d", CultureInfo.CurrentCulture)</span>
+                            </th>
+                            <td>@(game.OrganizerEmail ?? Loc["AdminOwnerUnknown"])</td>
+                            <td>
+                                <strong>@game.Participants</strong> / @(string.Format(CultureInfo.CurrentCulture, (game.LimitOverride is null ? Loc["AdminLimitPlan"] : Loc["AdminLimitCustom"]).Value, game.EffectiveLimit))
+                                @if (game.LimitLabel is { } label)
+                                {
+                                    <span class="adm-game__meta">@label</span>
+                                }
+                            </td>
+                            <td>
+                                <form method="post" action="/admin/actions/games/@game.Id/limit" class="adm-inline adm-inline--row">
+                                    <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                                    <label class="visually-hidden" for="limit-@game.Id">@Loc["AdminLimitInput"] — @game.Name</label>
+                                    <input id="limit-@game.Id" name="limit" class="ds-input adm-limit" type="number" min="1" max="100000" inputmode="numeric" placeholder="@Loc["AdminLimitInput"]" value="@game.LimitOverride" />
+                                    <label class="visually-hidden" for="label-@game.Id">@Loc["AdminLabelInput"] — @game.Name</label>
+                                    <input id="label-@game.Id" name="label" class="ds-input" type="text" maxlength="100" placeholder="@Loc["AdminLabelInput"]" value="@game.LimitLabel" />
+                                    <button type="submit" class="ds-btn ds-btn--secondary" data-busy-label="@Loc["AdminSaveBusy"]">@Loc["AdminSave"]</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (_page.PageCount > 1)
         {
-            <li class="adm-request">
-                <div class="adm-request__head">
-                    <strong>@game.Name</strong>
-                    <span class="ds-chip">@Loc["State" + game.State]</span>
-                </div>
-                <p class="ds-muted">@(game.OrganizerEmail ?? Loc["AdminOwnerUnknown"]) · @Loc["AdminColCreated"] @game.CreatedAt.ToLocalTime().ToString("d", CultureInfo.CurrentCulture)</p>
-                <p>@Loc["AdminColPlayers"]: <strong>@game.Participants</strong> / @(string.Format(CultureInfo.CurrentCulture, (game.LimitOverride is null ? Loc["AdminLimitPlan"] : Loc["AdminLimitCustom"]).Value, game.EffectiveLimit))@(game.LimitLabel is { } label ? " · " + label : "")</p>
-                <form method="post" action="/admin/actions/games/@game.Id/limit" class="adm-inline">
-                    <div class="ds-field">
-                        <label class="ds-label" for="limit-@game.Id">@Loc["AdminLimitInput"]</label>
-                        <input id="limit-@game.Id" name="limit" class="ds-input" type="number" min="1" max="100000" inputmode="numeric" value="@game.LimitOverride" />
-                    </div>
-                    <div class="ds-field">
-                        <label class="ds-label" for="label-@game.Id">@Loc["AdminLabelInput"]</label>
-                        <input id="label-@game.Id" name="label" class="ds-input" type="text" maxlength="100" value="@game.LimitLabel" />
-                    </div>
-                    <button type="submit" class="ds-btn ds-btn--secondary" data-busy-label="@Loc["AdminSaveBusy"]">@Loc["AdminSave"]</button>
-                </form>
-            </li>
+            <nav class="adm-pager" aria-label="@Loc["AdminPagerLabel"]">
+                @if (_page.Page > 1)
+                {
+                    <a class="ds-btn ds-btn--secondary" href="@PageUrl(_page.Page - 1)" rel="prev">@Loc["AdminPagePrev"]</a>
+                }
+                <span class="adm-pager__info">@string.Format(CultureInfo.CurrentCulture, Loc["AdminPageOf"].Value, _page.Page, _page.PageCount)</span>
+                @if (_page.Page < _page.PageCount)
+                {
+                    <a class="ds-btn ds-btn--secondary" href="@PageUrl(_page.Page + 1)" rel="next">@Loc["AdminPageNext"]</a>
+                }
+            </nav>
         }
-    </ul>
+    }
 </div>
 
 @code {
@@ -65,7 +133,49 @@
     [SupplyParameterFromQuery(Name = "error")]
     public string? Error { get; set; }
 
-    private List<AdminGame>? _games;
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? Q { get; set; }
 
-    protected override async Task OnInitializedAsync() => _games = await AdminData.GetGamesAsync();
+    [SupplyParameterFromQuery(Name = "state")]
+    public string? State { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? Sort { get; set; }
+
+    [SupplyParameterFromQuery(Name = "custom")]
+    public string? Custom { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageNumber { get; set; }
+
+    private AdminGamePage? _page;
+
+    private bool HasFilters => !string.IsNullOrWhiteSpace(Q) || ParsedState is not null || Custom == "1";
+
+    private GameState? ParsedState => Enum.TryParse<GameState>(State, out var state) && Enum.IsDefined(state) ? state : null;
+
+    private AdminGameSort ParsedSort => Sort switch
+    {
+        "oldest" => AdminGameSort.Oldest,
+        "players" => AdminGameSort.MostPlayers,
+        "name" => AdminGameSort.Name,
+        _ => AdminGameSort.Newest,
+    };
+
+    /// <summary>The list as it is now (without the saved/error flags), so a saved limit returns to the same place.</summary>
+    private string ReturnUrl => PageUrl(Math.Max(1, PageNumber ?? 1));
+
+    private string PageUrl(int page)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(Q)) parts.Add("q=" + Uri.EscapeDataString(Q.Trim()));
+        if (ParsedState is { } state) parts.Add("state=" + state);
+        if (Sort is "oldest" or "players" or "name") parts.Add("sort=" + Sort);
+        if (Custom == "1") parts.Add("custom=1");
+        if (page > 1) parts.Add("page=" + page);
+        return "/admin/games" + (parts.Count == 0 ? string.Empty : "?" + string.Join('&', parts));
+    }
+
+    protected override async Task OnInitializedAsync() =>
+        _page = await AdminData.SearchGamesAsync(new AdminGameQuery(Q, ParsedState, Custom == "1", ParsedSort, Math.Max(1, PageNumber ?? 1)));
 }

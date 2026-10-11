@@ -29,6 +29,33 @@ public sealed record AdminGameRow(
     int? LimitOverride,
     string? LimitLabel);
 
+public enum AdminGameSort
+{
+    Newest,
+    Oldest,
+    MostPlayers,
+    Name,
+}
+
+/// <summary>Which games to list: a search on the name or on the organizer address, filters, an order and a page.</summary>
+public sealed record AdminGameQuery(
+    string? Search = null,
+    GameState? State = null,
+    bool CustomLimitOnly = false,
+    AdminGameSort Sort = AdminGameSort.Newest,
+    int Page = 1,
+    int PageSize = AdminGameQuery.DefaultPageSize)
+{
+    public const int DefaultPageSize = 25;
+    public const int MaxPageSize = 100;
+}
+
+/// <summary>One page of the games that match a query, with the total so the list can be paged.</summary>
+public sealed record AdminGamePage(IReadOnlyList<AdminGame> Items, int Total, int Page, int PageSize)
+{
+    public int PageCount => Math.Max(1, (int)Math.Ceiling(Total / (double)PageSize));
+}
+
 public sealed record AdminGame(
     Guid Id,
     string Name,

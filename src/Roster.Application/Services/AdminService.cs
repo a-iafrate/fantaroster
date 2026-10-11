@@ -15,6 +15,28 @@ public sealed class AdminService(
     public Task<AdminStats> GetStatsAsync(CancellationToken cancellationToken = default) =>
         queries.GetStatsAsync(timeProvider.GetUtcNow(), cancellationToken);
 
+    /// <summary>One page of games for the administration list: search, filters, order and paging are done by the database.</summary>
+    public async Task<AdminGamePage> SearchGamesAsync(AdminGameQuery query, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+
+        var pageSize = Math.Clamp(query.PageSize, 1, AdminGameQuery.MaxPageSize);
+        var normalized = query with { Page = Math.Max(1, query.Page), PageSize = pageSize, Search = string.IsNullOrWhiteSpace(query.Search) ? null : query.Search.Trim() };
+        var (rows, total) = await queries.SearchGamesAsync(normalized, cancellationToken);
+        return new AdminGamePage(rows.Select(ToAdminGame).ToList(), total, normalized.Page, pageSize);
+    }
+
+    private AdminGame ToAdminGame(AdminGameRow r) => new(
+        r.Id,
+        r.Name,
+        r.OrganizerEmail,
+        r.State,
+        r.Participants,
+        r.CreatedAt,
+        r.LimitOverride ?? (r.OrganizerIsCommunity ? Math.Max(limits.FreeParticipantLimit, limits.CommunityParticipantLimit) : limits.FreeParticipantLimit),
+        r.LimitOverride,
+        r.LimitLabel);
+
     public async Task<List<AdminGame>> GetGamesAsync(CancellationToken cancellationToken = default)
     {
         var rows = await queries.GetGamesAsync(cancellationToken);
