@@ -1,0 +1,200 @@
+using System.Text.RegularExpressions;
+using Microsoft.Playwright;
+using Shouldly;
+using static Microsoft.Playwright.Assertions;
+
+namespace Roster.E2E;
+
+/// <summary>
+/// The organizer console on a phone and on a laptop: every section loads, nothing overflows horizontally,
+/// the menu works. Run with two domain packs (people and teams).
+/// </summary>
+[Collection(E2EGroup.Name)]
+public sealed class OrganizerTests(RosterAppFixture app)
+{
+    public static TheoryData<string, int, int> Devices() => new()
+    {
+        { "conference", 390, 844 },
+        { "conference", 1280, 800 },
+        { "tournament", 390, 844 },
+    };
+
+    [Theory]
+    [MemberData(nameof(Devices))]
+    public async Task Every_section_fits_the_screen(string scenarioName, int width, int height)
+    {
+        var scenario = scenarioName == "conference" ? TestScenario.Conference : TestScenario.Tournament;
+        var game = await TestData.SeedGameAsync(app.ConnectionString, scenario, TestGameState.Open);
+        var page = await app.NewOrganizerPageAsync(width, height);
+        var tag = $"organizer-{scenarioName}-{width}";
+
+        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Le mie partite" })).ToBeVisibleAsync();
+        await WaitForInteractiveAsync(page);
+        await AssertFitsAsync(page, "/organizer");
+        await app.ScreenshotAsync(page, $"{tag}-dashboard", fullPage: true);
+
+        foreach (var (section, heading) in new[]
+        {
+            ("", "Panoramica"), ("elements", "Elementi"), ("rules", "Regole"), ("referees", "Arbitri"),
+            ("control", "Controllo"), ("materials", "Materiali"), ("settings", "Impostazioni"),
+        })
+        {
+            await page.GotoAsync($"/organizer/games/{game.Id}/{section}");
+            await Expect(page.GetByRole(AriaRole.Heading, new() { Name = heading, Level = 1 })).ToBeVisibleAsync();
+            await WaitForInteractiveAsync(page);
+            await AssertFitsAsync(page, $"/{section}");
+            await app.ScreenshotAsync(page, $"{tag}-{(section.Length == 0 ? "overview" : section)}", fullPage: true);
+        }
+    }
+
+    [Fact]
+    public async Task Drawer_opens_navigates_and_closes_on_a_phone()
+    {
+        var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Conference, TestGameState.Open);
+        var page = await app.NewOrganizerPageAsync(390, 844, ColorScheme.Dark);
+        await page.GotoAsync($"/organizer/games/{game.Id}");
+        await WaitForInteractiveAsync(page);
+
+        var drawer = page.Locator("#org-sidebar");
+        await Expect(drawer).ToBeHiddenAsync();
+        await ClickUntilVisibleAsync(page.GetByRole(AriaRole.Button, new() { Name = "Apri il menu" }), drawer);
+        await page.WaitForTimeoutAsync(500); // slide-in animation
+        await app.ScreenshotAsync(page, "organizer-drawer-dark");
+
+        await drawer.GetByRole(AriaRole.Link, new() { Name = "Regole" }).ClickAsync();
+        await Expect(page).ToHaveURLAsync(new Regex("/rules$"));
+        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Regole", Level = 1 })).ToBeVisibleAsync();
+        await Expect(drawer).ToBeHiddenAsync();
+
+        await ClickUntilVisibleAsync(page.GetByRole(AriaRole.Button, new() { Name = "Apri il menu" }), drawer);
+        await page.Keyboard.PressAsync("Escape");
+        await Expect(drawer).ToBeHiddenAsync();
+    }
+
+    [Fact]
+    public async Task Account_menu_changes_theme_and_signs_out()
+    {
+        var page = await app.NewOrganizerPageAsync(1280, 800);
+        await WaitForInteractiveAsync(page);
+
+        await ClickUntilVisibleAsync(page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Menu account") }), page.GetByRole(AriaRole.Menu));
+        var theme = page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Tema") });
+        await theme.ClickAsync();
+        await Expect(page.Locator("html")).ToHaveAttributeAsync("data-theme-preference", "light");
+        await app.ScreenshotAsync(page, "organizer-account-menu");
+
+        await page.GetByRole(AriaRole.Menuitem, new() { Name = "Esci" }).ClickAsync();
+        await Expect(page).ToHaveURLAsync(new Regex("/$"));
+        await page.GotoAsync("/organizer");
+        await Expect(page).ToHaveURLAsync(new Regex("/login"));
+    }
+
+    [Fact]
+    public async Task Rules_are_edited_in_a_dialog_with_bonus_malus_and_a_stepper()
+    {
+        var game = await TestData.SeedGameAsync(app.ConnectionString, TestScenario.Tournament, TestGameState.Open);
+        var page = await app.NewOrganizerPageAsync(390, 844);
+        await page.GotoAsync($"/organizer/games/{game.Id}/rules");
+        await WaitForInteractiveAsync(page);
+
+        var dialog = page.GetByRole(AriaRole.Dialog);
+        await ClickUntilVisibleAsync(page.GetByRole(AriaRole.Button, new() { Name = "Aggiungi regola" }).First, dialog);
+        await dialog.GetByLabel("Cosa succede").FillAsync("Own goal");
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Malus" }).ClickAsync();
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Più punti" }).ClickAsync();
+        await Expect(dialog.Locator("output")).ToHaveTextAsync("−2");
+        await app.ScreenshotAsync(page, "organizer-rule-dialog");
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Salva regola" }).ClickAsync();
+
+        var row = page.Locator("li", new() { HasText = "Own goal" });
+        await Expect(row).ToBeVisibleAsync();
+        await Expect(row.GetByText("−2")).ToBeVisibleAsync();
+    }
+
+    [Theory]
+    [InlineData(390, 844)]
+    [InlineData(1280, 800)]
+    public async Task Wizard_creates_a_game_by_hand_in_six_steps(int width, int height)
+    {
+        var page = await app.NewOrganizerPageAsync(width, height);
+        await page.GotoAsync("/organizer/create-game");
+        await WaitForInteractiveAsync(page);
+        var tag = $"wizard-{width}";
+
+        // 1. What is it about: any pack; the first one is enough for this journey.
+        var packs = page.GetByRole(AriaRole.Radiogroup).First.GetByRole(AriaRole.Radio);
+        await Expect(packs.First).ToBeVisibleAsync();
+        await AssertFitsAsync(page, "wizard step 1");
+        await app.ScreenshotAsync(page, $"{tag}-1-pack");
+        await packs.Nth(1).ClickAsync();
+        await page.GetByRole(AriaRole.Button, new() { Name = "Continua" }).ClickAsync();
+
+        // 2. Settings.
+        await page.GetByLabel("Nome della partita").FillAsync("Wizard game");
+        await AssertFitsAsync(page, "wizard step 2");
+        await app.ScreenshotAsync(page, $"{tag}-2-settings");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Continua" }).ClickAsync();
+
+        // 3. Source: by hand (no plugin needed).
+        await Expect(page.GetByRole(AriaRole.Radio, new() { NameRegex = new Regex("Nessuna") }).First).ToBeVisibleAsync();
+        await AssertFitsAsync(page, "wizard step 3");
+        await app.ScreenshotAsync(page, $"{tag}-3-source");
+        await page.GetByRole(AriaRole.Radio).Last.ClickAsync();
+        await page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Importa e continua|Continua") }).ClickAsync();
+
+        // 4 and 5: elements and rules preview.
+        await page.GetByRole(AriaRole.Button, new() { Name = "Continua" }).ClickAsync();
+        await AssertFitsAsync(page, "wizard step 5");
+        await app.ScreenshotAsync(page, $"{tag}-5-rules");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Continua" }).ClickAsync();
+
+        // 6. Publish: lands on the new game.
+        await app.ScreenshotAsync(page, $"{tag}-6-publish");
+        await page.GetByRole(AriaRole.Button, new() { NameRegex = new Regex("Pubblica") }).ClickAsync();
+        await Expect(page).ToHaveURLAsync(new Regex(@"/organizer/games/[0-9a-f-]{36}$"));
+        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Panoramica", Level = 1 })).ToBeVisibleAsync();
+    }
+
+    /// <summary>
+    /// Pages are prerendered and become interactive when the circuit connects: a click before that does nothing.
+    /// Click again until what the click should open is there.
+    /// </summary>
+    private static async Task ClickUntilVisibleAsync(ILocator trigger, ILocator expected)
+    {
+        for (var attempt = 0; attempt < 15; attempt++)
+        {
+            await trigger.ClickAsync();
+            if (await expected.First.IsVisibleAsync())
+            {
+                return;
+            }
+            await Task.Delay(400);
+            if (await expected.First.IsVisibleAsync())
+            {
+                return;
+            }
+        }
+        await Expect(expected.First).ToBeVisibleAsync();
+    }
+
+    /// <summary>The page is interactive once the circuit is up: Blazor marks it by removing the loading state.</summary>
+    private static async Task WaitForInteractiveAsync(IPage page) =>
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+    private static async Task AssertFitsAsync(IPage page, string where)
+    {
+        var overflow = await page.EvaluateAsync<int>("() => document.documentElement.scrollWidth - document.documentElement.clientWidth");
+        if (overflow > 0)
+        {
+            var culprits = await page.EvaluateAsync<string>(
+                """
+                () => [...document.querySelectorAll('body *')]
+                    .filter(e => e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)
+                    .slice(0, 5)
+                    .map(e => `${e.tagName.toLowerCase()}.${e.className} (${Math.round(e.getBoundingClientRect().width)}px)`)
+                    .join(', ')
+                """);
+            overflow.ShouldBe(0, $"{where} overflows horizontally: {culprits}");
+        }
+    }
+}

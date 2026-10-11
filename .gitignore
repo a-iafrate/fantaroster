@@ -149,6 +149,8 @@ ipch/
 
 # Visual Studio Trace Files
 *.e2e
+# The Playwright project is called Roster.E2E: do not let the rule above ignore it (git ignores case on Windows).
+!/tests/Roster.E2E/
 
 # TFS 2012 Local Workspace
 $tf/
