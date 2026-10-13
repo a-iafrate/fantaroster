@@ -19,6 +19,9 @@ public sealed class PublicSiteTests(RosterAppFixture app)
         { "/login", 1280, ColorScheme.Light },
         { "/login?error=invalid_link", 390, ColorScheme.Light },
         { "/j", 360, ColorScheme.Dark },
+        { "/pricing", 390, ColorScheme.Light },
+        { "/pricing", 390, ColorScheme.Dark },
+        { "/pricing", 1280, ColorScheme.Light },
         { "/not-found", 390, ColorScheme.Light },
     };
 

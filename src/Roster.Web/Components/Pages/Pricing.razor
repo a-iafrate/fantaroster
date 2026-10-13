@@ -1,0 +1,188 @@
+@page "/pricing"
+@using System.Globalization
+@using Roster.Application.Plans
+@inject IStringLocalizer<SharedResource> Loc
+@inject PlanLimits Limits
+
+<PageTitle>@Loc["PricingPageTitle"]</PageTitle>
+
+@* Public pricing page. Plans and limits are the ones of the business model; the numbers of players come from configuration. *@
+<div class="pr">
+    <header class="pr-hero">
+        <h1 class="pr-hero__title">@Loc["PricingHeroTitle"]</h1>
+        <p class="pr-hero__sub">@Loc["PricingHeroSub"]</p>
+        <p class="pr-note"><i class="icon-info" aria-hidden="true"></i>@Loc["PricingIndicative"]</p>
+    </header>
+
+    <section class="pr-section" aria-labelledby="pr-plans-title">
+        <h2 id="pr-plans-title" class="visually-hidden">@Loc["PricingCompareTitle"]</h2>
+        <ul class="pr-plans">
+            <li class="pr-plan">
+                <span class="pr-plan__status pr-plan__status--now">@Loc["PricingAvailableNow"]</span>
+                <h3 class="pr-plan__name">@Loc["PricingPlanFree"]</h3>
+                <p class="pr-plan__for">@Loc["PricingPlanFreeFor"]</p>
+                <p class="pr-plan__price"><strong>@Loc["PricingPlanFreePrice"]</strong> <span>@Loc["PricingPlanFreeUnit"]</span></p>
+                <ul class="pr-plan__list">
+                    <li>@string.Format(CultureInfo.CurrentCulture, Loc["PricingFeatPlayers"].Value, Limits.FreeParticipantLimit)</li>
+                    <li>@Loc["PricingFeatLiveGame"]</li>
+                    <li>@Loc["PricingFeatPoweredBy"]</li>
+                    <li>@Loc["PricingFeatEveryone"]</li>
+                </ul>
+                <a href="/organizer/create-game" class="ds-btn ds-btn--l ds-btn--primary ds-btn--block">@Loc["PricingCtaFree"]</a>
+            </li>
+
+            <li class="pr-plan pr-plan--highlight">
+                <span class="pr-plan__status pr-plan__status--approval">@Loc["PricingAfterApproval"]</span>
+                <h3 class="pr-plan__name">@Loc["PricingPlanCommunity"]</h3>
+                <p class="pr-plan__for">@Loc["PricingPlanCommunityFor"]</p>
+                <p class="pr-plan__price"><strong>@Loc["PricingPlanCommunityPrice"]</strong> <span>@Loc["PricingPlanCommunityUnit"]</span></p>
+                <ul class="pr-plan__list">
+                    <li>@string.Format(CultureInfo.CurrentCulture, Loc["PricingFeatPlayers"].Value, Limits.CommunityParticipantLimit)</li>
+                    <li>@Loc["PricingFeatAuthorized"]</li>
+                </ul>
+                <a href="/organizer/account#community" class="ds-btn ds-btn--l ds-btn--primary ds-btn--block">@Loc["PricingCtaCommunity"]</a>
+            </li>
+
+            <li class="pr-plan">
+                <span class="pr-plan__status pr-plan__status--soon">@Loc["PricingComingSoon"]</span>
+                <h3 class="pr-plan__name">@Loc["PricingPlanPremium"]</h3>
+                <p class="pr-plan__for">@Loc["PricingPlanPremiumFor"]</p>
+                <p class="pr-plan__price"><strong>@Loc["PricingPlanPremiumPrice"]</strong> <span>@Loc["PricingPlanPremiumUnit"]</span></p>
+                <ul class="pr-plan__list">
+                    <li>@Loc["PricingFeatMorePlayers"]</li>
+                    <li>@Loc["PricingFeatEveryone"]</li>
+                </ul>
+                <span class="ds-btn ds-btn--l ds-btn--secondary ds-btn--block pr-plan__soon" aria-disabled="true">@Loc["PricingCtaSoon"]</span>
+            </li>
+
+            <li class="pr-plan">
+                <span class="pr-plan__status pr-plan__status--soon">@Loc["PricingComingSoon"]</span>
+                <h3 class="pr-plan__name">@Loc["PricingPlanPro"]</h3>
+                <p class="pr-plan__for">@Loc["PricingPlanProFor"]</p>
+                <p class="pr-plan__price"><strong>@Loc["PricingPlanProPrice"]</strong> <span>@Loc["PricingPlanProUnit"]</span></p>
+                <ul class="pr-plan__list">
+                    <li>@Loc["PricingFeatMorePlayers"]</li>
+                    <li>@Loc["PricingFeatSupport"]</li>
+                    <li>@Loc["PricingFeatEveryone"]</li>
+                </ul>
+                <span class="ds-btn ds-btn--l ds-btn--secondary ds-btn--block pr-plan__soon" aria-disabled="true">@Loc["PricingCtaSoon"]</span>
+            </li>
+        </ul>
+    </section>
+
+    <section class="pr-section" aria-labelledby="pr-compare">
+        <h2 id="pr-compare" class="pr-h2">@Loc["PricingCompareTitle"]</h2>
+        <div class="pr-table-wrap" role="region" aria-labelledby="pr-compare" tabindex="0">
+            <table class="pr-table">
+                <thead>
+                    <tr>
+                        <th scope="col">@Loc["PricingCompareFeature"]</th>
+                        <th scope="col">@Loc["PricingPlanFree"]</th>
+                        <th scope="col">@Loc["PricingPlanCommunity"]</th>
+                        <th scope="col">@Loc["PricingPlanPremium"]</th>
+                        <th scope="col">@Loc["PricingPlanPro"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">@Loc["PricingRowPlayers"]</th>
+                        <td>@Limits.FreeParticipantLimit</td>
+                        <td>@Limits.CommunityParticipantLimit</td>
+                        <td>@Loc["PricingPlayersMore"]</td>
+                        <td>@Loc["PricingPlayersMore"]</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">@Loc["PricingRowBilling"]</th>
+                        <td>@Loc["PricingBillingFree"]</td>
+                        <td>@Loc["PricingBillingYear"]</td>
+                        <td>@Loc["PricingBillingGame"]</td>
+                        <td>@Loc["PricingBillingEvent"]</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">@Loc["PricingRowWho"]</th>
+                        <td>@Loc["PricingWhoEveryone"]</td>
+                        <td>@Loc["PricingWhoAuthorized"]</td>
+                        <td>@Loc["PricingWhoEveryone"]</td>
+                        <td>@Loc["PricingWhoEveryone"]</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">@Loc["PricingRowStatus"]</th>
+                        <td>@Loc["PricingAvailableNow"]</td>
+                        <td>@Loc["PricingAfterApproval"]</td>
+                        <td>@Loc["PricingComingSoon"]</td>
+                        <td>@Loc["PricingComingSoon"]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="pr-h3">@Loc["PricingIncludedTitle"]</h3>
+        <ul class="pr-included">
+            <li>@Loc["PricingIncluded1"]</li>
+            <li>@Loc["PricingIncluded2"]</li>
+            <li>@Loc["PricingIncluded3"]</li>
+            <li>@Loc["PricingIncluded4"]</li>
+            <li>@Loc["PricingIncluded5"]</li>
+            <li>@Loc["PricingIncluded6"]</li>
+        </ul>
+    </section>
+
+    <section id="community" class="pr-section pr-community" aria-labelledby="pr-community-title">
+        <h2 id="pr-community-title" class="pr-h2">@Loc["PricingCommunityTitle"]</h2>
+        <p>@Loc["PricingCommunityIntro"]</p>
+        <p>@Loc["PricingCommunityWho"]</p>
+        <ol class="pr-steps">
+            <li class="pr-step">
+                <h3 class="pr-step__title">@Loc["PricingCommunityStep1Title"]</h3>
+                <p>@Loc["PricingCommunityStep1Body"]</p>
+            </li>
+            <li class="pr-step">
+                <h3 class="pr-step__title">@Loc["PricingCommunityStep2Title"]</h3>
+                <p>@Loc["PricingCommunityStep2Body"]</p>
+            </li>
+            <li class="pr-step">
+                <h3 class="pr-step__title">@Loc["PricingCommunityStep3Title"]</h3>
+                <p>@string.Format(CultureInfo.CurrentCulture, Loc["PricingCommunityStep3Body"].Value, Limits.CommunityParticipantLimit)</p>
+            </li>
+        </ol>
+        <p class="pr-note"><i class="icon-info" aria-hidden="true"></i>@Loc["PricingCommunityToday"]</p>
+        <a href="/organizer/account#community" class="ds-btn ds-btn--l ds-btn--primary">@Loc["PricingCommunityCta"]</a>
+    </section>
+
+    <section class="pr-section" aria-labelledby="pr-sponsor-title">
+        <h2 id="pr-sponsor-title" class="pr-h2">@Loc["PricingSponsorTitle"]</h2>
+        <p>@Loc["PricingSponsorBody"]</p>
+    </section>
+
+    <section class="pr-section" aria-labelledby="pr-faq-title">
+        <h2 id="pr-faq-title" class="pr-h2">@Loc["PricingFaqTitle"]</h2>
+        <div class="pr-faq">
+            <details class="pr-faq__item">
+                <summary>@Loc["PricingFaq1Q"]</summary>
+                <p>@Loc["PricingFaq1A"]</p>
+            </details>
+            <details class="pr-faq__item">
+                <summary>@Loc["PricingFaq2Q"]</summary>
+                <p>@Loc["PricingFaq2A"]</p>
+            </details>
+            <details class="pr-faq__item">
+                <summary>@Loc["PricingFaq3Q"]</summary>
+                <p>@Loc["PricingFaq3A"]</p>
+            </details>
+            <details class="pr-faq__item">
+                <summary>@Loc["PricingFaq4Q"]</summary>
+                <p>@Loc["PricingFaq4A"]</p>
+            </details>
+            <details class="pr-faq__item">
+                <summary>@Loc["PricingFaq5Q"]</summary>
+                <p>@Loc["PricingFaq5A"] <a href="/privacy">@Loc["PricingFaqPrivacyLink"]</a></p>
+            </details>
+        </div>
+    </section>
+
+    <section class="pr-bottom">
+        <h2 class="pr-h2">@Loc["PricingBottomTitle"]</h2>
+        <p>@Loc["PricingBottomBody"]</p>
+        <a href="/organizer/create-game" class="ds-btn ds-btn--l ds-btn--primary">@Loc["PricingCtaFree"]</a>
+    </section>
+</div>

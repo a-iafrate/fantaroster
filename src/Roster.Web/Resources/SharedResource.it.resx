@@ -1384,6 +1384,249 @@
   <data name="AdminPageOf" xml:space="preserve">
     <value>Pagina {0} di {1}</value>
   </data>
+  <data name="PubNavPricing" xml:space="preserve">
+    <value>Prezzi</value>
+  </data>
+  <data name="PricingPageTitle" xml:space="preserve">
+    <value>Prezzi</value>
+  </data>
+  <data name="PricingHeroTitle" xml:space="preserve">
+    <value>Una regola semplice: paga chi organizza, chi partecipa gioca gratis</value>
+  </data>
+  <data name="PricingHeroSub" xml:space="preserve">
+    <value>Chi gioca non paga e non ha bisogno di un account. Parti gratis e passa a un piano superiore solo quando la tua partita ha bisogno di più spazio.</value>
+  </data>
+  <data name="PricingIndicative" xml:space="preserve">
+    <value>I prezzi sono indicativi e possono cambiare prima dell'apertura dei piani a pagamento.</value>
+  </data>
+  <data name="PricingAvailableNow" xml:space="preserve">
+    <value>Disponibile ora</value>
+  </data>
+  <data name="PricingAfterApproval" xml:space="preserve">
+    <value>Disponibile dopo l'approvazione</value>
+  </data>
+  <data name="PricingComingSoon" xml:space="preserve">
+    <value>In arrivo</value>
+  </data>
+  <data name="PricingPlanFree" xml:space="preserve">
+    <value>Gratis</value>
+  </data>
+  <data name="PricingPlanFreeFor" xml:space="preserve">
+    <value>Amici, famiglie, piccoli gruppi e la tua prima prova.</value>
+  </data>
+  <data name="PricingPlanFreePrice" xml:space="preserve">
+    <value>0 €</value>
+  </data>
+  <data name="PricingPlanFreeUnit" xml:space="preserve">
+    <value>per sempre</value>
+  </data>
+  <data name="PricingPlanCommunity" xml:space="preserve">
+    <value>Community</value>
+  </data>
+  <data name="PricingPlanCommunityFor" xml:space="preserve">
+    <value>Gruppi di utenti, club, associazioni e serie di eventi senza scopo di lucro.</value>
+  </data>
+  <data name="PricingPlanCommunityPrice" xml:space="preserve">
+    <value>circa 10 €</value>
+  </data>
+  <data name="PricingPlanCommunityUnit" xml:space="preserve">
+    <value>all'anno</value>
+  </data>
+  <data name="PricingPlanPremium" xml:space="preserve">
+    <value>Partita Premium</value>
+  </data>
+  <data name="PricingPlanPremiumFor" xml:space="preserve">
+    <value>Feste, matrimoni, tornei e gruppi di amici più numerosi.</value>
+  </data>
+  <data name="PricingPlanPremiumPrice" xml:space="preserve">
+    <value>3–9 €</value>
+  </data>
+  <data name="PricingPlanPremiumUnit" xml:space="preserve">
+    <value>a partita</value>
+  </data>
+  <data name="PricingPlanPro" xml:space="preserve">
+    <value>Evento Pro</value>
+  </data>
+  <data name="PricingPlanProFor" xml:space="preserve">
+    <value>Eventi commerciali e aziendali con molte persone e sponsor.</value>
+  </data>
+  <data name="PricingPlanProPrice" xml:space="preserve">
+    <value>99–299 €</value>
+  </data>
+  <data name="PricingPlanProUnit" xml:space="preserve">
+    <value>a evento</value>
+  </data>
+  <data name="PricingFeatPlayers" xml:space="preserve">
+    <value>Fino a {0} giocatori per partita</value>
+  </data>
+  <data name="PricingFeatMorePlayers" xml:space="preserve">
+    <value>Più giocatori per partita</value>
+  </data>
+  <data name="PricingFeatLiveGame" xml:space="preserve">
+    <value>1 partita live alla volta</value>
+  </data>
+  <data name="PricingFeatPoweredBy" xml:space="preserve">
+    <value>Mostra un piccolo marchio "powered by"</value>
+  </data>
+  <data name="PricingFeatAuthorized" xml:space="preserve">
+    <value>Solo per organizzatori che abbiamo autorizzato</value>
+  </data>
+  <data name="PricingFeatEveryone" xml:space="preserve">
+    <value>Aperto a ogni organizzatore</value>
+  </data>
+  <data name="PricingFeatSupport" xml:space="preserve">
+    <value>Assistenza prioritaria per il tuo evento</value>
+  </data>
+  <data name="PricingCtaFree" xml:space="preserve">
+    <value>Crea la tua partita</value>
+  </data>
+  <data name="PricingCtaCommunity" xml:space="preserve">
+    <value>Richiedi l'autorizzazione</value>
+  </data>
+  <data name="PricingCtaSoon" xml:space="preserve">
+    <value>In arrivo</value>
+  </data>
+  <data name="PricingCompareTitle" xml:space="preserve">
+    <value>Confronta i piani</value>
+  </data>
+  <data name="PricingCompareFeature" xml:space="preserve">
+    <value>Cosa ottieni</value>
+  </data>
+  <data name="PricingRowPlayers" xml:space="preserve">
+    <value>Giocatori per partita</value>
+  </data>
+  <data name="PricingRowBilling" xml:space="preserve">
+    <value>Come si paga</value>
+  </data>
+  <data name="PricingRowWho" xml:space="preserve">
+    <value>Chi può sceglierlo</value>
+  </data>
+  <data name="PricingRowStatus" xml:space="preserve">
+    <value>Stato</value>
+  </data>
+  <data name="PricingBillingFree" xml:space="preserve">
+    <value>Nulla da pagare</value>
+  </data>
+  <data name="PricingBillingYear" xml:space="preserve">
+    <value>Abbonamento annuale</value>
+  </data>
+  <data name="PricingBillingGame" xml:space="preserve">
+    <value>Una volta per partita</value>
+  </data>
+  <data name="PricingBillingEvent" xml:space="preserve">
+    <value>Una volta per evento</value>
+  </data>
+  <data name="PricingWhoEveryone" xml:space="preserve">
+    <value>Chiunque</value>
+  </data>
+  <data name="PricingWhoAuthorized" xml:space="preserve">
+    <value>Organizzatori autorizzati</value>
+  </data>
+  <data name="PricingPlayersMore" xml:space="preserve">
+    <value>Di più (dipende dal piano)</value>
+  </data>
+  <data name="PricingIncludedTitle" xml:space="preserve">
+    <value>Incluso in ogni piano</value>
+  </data>
+  <data name="PricingIncluded1" xml:space="preserve">
+    <value>I giocatori entrano con un soprannome: nessun account, nessuna app da installare</value>
+  </data>
+  <data name="PricingIncluded2" xml:space="preserve">
+    <value>Partita pronta da un ambito con parole, regole e modelli propri</value>
+  </data>
+  <data name="PricingIncluded3" xml:space="preserve">
+    <value>Elementi importati da un file o da un'altra fonte, tenuti allineati</value>
+  </data>
+  <data name="PricingIncluded4" xml:space="preserve">
+    <value>Console degli arbitri, classifica dal vivo e schermo grande</value>
+  </data>
+  <data name="PricingIncluded5" xml:space="preserve">
+    <value>Consenso delle persone in gioco e diritto di uscire in qualsiasi momento</value>
+  </data>
+  <data name="PricingIncluded6" xml:space="preserve">
+    <value>Italiano e inglese, su telefono e computer</value>
+  </data>
+  <data name="PricingCommunityTitle" xml:space="preserve">
+    <value>Il piano Community</value>
+  </data>
+  <data name="PricingCommunityIntro" xml:space="preserve">
+    <value>Un prezzo più basso per chi tiene viva una scena. Proprio perché costa meno, non è aperto a tutti: controlliamo ogni richiesta.</value>
+  </data>
+  <data name="PricingCommunityWho" xml:space="preserve">
+    <value>Per chi è: gruppi di utenti, club, associazioni e serie di eventi senza scopo di lucro che organizzano partite per i loro membri.</value>
+  </data>
+  <data name="PricingCommunityStep1Title" xml:space="preserve">
+    <value>1. Fai la richiesta</value>
+  </data>
+  <data name="PricingCommunityStep1Body" xml:space="preserve">
+    <value>Dalla pagina del tuo account descrivi chi sei e cosa organizzi e aggiungi il link alla tua community o al tuo evento.</value>
+  </data>
+  <data name="PricingCommunityStep2Title" xml:space="preserve">
+    <value>2. Controlliamo</value>
+  </data>
+  <data name="PricingCommunityStep2Body" xml:space="preserve">
+    <value>Guardiamo il link e quello che hai scritto. Se è una community vera approviamo; altrimenti ti spieghiamo perché e potrai riprovare.</value>
+  </data>
+  <data name="PricingCommunityStep3Title" xml:space="preserve">
+    <value>3. Ricevi una email</value>
+  </data>
+  <data name="PricingCommunityStep3Body" xml:space="preserve">
+    <value>Ricevi la risposta per email, con una nota da parte nostra. Una volta approvato, le tue partite accettano fino a {0} giocatori.</value>
+  </data>
+  <data name="PricingCommunityToday" xml:space="preserve">
+    <value>Oggi l'approvazione attiva subito il limite più alto. L'abbonamento annuale arriva con i piani a pagamento e sarà offerto solo agli organizzatori approvati.</value>
+  </data>
+  <data name="PricingCommunityCta" xml:space="preserve">
+    <value>Richiedi l'autorizzazione</value>
+  </data>
+  <data name="PricingSponsorTitle" xml:space="preserve">
+    <value>Sponsor</value>
+  </data>
+  <data name="PricingSponsorBody" xml:space="preserve">
+    <value>Paga un organizzatore, o uno sponsor; tutto il gruppo gioca gratis. I bonus sponsor (un QR che dà ai giocatori un bonus personale, con il resoconto delle scansioni) arriveranno in una versione successiva e saranno venduti tramite l'organizzatore. I dati di contatto arrivano a uno sponsor solo con un consenso separato ed esplicito del giocatore.</value>
+  </data>
+  <data name="PricingFaqTitle" xml:space="preserve">
+    <value>Domande frequenti</value>
+  </data>
+  <data name="PricingFaq1Q" xml:space="preserve">
+    <value>Cosa succede quando una partita è piena?</value>
+  </data>
+  <data name="PricingFaq1A" xml:space="preserve">
+    <value>Nessuno di chi è già dentro viene tolto. I nuovi giocatori vedono un messaggio chiaro che la partita è al completo. Puoi passare a un piano con più spazio o chiederci di alzare il limite di quella partita.</value>
+  </data>
+  <data name="PricingFaq2Q" xml:space="preserve">
+    <value>I giocatori hanno bisogno di un account?</value>
+  </data>
+  <data name="PricingFaq2A" xml:space="preserve">
+    <value>No. I giocatori entrano con un link o un QR e un soprannome. Non chiediamo altro.</value>
+  </data>
+  <data name="PricingFaq3Q" xml:space="preserve">
+    <value>Offrite un limite più alto per un evento di lancio o un partner?</value>
+  </data>
+  <data name="PricingFaq3A" xml:space="preserve">
+    <value>Sì. Possiamo alzare il limite di una singola partita, qualunque sia il piano di chi la organizza. Se organizzi qualcosa che lo merita, chiedicelo dalla pagina del tuo account.</value>
+  </data>
+  <data name="PricingFaq4Q" xml:space="preserve">
+    <value>Sono i prezzi definitivi?</value>
+  </data>
+  <data name="PricingFaq4A" xml:space="preserve">
+    <value>No: sono indicativi finché non si aprono i piani a pagamento. Oggi sono disponibili il piano Gratis e, dopo l'approvazione, il limite Community.</value>
+  </data>
+  <data name="PricingFaq5Q" xml:space="preserve">
+    <value>E i nostri dati e la privacy?</value>
+  </data>
+  <data name="PricingFaq5A" xml:space="preserve">
+    <value>I giocatori sono anonimi: basta un soprannome. Puoi scaricare o cancellare i tuoi dati in qualsiasi momento dalla pagina del tuo account. Leggi l'informativa completa sulla privacy per i dettagli.</value>
+  </data>
+  <data name="PricingFaqPrivacyLink" xml:space="preserve">
+    <value>Informativa sulla privacy</value>
+  </data>
+  <data name="PricingBottomTitle" xml:space="preserve">
+    <value>Pronto a cominciare?</value>
+  </data>
+  <data name="PricingBottomBody" xml:space="preserve">
+    <value>Crea gratis la tua prima partita; potrai passare a un piano superiore quando ti serve.</value>
+  </data>
 </root>
 
 

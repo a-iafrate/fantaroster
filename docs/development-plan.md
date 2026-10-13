@@ -276,6 +276,7 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 - [ ] Dashboards and alerts: join rate, hub connections, score latency, error rate.
 - [ ] Backup and restore test for the database.
 - [x] Plans and limits: participant limit per game (50 Free, 300 community, configurable), per-game limit set by an administrator (launch events), community request from the account page with approval by an administrator and an email with the decision. *(Done: `Game.EffectiveParticipantLimit`, `CommunityRequest`, migration `AddCommunityAndParticipantLimits`, join answers 403 when the game is full.)*
+- [x] Public pricing page (`/pricing`): plans, limits from configuration, comparison table, Community authorization steps, sponsors and FAQ; linked from the header, the phone menu and the footer; EN and IT; audited with axe. *(Prices indicative, paid plans "coming soon" until payments exist.)*
 - [x] Internal administration area (`Admin:Emails`): statistics dashboard, community requests, all games with their limit; hidden from everybody else. *(Done: `/admin`, `/admin/requests`, `/admin/games` with search by name or organizer email, state and custom-limit filters, sorting and paging done by the database; the pages load in two steps with a loading indicator; accessibility audited with axe.)*
 
 **Exit criteria**

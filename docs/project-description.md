@@ -419,6 +419,8 @@ These apply to every domain, with extra rules where needed.
 - **Periodic re-check of the authorization:** the plan renews every year, but the authorization is checked again every two or three years (a quick look at the community link), so inactive or changed communities do not keep the price for ever.
 - **Per-game vouchers:** instead of unlocking the account, a code raises the limit of one game, the same way an administrator does today. Useful for one-off events.
 
+**Public pricing page.** `/pricing` explains the plans to everybody, before they sign in: what Free, Community, Premium and Pro give, the player limit of each (taken from configuration), a comparison table, what every plan includes, how the Community plan is authorized (ask, we check, you are told by email), what happens to sponsors and the usual questions. Prices are shown as indicative and the paid plans as "coming soon" until payments exist; the Community call to action leads to the request on the account page.
+
 **Internal administration.** The addresses listed in `Admin:Emails` see an administration area: statistics (organizers, games by state, players and points, players per day, games with most players), community requests (approve or reject with a note) and the list of all games with their limit. For everybody else these pages do not exist.
 
 **Why it works:** the free plan spreads the product; every game shows it to tens or hundreds of people, including future organizers. Curated domains and plugins justify the upgrade.

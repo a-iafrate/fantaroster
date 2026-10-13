@@ -53,7 +53,7 @@ public sealed partial class AccessibilityTests(RosterAppFixture app)
         var problems = new List<string>();
         var page = await app.NewPageAsync(width, HeightFor(width), scheme);
 
-        foreach (var path in new[] { "/", "/login", "/login?error=invalid_link", "/j", "/terms", "/privacy", "/not-found" })
+        foreach (var path in new[] { "/", "/login", "/login?error=invalid_link", "/j", "/terms", "/privacy", "/pricing", "/not-found" })
         {
             await page.GotoAsync(path);
             await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
