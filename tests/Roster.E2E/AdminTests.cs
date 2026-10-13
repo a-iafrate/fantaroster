@@ -69,7 +69,7 @@ public sealed class AdminTests(RosterAppFixture app)
         await Expect(admin.GetByText("Decisione salvata")).ToBeVisibleAsync();
 
         await organizer.GotoAsync("/organizer/account");
-        await Expect(organizer.GetByText("Sei una community riconosciuta")).ToBeVisibleAsync();
+        await Expect(organizer.GetByText(app.PaymentsOn ? "Abbiamo approvato la tua community" : "Sei una community riconosciuta")).ToBeVisibleAsync();
         await Expect(organizer.Locator("#community-description")).ToHaveCountAsync(0);
 
         // The development email sender writes the message to the log of the server.

@@ -11,6 +11,9 @@
 @inject AuthenticationStateProvider AuthState
 @inject PlanService Plans
 @inject PlanLimits Limits
+@inject Roster.Application.Payments.PaymentSettings Payments
+@using Roster.Domain.Payments
+@using Roster.Web.Payments
 
 <PageTitle>@Loc["AccountTitle"]</PageTitle>
 
@@ -48,12 +51,49 @@
         <p class="ds-alert ds-alert--info" role="status">@Loc["CommunityAlready"]</p>
     }
 
+    @if (BillingNotice() is { } billingNotice)
+    {
+        <p class="@(Billing is "active" or "ended" ? "ds-alert ds-alert--success" : Billing is "pending" or "notcompleted" ? "ds-alert ds-alert--info" : "ds-alert")" role="@(Billing is "error" or "noteligible" ? "alert" : "status")">@billingNotice</p>
+    }
+
     <section id="community" class="account-section" aria-labelledby="account-community">
         <h2 id="account-community" class="ds-section-title">@Loc["CommunityTitle"]</h2>
         <p class="ds-muted">@Loc["CommunityDesc"]</p>
         <p class="ds-muted">@string.Format(CultureInfo.CurrentCulture, Loc["CommunityLimitInfo"].Value, Limits.FreeParticipantLimit, Limits.CommunityParticipantLimit)</p>
 
-        @if (_plan is { IsCommunity: true } community)
+        @if (_plan is { IsApprovedCommunity: true } approved && Payments.SubscriptionsEnabled)
+        {
+            @* Authorized by us: from here on the plan is paid for, every year, on PayPal. *@
+            @if (approved.IsCommunity && approved.LatestSubscription is { } active)
+            {
+                <p class="ds-alert ds-alert--success" role="status">
+                    @string.Format(CultureInfo.CurrentCulture, Loc[active.Status == SubscriptionStatus.Cancelled ? "CommunitySubscriptionCancelledUntil" : "CommunitySubscriptionActive"].Value, PaidUntil(active))
+                </p>
+                @if (active.Status == SubscriptionStatus.Active)
+                {
+                    <form method="post" action="/organizer/account/subscription/cancel">
+                        <button type="submit" class="ds-btn ds-btn--secondary" data-busy-label="@Loc["CommunityBusy"]">@Loc["CommunitySubscriptionCancel"]</button>
+                    </form>
+                }
+            }
+            else
+            {
+                @if (approved.LatestSubscription is { Status: SubscriptionStatus.Suspended })
+                {
+                    <p class="ds-alert" role="alert">@Loc["CommunitySubscriptionSuspended"]</p>
+                }
+                else
+                {
+                    <p class="ds-alert ds-alert--info" role="status">@Loc["CommunityApprovedNeedsPayment"]</p>
+                }
+
+                <p class="ds-muted">@string.Format(CultureInfo.CurrentCulture, Loc["CommunitySubscribeDesc"].Value, PaymentFormat.Money(Payments.CommunityYearlyPrice, Payments.Currency))</p>
+                <form method="post" action="/organizer/account/subscribe">
+                    <button type="submit" class="ds-btn ds-btn--l ds-btn--primary" data-busy-label="@Loc["PlanBuyBusy"]">@Loc["CommunitySubscribeButton"]</button>
+                </form>
+            }
+        }
+        else if (_plan is { IsCommunity: true } community)
         {
             <p class="ds-alert ds-alert--success" role="status">@string.Format(CultureInfo.CurrentCulture, Loc["CommunityStatusApproved"].Value, community.ParticipantLimit)</p>
         }
@@ -115,7 +155,24 @@
     [SupplyParameterFromQuery(Name = "community")]
     public string? Community { get; set; }
 
+    [SupplyParameterFromQuery(Name = "billing")]
+    public string? Billing { get; set; }
+
     private OrganizerPlan? _plan;
+
+    private static string PaidUntil(Subscription subscription) =>
+        subscription.PaidUntil is { } until ? until.ToLocalTime().ToString("d", CultureInfo.CurrentCulture) : string.Empty;
+
+    private string? BillingNotice() => Billing switch
+    {
+        "active" => Loc["CommunityBillingActive"].Value,
+        "pending" => Loc["CommunityBillingPending"].Value,
+        "notcompleted" => Loc["CommunityBillingNotCompleted"].Value,
+        "ended" => Loc["CommunityBillingEnded"].Value,
+        "error" => Loc["CommunityBillingError"].Value,
+        "noteligible" => Loc["CommunityBillingNotEligible"].Value,
+        _ => null,
+    };
 
     protected override async Task OnInitializedAsync()
     {

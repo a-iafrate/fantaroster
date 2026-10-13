@@ -1627,6 +1627,240 @@
   <data name="PricingBottomBody" xml:space="preserve">
     <value>Create your first game for free; you can move up whenever you need.</value>
   </data>
+  <data name="NavPlan" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="PlanTabTitle" xml:space="preserve">
+    <value>Plan and limit</value>
+  </data>
+  <data name="PlanTabDesc" xml:space="preserve">
+    <value>How many players this game accepts, and how to make room for more.</value>
+  </data>
+  <data name="PlanCurrentLimit" xml:space="preserve">
+    <value>This game accepts up to {0} players.</value>
+  </data>
+  <data name="PlanSourceFree" xml:space="preserve">
+    <value>It follows the Free plan.</value>
+  </data>
+  <data name="PlanSourceCommunity" xml:space="preserve">
+    <value>It follows the Community plan of your account.</value>
+  </data>
+  <data name="PlanSourcePremium" xml:space="preserve">
+    <value>You bought the Premium plan for this game.</value>
+  </data>
+  <data name="PlanSourcePro" xml:space="preserve">
+    <value>You bought the Pro plan for this game.</value>
+  </data>
+  <data name="PlanSourceCustom" xml:space="preserve">
+    <value>We set the limit of this game{0}.</value>
+  </data>
+  <data name="PlanBuyTitle" xml:space="preserve">
+    <value>Make room for more players</value>
+  </data>
+  <data name="PlanBuyDesc" xml:space="preserve">
+    <value>Pay once for this game and the new limit is active as soon as the payment is confirmed.</value>
+  </data>
+  <data name="PlanSoon" xml:space="preserve">
+    <value>The paid plans are not open yet. Until they are, ask us for a higher limit if your event needs it.</value>
+  </data>
+  <data name="PlanSeePricing" xml:space="preserve">
+    <value>See the plans</value>
+  </data>
+  <data name="PlanTierPlayers" xml:space="preserve">
+    <value>Up to {0} players</value>
+  </data>
+  <data name="PlanTierIncluded" xml:space="preserve">
+    <value>Already included</value>
+  </data>
+  <data name="PlanBuyButton" xml:space="preserve">
+    <value>Buy for {0}</value>
+  </data>
+  <data name="PlanBuyBusy" xml:space="preserve">
+    <value>Going to PayPal…</value>
+  </data>
+  <data name="PlanSecurePayPal" xml:space="preserve">
+    <value>You pay on PayPal: we never see your card or your account.</value>
+  </data>
+  <data name="PlanNoticePaid" xml:space="preserve">
+    <value>Payment received. The new limit is already active.</value>
+  </data>
+  <data name="PlanNoticeAlready" xml:space="preserve">
+    <value>This payment was already counted: the limit is active.</value>
+  </data>
+  <data name="PlanNoticeFailed" xml:space="preserve">
+    <value>The payment could not be completed. If money left your account, write to us and we will sort it out.</value>
+  </data>
+  <data name="PlanNoticeCancelled" xml:space="preserve">
+    <value>You cancelled the payment. Nothing was charged.</value>
+  </data>
+  <data name="PlanNoticeError" xml:space="preserve">
+    <value>We could not reach PayPal. Try again in a minute.</value>
+  </data>
+  <data name="PlanNoticeCovered" xml:space="preserve">
+    <value>This game already has at least that much room.</value>
+  </data>
+  <data name="PlanNoticeInvalid" xml:space="preserve">
+    <value>That option does not exist.</value>
+  </data>
+  <data name="PlanNoticeDisabled" xml:space="preserve">
+    <value>Payments are not open yet.</value>
+  </data>
+  <data name="CommunityApprovedNeedsPayment" xml:space="preserve">
+    <value>We approved your community. Subscribe to switch the higher limit on.</value>
+  </data>
+  <data name="CommunitySubscribeDesc" xml:space="preserve">
+    <value>{0} a year, renewed every year until you stop it. You pay on PayPal.</value>
+  </data>
+  <data name="CommunitySubscribeButton" xml:space="preserve">
+    <value>Subscribe with PayPal</value>
+  </data>
+  <data name="CommunitySubscriptionActive" xml:space="preserve">
+    <value>Your Community plan is active until {0}, then it renews.</value>
+  </data>
+  <data name="CommunitySubscriptionCancelledUntil" xml:space="preserve">
+    <value>Renewal stopped. Your Community plan stays active until {0}.</value>
+  </data>
+  <data name="CommunitySubscriptionCancel" xml:space="preserve">
+    <value>Stop the renewal</value>
+  </data>
+  <data name="CommunitySubscriptionSuspended" xml:space="preserve">
+    <value>Your subscription is suspended because a payment failed. Update your payment method on PayPal.</value>
+  </data>
+  <data name="CommunityBillingActive" xml:space="preserve">
+    <value>Subscription active. Your games now accept the Community limit.</value>
+  </data>
+  <data name="CommunityBillingPending" xml:space="preserve">
+    <value>PayPal has not confirmed the subscription yet. It will be active as soon as it does.</value>
+  </data>
+  <data name="CommunityBillingNotCompleted" xml:space="preserve">
+    <value>You did not complete the subscription. Nothing was charged.</value>
+  </data>
+  <data name="CommunityBillingEnded" xml:space="preserve">
+    <value>Renewal stopped. The plan stays active until the end of the period you paid for.</value>
+  </data>
+  <data name="CommunityBillingError" xml:space="preserve">
+    <value>We could not complete the operation with PayPal. Try again in a minute.</value>
+  </data>
+  <data name="CommunityBillingNotEligible" xml:space="preserve">
+    <value>The Community plan is only for organizers we have approved.</value>
+  </data>
+  <data name="PricingTierLine" xml:space="preserve">
+    <value>Up to {0} players: {1}</value>
+  </data>
+  <data name="PricingCtaBuy" xml:space="preserve">
+    <value>Choose a game to upgrade</value>
+  </data>
+  <data name="PricingSecurePayPal" xml:space="preserve">
+    <value>You pay on PayPal: we never see your card or your account.</value>
+  </data>
+  <data name="PricingCommunityPaid" xml:space="preserve">
+    <value>After our approval you subscribe on PayPal at the yearly price; the plan renews every year until you stop it.</value>
+  </data>
+  <data name="PaymentOrderDescription" xml:space="preserve">
+    <value>{0} - {1} plan, up to {2} players</value>
+  </data>
+  <data name="PaymentMailPurchaseSubject" xml:space="preserve">
+    <value>Your receipt from {0}</value>
+  </data>
+  <data name="PaymentMailPurchaseHeading" xml:space="preserve">
+    <value>Thank you for your payment</value>
+  </data>
+  <data name="PaymentMailPurchaseBody" xml:space="preserve">
+    <value>We received {1} for the {2} plan. Your game "{3}" now accepts up to {4} players.</value>
+  </data>
+  <data name="PaymentMailSubscriptionSubject" xml:space="preserve">
+    <value>Your Community plan on {0} is active</value>
+  </data>
+  <data name="PaymentMailSubscriptionHeading" xml:space="preserve">
+    <value>Your Community plan is active</value>
+  </data>
+  <data name="PaymentMailSubscriptionBody" xml:space="preserve">
+    <value>Thank you. Your Community plan on {0} is active until {1} and renews every year until you stop it from your account page.</value>
+  </data>
+  <data name="PaymentMailReference" xml:space="preserve">
+    <value>Reference: {0}</value>
+  </data>
+  <data name="PaymentMailButton" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="AdminNavPayments" xml:space="preserve">
+    <value>Payments</value>
+  </data>
+  <data name="AdminPaymentsTitle" xml:space="preserve">
+    <value>Payments</value>
+  </data>
+  <data name="AdminPaymentsDesc" xml:space="preserve">
+    <value>Purchases of single games and Community subscriptions, as PayPal reported them.</value>
+  </data>
+  <data name="AdminPaymentsOff" xml:space="preserve">
+    <value>Payments are off: PayPal is not configured, so nothing can be bought.</value>
+  </data>
+  <data name="AdminPlanCreated" xml:space="preserve">
+    <value>Plan created. Put this id in the setting Payments:PayPal:CommunityPlanId and restart the app: {0}</value>
+  </data>
+  <data name="AdminPlanError" xml:space="preserve">
+    <value>PayPal refused to create the plan. Check the credentials and try again.</value>
+  </data>
+  <data name="AdminSubscriptionsOn" xml:space="preserve">
+    <value>Community subscriptions are on.</value>
+  </data>
+  <data name="AdminPlanCreateDesc" xml:space="preserve">
+    <value>The Community subscription needs a yearly billing plan on PayPal. Create it once here, then put its id in the configuration (it also needs the webhook id).</value>
+  </data>
+  <data name="AdminPlanCreate" xml:space="preserve">
+    <value>Create the Community plan on PayPal</value>
+  </data>
+  <data name="AdminPurchasesTitle" xml:space="preserve">
+    <value>Game purchases</value>
+  </data>
+  <data name="AdminSubscriptionsTitle" xml:space="preserve">
+    <value>Community subscriptions</value>
+  </data>
+  <data name="AdminPaymentsTotals" xml:space="preserve">
+    <value>{0} completed payments, {1} in total.</value>
+  </data>
+  <data name="AdminPaymentsNone" xml:space="preserve">
+    <value>Nothing yet.</value>
+  </data>
+  <data name="AdminColKind" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="AdminColAmount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="AdminColPaidUntil" xml:space="preserve">
+    <value>Paid until</value>
+  </data>
+  <data name="PaymentStatusCreated" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="PaymentStatusCompleted" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="PaymentStatusFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="PaymentStatusCancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="PaymentStatusRefunded" xml:space="preserve">
+    <value>Refunded</value>
+  </data>
+  <data name="SubscriptionStatusPending" xml:space="preserve">
+    <value>Waiting for approval</value>
+  </data>
+  <data name="SubscriptionStatusActive" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="SubscriptionStatusSuspended" xml:space="preserve">
+    <value>Suspended</value>
+  </data>
+  <data name="SubscriptionStatusCancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="SubscriptionStatusExpired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
 </root>
 
 

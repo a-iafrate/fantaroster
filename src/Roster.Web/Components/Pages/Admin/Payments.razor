@@ -1,0 +1,147 @@
+@page "/admin/payments"
+@attribute [Authorize(Policy = AdminAccess.PolicyName)]
+@attribute [StreamRendering]
+@using Roster.Application.Payments
+@using Roster.Application.Ports.Data
+@using Roster.Domain.Payments
+@using Roster.Web.Payments
+@inject IPurchaseRepository PurchaseRepository
+@inject ISubscriptionRepository SubscriptionRepository
+@inject PaymentSettings Settings
+@inject IStringLocalizer<SharedResource> Loc
+
+<PageTitle>@Loc["AdminPaymentsTitle"]</PageTitle>
+
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["AdminPaymentsTitle"]</h1>
+            <p class="ds-page-desc">@Loc["AdminPaymentsDesc"]</p>
+        </div>
+    </header>
+
+    @if (!Settings.PurchasesEnabled)
+    {
+        <p class="ds-alert ds-alert--info" role="status">@Loc["AdminPaymentsOff"]</p>
+    }
+    else
+    {
+        @if (Plan is { Length: > 0 } plan && plan is not ("off" or "error"))
+        {
+            <p class="ds-alert ds-alert--success" role="status">@string.Format(CultureInfo.CurrentCulture, Loc["AdminPlanCreated"].Value, plan)</p>
+        }
+        else if (Plan == "error")
+        {
+            <p class="ds-alert" role="alert">@Loc["AdminPlanError"]</p>
+        }
+
+        @if (Settings.SubscriptionsEnabled)
+        {
+            <p class="ds-muted">@Loc["AdminSubscriptionsOn"]</p>
+        }
+        else
+        {
+            <section class="adm-section">
+                <p class="ds-muted">@Loc["AdminPlanCreateDesc"]</p>
+                <form method="post" action="/admin/actions/payments/community-plan">
+                    <button type="submit" class="ds-btn ds-btn--secondary" data-busy-label="@Loc["AdminSaveBusy"]">@Loc["AdminPlanCreate"]</button>
+                </form>
+            </section>
+        }
+    }
+
+    @if (_purchases is null)
+    {
+        <p class="ds-loading" role="status"><span class="ds-spinner" aria-hidden="true"></span>@Loc["AdminLoading"]</p>
+    }
+    else
+    {
+        <section class="adm-section" aria-labelledby="adm-purchases">
+            <h2 id="adm-purchases" class="ds-section-title">@Loc["AdminPurchasesTitle"]</h2>
+            <p class="ds-muted">@string.Format(CultureInfo.CurrentCulture, Loc["AdminPaymentsTotals"].Value, _completed, PaymentFormat.Money(_total, Settings.Currency))</p>
+            @if (_purchases.Count == 0)
+            {
+                <p class="ds-muted">@Loc["AdminPaymentsNone"]</p>
+            }
+            else
+            {
+                <div class="adm-table-wrap" role="region" aria-labelledby="adm-purchases" tabindex="0">
+                    <table class="adm-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">@Loc["AdminColCreated"]</th>
+                                <th scope="col">@Loc["AdminColKind"]</th>
+                                <th scope="col">@Loc["AdminColPlayers"]</th>
+                                <th scope="col">@Loc["AdminColAmount"]</th>
+                                <th scope="col">@Loc["AdminColState"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var purchase in _purchases)
+                            {
+                                <tr>
+                                    <td>@purchase.CreatedAt.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)</td>
+                                    <td>@Loc[purchase.Kind == PurchaseKind.Premium ? "PricingPlanPremium" : "PricingPlanPro"]</td>
+                                    <td>@purchase.ParticipantLimit</td>
+                                    <td>@PaymentFormat.Money(purchase.Amount, purchase.Currency)</td>
+                                    <td>@Loc["PaymentStatus" + purchase.Status]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+
+        <section class="adm-section" aria-labelledby="adm-subs">
+            <h2 id="adm-subs" class="ds-section-title">@Loc["AdminSubscriptionsTitle"]</h2>
+            @if (_subscriptions!.Count == 0)
+            {
+                <p class="ds-muted">@Loc["AdminPaymentsNone"]</p>
+            }
+            else
+            {
+                <div class="adm-table-wrap" role="region" aria-labelledby="adm-subs" tabindex="0">
+                    <table class="adm-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">@Loc["AdminColCreated"]</th>
+                                <th scope="col">@Loc["AdminColState"]</th>
+                                <th scope="col">@Loc["AdminColPaidUntil"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var subscription in _subscriptions)
+                            {
+                                <tr>
+                                    <td>@subscription.CreatedAt.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)</td>
+                                    <td>@Loc["SubscriptionStatus" + subscription.Status]</td>
+                                    <td>@(subscription.PaidUntil?.ToLocalTime().ToString("d", CultureInfo.CurrentCulture) ?? "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "plan")]
+    public string? Plan { get; set; }
+
+    private List<Purchase>? _purchases;
+    private List<Subscription>? _subscriptions;
+    private int _completed;
+    private decimal _total;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _purchases = await PurchaseRepository.ListRecentAsync(200);
+        _subscriptions = await SubscriptionRepository.ListRecentAsync(200);
+        var completed = _purchases.Where(p => p.Status == PurchaseStatus.Completed).ToList();
+        _completed = completed.Count;
+        _total = completed.Sum(p => p.Amount);
+    }
+}

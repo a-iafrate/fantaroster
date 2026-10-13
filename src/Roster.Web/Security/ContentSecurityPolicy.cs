@@ -30,7 +30,9 @@ public static class ContentSecurityPolicy
             "worker-src 'self'",
             "object-src 'none'",
             "base-uri 'self'",
-            "form-action 'self'",
+            // A purchase sends the organizer to PayPal with a form post that is answered by a redirect: the browser checks that
+            // destination against this list too.
+            "form-action 'self' https://www.paypal.com https://www.sandbox.paypal.com",
             "frame-ancestors 'none'",
         };
         return string.Join("; ", directives);

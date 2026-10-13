@@ -34,6 +34,8 @@ public sealed class RosterAppFixture : IAsyncLifetime
     /// </summary>
     public string GameActionsMode { get; } = Environment.GetEnvironmentVariable("ROSTER_E2E_GAME_ACTIONS") is { Length: > 0 } mode ? mode : "Interactive";
 
+    public bool PaymentsOn { get; } = !string.Equals(Environment.GetEnvironmentVariable("ROSTER_E2E_PAYMENTS"), "Off", StringComparison.OrdinalIgnoreCase);
+
     public bool GameActionsAreForms => string.Equals(GameActionsMode, "Forms", StringComparison.OrdinalIgnoreCase);
 
     public IBrowser Browser { get; private set; } = null!;
@@ -227,6 +229,10 @@ public sealed class RosterAppFixture : IAsyncLifetime
             startInfo.Environment["Azure__SignalR__ConnectionString"] = string.Empty;
         }
         startInfo.Environment["Organizer__GameActions"] = GameActionsMode;
+        // Payments run against the built-in stand-in for PayPal; ROSTER_E2E_PAYMENTS=Off runs the suite with payments off.
+        startInfo.Environment["Payments__PayPal__Mode"] = PaymentsOn ? "Fake" : "Sandbox";
+        startInfo.Environment["Payments__PayPal__ClientId"] = string.Empty;
+        startInfo.Environment["Payments__PayPal__ClientSecret"] = string.Empty;
         for (var i = 1; i <= AdminAddressCount; i++)
         {
             startInfo.Environment[$"Admin__Emails__{i - 1}"] = $"admin-e2e-{i}@example.test";

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Roster.Application.Admin;
+using Roster.Application.Payments;
 using Roster.Application.Ports.Data;
 using Roster.Domain.Games;
 using Roster.Domain.Organizers;
@@ -7,7 +8,7 @@ using Roster.Domain.Scores;
 
 namespace Roster.Infrastructure.Data.Repositories;
 
-internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
+internal sealed class AdminQueries(RosterDbContext context, PaymentSettings payments, TimeProvider timeProvider) : IAdminQueries
 {
     private const int TopGamesCount = 10;
     private const int JoinDays = 14;
@@ -40,7 +41,8 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
         var requests = await context.CommunityRequests
             .Select(r => new { r.OrganizerId, r.Status })
             .ToListAsync(cancellationToken);
-        var communityOrganizers = requests.Where(r => r.Status == CommunityRequestStatus.Approved).Select(r => r.OrganizerId).ToHashSet(StringComparer.Ordinal);
+        var approvedOrganizers = requests.Where(r => r.Status == CommunityRequestStatus.Approved).Select(r => r.OrganizerId).ToHashSet(StringComparer.Ordinal);
+        var communityOrganizers = await WithPaidPlanAsync(approvedOrganizers, cancellationToken);
 
         var firstDay = new DateTimeOffset(now.UtcDateTime.AddDays(-(JoinDays - 1)).Date, TimeSpan.Zero);
         var joined = await context.Participants
@@ -72,7 +74,7 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
             scores.Where(s => s.Status == ScoreStatus.Valid).Sum(s => s.Count),
             scores.Where(s => s.Status == ScoreStatus.Voided).Sum(s => s.Count),
             requests.Count(r => r.Status == CommunityRequestStatus.Pending),
-            communityOrganizers.Count,
+            approvedOrganizers.Count,
             joins,
             topGames.OrderByDescending(g => g.Participants).ToList());
     }
@@ -137,10 +139,12 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
         var organizerIds = page.Select(g => g.OrganizerId).Where(o => o is not null).Distinct().ToList();
         var communityOrganizers = organizerIds.Count == 0
             ? []
-            : (await context.CommunityRequests
-                .Where(r => r.Status == CommunityRequestStatus.Approved && organizerIds.Contains(r.OrganizerId))
-                .Select(r => r.OrganizerId)
-                .ToListAsync(cancellationToken)).ToHashSet(StringComparer.Ordinal);
+            : await WithPaidPlanAsync(
+                (await context.CommunityRequests
+                    .Where(r => r.Status == CommunityRequestStatus.Approved && organizerIds.Contains(r.OrganizerId))
+                    .Select(r => r.OrganizerId)
+                    .ToListAsync(cancellationToken)).ToHashSet(StringComparer.Ordinal),
+                cancellationToken);
 
         var rows = page
             .Select(r => new AdminGameRow(
@@ -159,10 +163,12 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
 
     public async Task<List<AdminGameRow>> GetGamesAsync(CancellationToken cancellationToken = default)
     {
-        var communityOrganizers = (await context.CommunityRequests
-            .Where(r => r.Status == CommunityRequestStatus.Approved)
-            .Select(r => r.OrganizerId)
-            .ToListAsync(cancellationToken)).ToHashSet(StringComparer.Ordinal);
+        var communityOrganizers = await WithPaidPlanAsync(
+            (await context.CommunityRequests
+                .Where(r => r.Status == CommunityRequestStatus.Approved)
+                .Select(r => r.OrganizerId)
+                .ToListAsync(cancellationToken)).ToHashSet(StringComparer.Ordinal),
+            cancellationToken);
 
         var counts = await context.Participants
             .GroupBy(p => p.GameId)
@@ -170,6 +176,22 @@ internal sealed class AdminQueries(RosterDbContext context) : IAdminQueries
             .ToDictionaryAsync(g => g.GameId, g => g.Count, cancellationToken);
 
         return (await ReadGamesAsync(null, communityOrganizers, counts, cancellationToken)).OrderByDescending(g => g.CreatedAt).ToList();
+    }
+
+    /// <summary>
+    /// Of the approved communities, the ones the community limit applies to now: all of them while subscriptions are off,
+    /// and only those with a paid subscription once they are on.
+    /// </summary>
+    private async Task<HashSet<string>> WithPaidPlanAsync(HashSet<string> approved, CancellationToken cancellationToken)
+    {
+        if (!payments.SubscriptionsEnabled || approved.Count == 0)
+        {
+            return approved;
+        }
+
+        var now = timeProvider.GetUtcNow();
+        var subscriptions = await context.Subscriptions.AsNoTracking().Where(s => approved.Contains(s.OrganizerId)).ToListAsync(cancellationToken);
+        return subscriptions.Where(s => s.GrantsPlan(now)).Select(s => s.OrganizerId).ToHashSet(StringComparer.Ordinal);
     }
 
     /// <summary>The games (all, or the given ones) with the email of their organizer.</summary>

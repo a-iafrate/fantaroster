@@ -100,6 +100,9 @@
                 <a href="/admin/games" class="org-nav-item" aria-current="@(AdminPath == "admin/games" ? "page" : null)" @onclick="CloseDrawer">
                     <i class="icon-list" aria-hidden="true"></i><span>@Loc["AdminNavGames"]</span>
                 </a>
+                <a href="/admin/payments" class="org-nav-item" aria-current="@(AdminPath == "admin/payments" ? "page" : null)" @onclick="CloseDrawer">
+                    <i class="icon-credit-card" aria-hidden="true"></i><span>@Loc["AdminNavPayments"]</span>
+                </a>
             </nav>
         }
         <div class="org-plan">
@@ -213,6 +216,7 @@
         yield return new NavItem($"{root}/referees", "icon-flag", Loc["NavReferees"], _section == "referees");
         yield return new NavItem($"{root}/control", "icon-radio", Loc["NavControl"], _section == "control");
         yield return new NavItem($"{root}/materials", "icon-qr-code", Loc["NavMaterials"], _section == "materials");
+        yield return new NavItem($"{root}/plan", "icon-credit-card", Loc["NavPlan"], _section == "plan");
         yield return new NavItem($"{root}/settings", "icon-settings", Loc["NavSettings"], _section == "settings");
     }
 

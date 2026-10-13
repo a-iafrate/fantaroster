@@ -182,6 +182,14 @@ public static class TestData
             .SingleAsync();
     }
 
+    public static async Task<string?> GetPurchaseStatusAsync(string connectionString, Guid gameId)
+    {
+        await using var db = CreateContext(connectionString);
+        return await db.Database
+            .SqlQuery<string>($"SELECT TOP (1) [Status] AS [Value] FROM [Purchases] WHERE [GameId] = {gameId} ORDER BY [CreatedAt] DESC")
+            .FirstOrDefaultAsync();
+    }
+
     public static RosterDbContext CreateContext(string connectionString) =>
         new(new DbContextOptionsBuilder<RosterDbContext>().UseSqlServer(connectionString).Options);
 }

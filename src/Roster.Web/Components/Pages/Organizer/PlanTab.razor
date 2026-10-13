@@ -1,0 +1,129 @@
+@using System.Globalization
+@using Roster.Application.Payments
+@using Roster.Application.Services
+@using Roster.Domain.Games
+@using Roster.Domain.Payments
+@using Roster.Web.Payments
+@inject PlanService Plans
+@inject NavigationManager Navigation
+@inject PaymentSettings Payments
+@inject IStringLocalizer<SharedResource> Loc
+
+<div class="ds-page">
+    <header class="ds-page-header">
+        <div class="ds-page-heading">
+            <h1 class="ds-page-title">@Loc["PlanTabTitle"]</h1>
+            <p class="ds-page-desc">@Loc["PlanTabDesc"]</p>
+        </div>
+    </header>
+
+    @if (NoticeText() is { } notice)
+    {
+        <p class="@NoticeClass()" role="@(IsGoodNotice() ? "status" : "alert")">@notice</p>
+    }
+
+    @if (_limit is null)
+    {
+        <p class="ds-loading" role="status"><span class="ds-spinner" aria-hidden="true"></span>@Loc["Loading"]</p>
+    }
+    else
+    {
+        <section class="plan-current" aria-labelledby="plan-current-title">
+            <h2 id="plan-current-title" class="ds-section-title">@string.Format(CultureInfo.CurrentCulture, Loc["PlanCurrentLimit"].Value, _limit)</h2>
+            <p class="ds-muted">@SourceText()</p>
+        </section>
+
+        <section class="plan-buy" aria-labelledby="plan-buy-title">
+            <h2 id="plan-buy-title" class="ds-section-title">@Loc["PlanBuyTitle"]</h2>
+            @if (!Payments.PurchasesEnabled)
+            {
+                <p class="ds-muted">@Loc["PlanSoon"]</p>
+                <a href="/pricing" class="ds-btn ds-btn--secondary">@Loc["PlanSeePricing"]</a>
+            }
+            else
+            {
+                <p class="ds-muted">@Loc["PlanBuyDesc"]</p>
+                @foreach (var kind in new[] { PurchaseKind.Premium, PurchaseKind.Pro })
+                {
+                    <h3 class="plan-kind">@Loc[kind == PurchaseKind.Premium ? "PricingPlanPremium" : "PricingPlanPro"]</h3>
+                    <ul class="plan-tiers">
+                        @foreach (var tier in Payments.TiersFor(kind))
+                        {
+                            <li class="plan-tier">
+                                <span class="plan-tier__players">@string.Format(CultureInfo.CurrentCulture, Loc["PlanTierPlayers"].Value, tier.ParticipantLimit)</span>
+                                @if (tier.ParticipantLimit <= _limit)
+                                {
+                                    <span class="ds-muted">@Loc["PlanTierIncluded"]</span>
+                                }
+                                else
+                                {
+                                    <form method="post" action="/organizer/actions/games/@Game.Id/checkout">
+                                        <input type="hidden" name="kind" value="@kind" />
+                                        <input type="hidden" name="limit" value="@tier.ParticipantLimit" />
+                                        <button type="submit" class="ds-btn ds-btn--primary" data-busy-label="@Loc["PlanBuyBusy"]">@string.Format(CultureInfo.CurrentCulture, Loc["PlanBuyButton"].Value, PaymentFormat.Money(tier.Price, Payments.Currency))</button>
+                                    </form>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+
+                <p class="ds-muted plan-secure"><i class="icon-shield" aria-hidden="true"></i>@Loc["PlanSecurePayPal"]</p>
+            }
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Game Game { get; set; } = default!;
+
+    /// <summary>
+    /// What the last payment step said, read from the address the organizer came back to: paid, already, failed, cancelled,
+    /// error, covered, invalid, disabled. (Read here because a page that is interactive does not receive query values for
+    /// the components below it.)
+    /// </summary>
+    private string? Notice =>
+        Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(new Uri(Navigation.Uri).Query).TryGetValue("billing", out var value) ? value.ToString() : null;
+
+    private int? _limit;
+    private bool _community;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _limit = await Plans.GetEffectiveLimitAsync(Game);
+        _community = Game.OrganizerId is { } organizerId && await Plans.IsCommunityAsync(organizerId);
+    }
+
+    private string SourceText()
+    {
+        if (Game.ParticipantLimitOverride is not null)
+        {
+            return string.Format(CultureInfo.CurrentCulture, Loc["PlanSourceCustom"].Value, string.IsNullOrWhiteSpace(Game.LimitLabel) ? string.Empty : " (" + Game.LimitLabel + ")");
+        }
+
+        if (Game.PurchasedParticipantLimit is not null && Game.PurchasedParticipantLimit == _limit)
+        {
+            return Loc[Game.PurchasedPlan == PurchaseKind.Pro ? "PlanSourcePro" : "PlanSourcePremium"].Value;
+        }
+
+        return Loc[_community ? "PlanSourceCommunity" : "PlanSourceFree"].Value;
+    }
+
+    private bool IsGoodNotice() => Notice is "paid" or "already";
+
+    private string NoticeClass() => IsGoodNotice() ? "ds-alert ds-alert--success" : Notice == "cancelled" ? "ds-alert ds-alert--info" : "ds-alert";
+
+    private string? NoticeText() => Notice switch
+    {
+        "paid" => Loc["PlanNoticePaid"].Value,
+        "already" => Loc["PlanNoticeAlready"].Value,
+        "failed" => Loc["PlanNoticeFailed"].Value,
+        "cancelled" => Loc["PlanNoticeCancelled"].Value,
+        "error" => Loc["PlanNoticeError"].Value,
+        "covered" => Loc["PlanNoticeCovered"].Value,
+        "invalid" => Loc["PlanNoticeInvalid"].Value,
+        "disabled" => Loc["PlanNoticeDisabled"].Value,
+        _ => null,
+    };
+}

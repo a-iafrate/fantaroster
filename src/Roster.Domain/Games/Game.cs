@@ -26,6 +26,12 @@ public sealed class Game
     /// <summary>A participant limit set by an administrator for this game (for instance a launch event); it wins over the plan.</summary>
     public int? ParticipantLimitOverride { get; private set; }
 
+    /// <summary>The participant limit bought for this game with a one-time payment, if any.</summary>
+    public int? PurchasedParticipantLimit { get; private set; }
+
+    /// <summary>The per-game plan that was bought (<c>Premium</c> or <c>Pro</c>), if any.</summary>
+    public Roster.Domain.Payments.PurchaseKind? PurchasedPlan { get; private set; }
+
     /// <summary>Why the limit was raised (shown to administrators only), e.g. "Launch event".</summary>
     public string? LimitLabel { get; private set; }
 
@@ -92,7 +98,28 @@ public sealed class Game
     /// when the organizer is an approved community, otherwise the free limit.
     /// </summary>
     public int EffectiveParticipantLimit(int freeLimit, int communityLimit, bool organizerIsCommunity) =>
-        ParticipantLimitOverride ?? (organizerIsCommunity ? Math.Max(freeLimit, communityLimit) : freeLimit);
+        ParticipantLimitOverride ?? Math.Max(PurchasedParticipantLimit ?? 0, organizerIsCommunity ? Math.Max(freeLimit, communityLimit) : freeLimit);
+
+    /// <summary>Records a completed payment: the game keeps the larger of what it already had and what was bought.</summary>
+    public void ApplyPurchase(Roster.Domain.Payments.PurchaseKind kind, int participantLimit)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(participantLimit, 1);
+
+        if (PurchasedParticipantLimit is { } current && current >= participantLimit)
+        {
+            return;
+        }
+
+        PurchasedParticipantLimit = participantLimit;
+        PurchasedPlan = kind;
+    }
+
+    /// <summary>Removes what was bought, after a refund; <paramref name="remaining"/> is the best purchase that is still valid.</summary>
+    public void RevokePurchase(Roster.Domain.Payments.PurchaseKind? remainingKind, int? remainingLimit)
+    {
+        PurchasedParticipantLimit = remainingLimit;
+        PurchasedPlan = remainingLimit is null ? null : remainingKind;
+    }
 
     public void Rename(string name)
     {

@@ -43,7 +43,7 @@ public class JoinGameCommandHandlerTests
             _tokenService,
             _profanityFilter,
             TimeProvider.System,
-            new PlanService(new PlanLimits(2, 5), _communityRequests));
+            new PlanService(new PlanLimits(2, 5), Roster.Application.Payments.PaymentSettings.Disabled, _communityRequests, Substitute.For<ISubscriptionRepository>(), TimeProvider.System));
     }
 
     [Fact]

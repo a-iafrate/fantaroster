@@ -25,6 +25,7 @@ public sealed class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.HasIndex(x => x.OrganizerId);
 
         builder.Property(x => x.LimitLabel).HasMaxLength(100);
+        builder.Property(x => x.PurchasedPlan).HasConversion<string>().HasMaxLength(20);
 
         builder.Property(x => x.CaptainMultiplier).HasPrecision(18, 4);
 

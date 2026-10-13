@@ -1,0 +1,42 @@
+.plan-current,
+.plan-buy {
+    margin-bottom: var(--space-8);
+}
+
+.plan-kind {
+    margin: var(--space-5) 0 var(--space-2);
+    font-size: 1.125rem;
+}
+
+.plan-tiers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 36rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.plan-tier {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-m);
+    background: var(--color-surface);
+}
+
+.plan-tier__players {
+    font-weight: 700;
+}
+
+.plan-secure {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+}

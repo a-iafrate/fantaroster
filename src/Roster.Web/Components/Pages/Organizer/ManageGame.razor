@@ -50,6 +50,9 @@ else
         case "materials":
             <AssetsTab Game="Game" OnError="HandleError" />
             break;
+        case "plan":
+            <PlanTab Game="Game" />
+            break;
         case "settings":
             <SettingsTab Game="Game" OnSaved="LoadGame" OnError="HandleError" />
             break;

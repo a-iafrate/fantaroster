@@ -3,6 +3,9 @@
 @using Roster.Application.Plans
 @inject IStringLocalizer<SharedResource> Loc
 @inject PlanLimits Limits
+@inject Roster.Application.Payments.PaymentSettings Payments
+@using Roster.Domain.Payments
+@using Roster.Web.Payments
 
 <PageTitle>@Loc["PricingPageTitle"]</PageTitle>
 
@@ -11,7 +14,7 @@
     <header class="pr-hero">
         <h1 class="pr-hero__title">@Loc["PricingHeroTitle"]</h1>
         <p class="pr-hero__sub">@Loc["PricingHeroSub"]</p>
-        <p class="pr-note"><i class="icon-info" aria-hidden="true"></i>@Loc["PricingIndicative"]</p>
+        <p class="pr-note"><i class="icon-info" aria-hidden="true"></i>@Loc[Payments.PurchasesEnabled ? "PricingSecurePayPal" : "PricingIndicative"]</p>
     </header>
 
     <section class="pr-section" aria-labelledby="pr-plans-title">
@@ -35,7 +38,7 @@
                 <span class="pr-plan__status pr-plan__status--approval">@Loc["PricingAfterApproval"]</span>
                 <h3 class="pr-plan__name">@Loc["PricingPlanCommunity"]</h3>
                 <p class="pr-plan__for">@Loc["PricingPlanCommunityFor"]</p>
-                <p class="pr-plan__price"><strong>@Loc["PricingPlanCommunityPrice"]</strong> <span>@Loc["PricingPlanCommunityUnit"]</span></p>
+                <p class="pr-plan__price"><strong>@(Payments.SubscriptionsEnabled ? PaymentFormat.Money(Payments.CommunityYearlyPrice, Payments.Currency) : Loc["PricingPlanCommunityPrice"].Value)</strong> <span>@Loc["PricingPlanCommunityUnit"]</span></p>
                 <ul class="pr-plan__list">
                     <li>@string.Format(CultureInfo.CurrentCulture, Loc["PricingFeatPlayers"].Value, Limits.CommunityParticipantLimit)</li>
                     <li>@Loc["PricingFeatAuthorized"]</li>
@@ -44,28 +47,62 @@
             </li>
 
             <li class="pr-plan">
-                <span class="pr-plan__status pr-plan__status--soon">@Loc["PricingComingSoon"]</span>
+                <span class="pr-plan__status @(Payments.PurchasesEnabled ? "pr-plan__status--now" : "pr-plan__status--soon")">@Loc[Payments.PurchasesEnabled ? "PricingAvailableNow" : "PricingComingSoon"]</span>
                 <h3 class="pr-plan__name">@Loc["PricingPlanPremium"]</h3>
                 <p class="pr-plan__for">@Loc["PricingPlanPremiumFor"]</p>
-                <p class="pr-plan__price"><strong>@Loc["PricingPlanPremiumPrice"]</strong> <span>@Loc["PricingPlanPremiumUnit"]</span></p>
+                <p class="pr-plan__price"><strong>@PriceRange(PurchaseKind.Premium, Loc["PricingPlanPremiumPrice"].Value)</strong> <span>@Loc["PricingPlanPremiumUnit"]</span></p>
                 <ul class="pr-plan__list">
-                    <li>@Loc["PricingFeatMorePlayers"]</li>
+                    @if (Payments.PurchasesEnabled)
+                    {
+                        @foreach (var tier in Payments.TiersFor(PurchaseKind.Premium))
+                        {
+                            <li>@string.Format(CultureInfo.CurrentCulture, Loc["PricingTierLine"].Value, tier.ParticipantLimit, PaymentFormat.Money(tier.Price, Payments.Currency))</li>
+                        }
+                    }
+                    else
+                    {
+                        <li>@Loc["PricingFeatMorePlayers"]</li>
+                    }
                     <li>@Loc["PricingFeatEveryone"]</li>
                 </ul>
-                <span class="ds-btn ds-btn--l ds-btn--secondary ds-btn--block pr-plan__soon" aria-disabled="true">@Loc["PricingCtaSoon"]</span>
+                @if (Payments.PurchasesEnabled)
+                {
+                    <a href="/organizer" class="ds-btn ds-btn--l ds-btn--primary ds-btn--block">@Loc["PricingCtaBuy"]</a>
+                }
+                else
+                {
+                    <span class="ds-btn ds-btn--l ds-btn--secondary ds-btn--block pr-plan__soon" aria-disabled="true">@Loc["PricingCtaSoon"]</span>
+                }
             </li>
 
             <li class="pr-plan">
-                <span class="pr-plan__status pr-plan__status--soon">@Loc["PricingComingSoon"]</span>
+                <span class="pr-plan__status @(Payments.PurchasesEnabled ? "pr-plan__status--now" : "pr-plan__status--soon")">@Loc[Payments.PurchasesEnabled ? "PricingAvailableNow" : "PricingComingSoon"]</span>
                 <h3 class="pr-plan__name">@Loc["PricingPlanPro"]</h3>
                 <p class="pr-plan__for">@Loc["PricingPlanProFor"]</p>
-                <p class="pr-plan__price"><strong>@Loc["PricingPlanProPrice"]</strong> <span>@Loc["PricingPlanProUnit"]</span></p>
+                <p class="pr-plan__price"><strong>@PriceRange(PurchaseKind.Pro, Loc["PricingPlanProPrice"].Value)</strong> <span>@Loc["PricingPlanProUnit"]</span></p>
                 <ul class="pr-plan__list">
-                    <li>@Loc["PricingFeatMorePlayers"]</li>
+                    @if (Payments.PurchasesEnabled)
+                    {
+                        @foreach (var tier in Payments.TiersFor(PurchaseKind.Pro))
+                        {
+                            <li>@string.Format(CultureInfo.CurrentCulture, Loc["PricingTierLine"].Value, tier.ParticipantLimit, PaymentFormat.Money(tier.Price, Payments.Currency))</li>
+                        }
+                    }
+                    else
+                    {
+                        <li>@Loc["PricingFeatMorePlayers"]</li>
+                    }
                     <li>@Loc["PricingFeatSupport"]</li>
                     <li>@Loc["PricingFeatEveryone"]</li>
                 </ul>
-                <span class="ds-btn ds-btn--l ds-btn--secondary ds-btn--block pr-plan__soon" aria-disabled="true">@Loc["PricingCtaSoon"]</span>
+                @if (Payments.PurchasesEnabled)
+                {
+                    <a href="/organizer" class="ds-btn ds-btn--l ds-btn--primary ds-btn--block">@Loc["PricingCtaBuy"]</a>
+                }
+                else
+                {
+                    <span class="ds-btn ds-btn--l ds-btn--secondary ds-btn--block pr-plan__soon" aria-disabled="true">@Loc["PricingCtaSoon"]</span>
+                }
             </li>
         </ul>
     </section>
@@ -109,8 +146,8 @@
                         <th scope="row">@Loc["PricingRowStatus"]</th>
                         <td>@Loc["PricingAvailableNow"]</td>
                         <td>@Loc["PricingAfterApproval"]</td>
-                        <td>@Loc["PricingComingSoon"]</td>
-                        <td>@Loc["PricingComingSoon"]</td>
+                        <td>@Loc[Payments.PurchasesEnabled ? "PricingAvailableNow" : "PricingComingSoon"]</td>
+                        <td>@Loc[Payments.PurchasesEnabled ? "PricingAvailableNow" : "PricingComingSoon"]</td>
                     </tr>
                 </tbody>
             </table>
@@ -145,7 +182,7 @@
                 <p>@string.Format(CultureInfo.CurrentCulture, Loc["PricingCommunityStep3Body"].Value, Limits.CommunityParticipantLimit)</p>
             </li>
         </ol>
-        <p class="pr-note"><i class="icon-info" aria-hidden="true"></i>@Loc["PricingCommunityToday"]</p>
+        <p class="pr-note"><i class="icon-info" aria-hidden="true"></i>@Loc[Payments.SubscriptionsEnabled ? "PricingCommunityPaid" : "PricingCommunityToday"]</p>
         <a href="/organizer/account#community" class="ds-btn ds-btn--l ds-btn--primary">@Loc["PricingCommunityCta"]</a>
     </section>
 
@@ -186,3 +223,20 @@
         <a href="/organizer/create-game" class="ds-btn ds-btn--l ds-btn--primary">@Loc["PricingCtaFree"]</a>
     </section>
 </div>
+
+@code {
+    /// <summary>"min–max" of a price list when the plans are on sale; the text of the business model otherwise.</summary>
+    private string PriceRange(PurchaseKind kind, string fallback)
+    {
+        var tiers = Payments.TiersFor(kind);
+        if (!Payments.PurchasesEnabled || tiers.Count == 0)
+        {
+            return fallback;
+        }
+
+        var min = tiers.Min(t => t.Price);
+        var max = tiers.Max(t => t.Price);
+        return min == max ? PaymentFormat.Money(min, Payments.Currency) : $"{min.ToString("0.##", CultureInfo.CurrentCulture)}–{PaymentFormat.Money(max, Payments.Currency)}";
+    }
+}
+

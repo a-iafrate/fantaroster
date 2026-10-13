@@ -22,7 +22,7 @@ public sealed class PricingTests(RosterAppFixture app)
 
         await Expect(page.GetByText("Fino a 50 giocatori per partita")).ToBeVisibleAsync();
         await Expect(page.GetByText("Fino a 300 giocatori per partita")).ToBeVisibleAsync();
-        await Expect(page.GetByText("I prezzi sono indicativi")).ToBeVisibleAsync();
+        await Expect(page.GetByText(app.PaymentsOn ? "Paghi su PayPal" : "I prezzi sono indicativi").First).ToBeVisibleAsync();
         await Expect(page.GetByRole(AriaRole.Table).GetByRole(AriaRole.Row)).ToHaveCountAsync(5);
         await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "3. Ricevi una email" })).ToBeVisibleAsync();
         await app.ScreenshotAsync(page, "pricing", fullPage: true);

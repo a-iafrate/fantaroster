@@ -276,6 +276,7 @@ Each phase lists its goal, tasks, deliverables and exit criteria. Tasks are writ
 - [ ] Dashboards and alerts: join rate, hub connections, score latency, error rate.
 - [ ] Backup and restore test for the database.
 - [x] Plans and limits: participant limit per game (50 Free, 300 community, configurable), per-game limit set by an administrator (launch events), community request from the account page with approval by an administrator and an email with the decision. *(Done: `Game.EffectiveParticipantLimit`, `CommunityRequest`, migration `AddCommunityAndParticipantLimits`, join answers 403 when the game is full.)*
+- [x] Payments with PayPal: one-time purchases for single games (Premium, Pro) and the yearly Community subscription, with notifications (webhooks), refunds, receipts by email, a Plan tab per game, the administration payments page and a built-in stand-in for tests. *(Done and switched off until PayPal is configured; see `docs/payments.md`. Still to do before going live: create the PayPal app, the webhook and the billing plan, and try them in Sandbox.)*
 - [x] Public pricing page (`/pricing`): plans, limits from configuration, comparison table, Community authorization steps, sponsors and FAQ; linked from the header, the phone menu and the footer; EN and IT; audited with axe. *(Prices indicative, paid plans "coming soon" until payments exist.)*
 - [x] Internal administration area (`Admin:Emails`): statistics dashboard, community requests, all games with their limit; hidden from everybody else. *(Done: `/admin`, `/admin/requests`, `/admin/games` with search by name or organizer email, state and custom-limit filters, sorting and paging done by the database; the pages load in two steps with a loading indicator; accessibility audited with axe.)*
 
@@ -317,7 +318,7 @@ Prioritized by pilot feedback. Initial order:
 | 5 | Duplicate edition *(done early: dashboard card and game menu; rules, elements and sources are copied, people must consent again)* | 1 |
 | 6 | Google Sheets and ICS plugins | 3 |
 | 7 | Second public domain pack (Amateur sports or Events and parties) and a second real event outside conferences | 2 |
-| 8 | Payments for Premium and Pro plans, and the Community plan (~€10 a year, bought only after authorization with an unlock code); the administrator per-game limit keeps working independently of plan and payment | 5 |
+| 8 | Payments for Premium and Pro plans, and the Community plan (~€10 a year, bought only after authorization) *(done early with PayPal, off until configured; the unlock code is still to do)*; the administrator per-game limit keeps working independently of plan and payment | 5 |
 | 9 | Passkeys for organizers | 2 |
 
 ### Phase 10 — P2 exploration

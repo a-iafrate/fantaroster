@@ -13,6 +13,8 @@ public sealed class RosterWebFactory : WebApplicationFactory<Program>
         Environment.SetEnvironmentVariable("ConnectionStrings__sqldb", IntegrationDatabase.ConnectionString);
         Environment.SetEnvironmentVariable("Azure__SignalR__ConnectionString", string.Empty);
         Environment.SetEnvironmentVariable("AzureCommunicationServices__ConnectionString", string.Empty);
+        // Payments run against the built-in stand-in for PayPal: nothing leaves the machine.
+        Environment.SetEnvironmentVariable("Payments__PayPal__Mode", "Fake");
         // A small limit so the rate limit tests need a handful of requests.
         Environment.SetEnvironmentVariable("Security__RateLimits__JoinCodeLookupPerMinute", "3");
     }

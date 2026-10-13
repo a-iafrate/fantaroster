@@ -21,6 +21,9 @@ public static class DependencyInjection
         services.AddScoped<IRefereeRepository, RefereeRepository>();
         services.AddScoped<ICommunityRequestRepository, CommunityRequestRepository>();
         services.AddScoped<IAdminQueries, AdminQueries>();
+        services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+        services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+        services.AddScoped<IPaymentEventRepository, PaymentEventRepository>();
         services.AddSingleton<Roster.Infrastructure.Email.EmailTransport>();
 
         services.AddScoped<Roster.Infrastructure.Security.OrganizerAccountService>();

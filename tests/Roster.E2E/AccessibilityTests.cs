@@ -19,7 +19,7 @@ public sealed partial class AccessibilityTests(RosterAppFixture app)
         RunOnly = new RunOnlyOptions { Type = "tag", Values = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"] },
     };
 
-    private static readonly string[] OrganizerSections = ["", "/elements", "/rules", "/referees", "/control", "/materials", "/settings"];
+    private static readonly string[] OrganizerSections = ["", "/elements", "/rules", "/referees", "/control", "/materials", "/plan", "/settings"];
 
     public static TheoryData<int, ColorScheme> Setups() => new()
     {
@@ -180,7 +180,7 @@ public sealed partial class AccessibilityTests(RosterAppFixture app)
         await TestData.AddScoresAsync(app.BaseUrl, game);
         var (page, _) = await app.NewAdminPageAsync(width, HeightFor(width), scheme);
 
-        foreach (var path in new[] { "/admin", "/admin/requests", "/admin/games" })
+        foreach (var path in new[] { "/admin", "/admin/requests", "/admin/games", "/admin/payments" })
         {
             await page.GotoAsync(path);
             await page.WaitForLoadStateAsync(LoadState.NetworkIdle);

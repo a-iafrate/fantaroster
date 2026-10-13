@@ -5,6 +5,7 @@ using Roster.Application.Ports;
 using Roster.Application.Services;
 using Roster.Infrastructure;
 using Roster.Infrastructure.Data;
+using Roster.Infrastructure.Payments;
 using Roster.Plugins.Abstractions;
 using Roster.Plugins.Csv;
 using Roster.Plugins.Sessionize;
@@ -41,6 +42,10 @@ builder.Services.AddSingleton(new Roster.Application.Plans.PlanLimits(
 builder.Services.AddScoped<PlanService>();
 builder.Services.AddScoped<CommunityRequestService>();
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddPayments(builder.Configuration, builder.Environment.IsDevelopment());
+builder.Services.AddSingleton(Roster.Web.Payments.PaymentCatalog.FromConfiguration(builder.Configuration, builder.Environment.IsDevelopment()));
+builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<Roster.Application.Ports.IPaymentNotifier, Roster.Web.Services.PaymentNotifier>();
 builder.Services.AddScoped<Roster.Application.Ports.ICommunityNotifier, Roster.Web.Services.CommunityDecisionNotifier>();
 builder.Services.Configure<Roster.Web.Security.AdminOptions>(builder.Configuration.GetSection(Roster.Web.Security.AdminOptions.SectionName));
 builder.Services.AddSingleton<Roster.Web.Security.AdminAccess>();
@@ -219,6 +224,7 @@ app.MapAuthEndpoints();
 app.MapAccountEndpoints();
 app.MapGameActionEndpoints();
 app.MapCommunityAndAdminEndpoints();
+app.MapPaymentEndpoints();
 app.MapRefereeEndpoints();
 app.MapParticipantEndpoints();
 
